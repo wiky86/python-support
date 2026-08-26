@@ -1,10 +1,17 @@
 import { redirect, notFound } from "next/navigation";
-import { getTrack } from "@/lib/content";
+import { getAllTracks, getTrack } from "@/lib/content";
 
 interface TrackPageProps {
   params: {
     trackId: string;
   };
+}
+
+export function generateStaticParams() {
+  const tracks = getAllTracks();
+  return tracks.map((track) => ({
+    trackId: track.id,
+  }));
 }
 
 export default function TrackPage({ params }: TrackPageProps) {
