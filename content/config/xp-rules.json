@@ -1,0 +1,42 @@
+{
+  "levelFormula": {
+    "type": "incremental",
+    "baseCost": 250,
+    "increment": 50,
+    "description": "Lv(n)->Lv(n+1)에 필요한 XP = 200 + 50n. Lv(n+1) 도달 누적 XP = 25n^2 + 175n - 200",
+    "levelFromXpFormula": "level = floor((-175 + sqrt(175^2 + 100*(xp+200))) / 50) + 1, 최소 1로 보정"
+  },
+  "awards": {
+    "dailyLogin": 10,
+    "streakMilestone": {
+      "3": 20,
+      "7": 50,
+      "14": 80,
+      "30": 150,
+      "60": 250,
+      "90": 350,
+      "180": 700
+    },
+    "streakRepeating": {
+      "everyDays": 30,
+      "xp": 120
+    },
+    "topicComplete": 15,
+    "quizPass": 20,
+    "quizPerfectBonus": 10,
+    "trackComplete": 50,
+    "projectComplete": 60
+  },
+  "rules": {
+    "oneTimePerItem": ["topicComplete", "quizPass", "trackComplete", "projectComplete"],
+    "dailyOncePerDay": ["dailyLogin"],
+    "streakMilestoneOnce": true,
+    "streakRepeatingEvery": 30,
+    "quizPerfectBonusBasis": "최초 통과 시점의 점수를 기준으로 만점 여부를 판정한다"
+  },
+  "designTargets": {
+    "note": "이 수치는 아래 두 목표를 만족하도록 역산되었다. 수정 시 두 시나리오를 다시 검증할 것.",
+    "learnOnly": "전 과정(트랙7개) 완주만 하면 약 2,660 XP -> 대략 Lv6~7",
+    "learnPlus6MonthStreak": "완주 + 6개월 매일 출석 시 약 6,800 XP -> Lv12"
+  }
+}

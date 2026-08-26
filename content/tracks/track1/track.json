@@ -1,0 +1,25 @@
+{
+  "id": "track1",
+  "order": 1,
+  "title": "파이썬 기초 다지기",
+  "description": "데이터 분석에 필요한 최소한의 파이썬 문법을 익힙니다.",
+  "topicOrder": [
+    "track1.variables",
+    "track1.lists",
+    "track1.dict",
+    "track1.conditions",
+    "track1.loops",
+    "track1.functions",
+    "track1.comprehension"
+  ],
+  "topicFiles": [
+    "topics/t1-variables.json",
+    "topics/t2-lists.json",
+    "topics/t3-dict.json",
+    "topics/t4-conditions.json",
+    "topics/t5-loops.json",
+    "topics/t6-functions.json",
+    "topics/t7-comprehension.json"
+  ],
+  "projectFile": "project.json"
+}

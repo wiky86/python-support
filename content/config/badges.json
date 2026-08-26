@@ -1,0 +1,45 @@
+{
+  "conditionTypes": {
+    "topic_count": "완료한 토픽 수가 gte 이상",
+    "topic_percent": "전체 토픽 대비 완료 비율(%)이 gte 이상",
+    "quiz_pass_count": "통과한 퀴즈 수가 gte 이상",
+    "perfect_quiz_count": "만점 통과한 퀴즈 수가 gte 이상",
+    "project_count": "완료한 미니 프로젝트 수가 gte 이상",
+    "track_complete": "trackId 트랙의 모든 토픽 완료",
+    "all_tracks_complete": "모든 트랙 완료",
+    "flawless_track": "한 트랙의 모든 퀴즈를 만점 통과(최초 통과 점수 기준)",
+    "streak": "현재 연속 접속 일수(streak_count)가 gte 이상",
+    "level": "현재 레벨이 gte 이상"
+  },
+  "badges": [
+    { "id": "first_topic",    "name": "첫 발자국",       "desc": "첫 토픽을 완료했어요",              "icon": "footprints", "condition": { "type": "topic_count", "gte": 1 } },
+    { "id": "first_quiz",     "name": "첫 통과",         "desc": "첫 퀴즈를 통과했어요",              "icon": "check",      "condition": { "type": "quiz_pass_count", "gte": 1 } },
+    { "id": "first_project",  "name": "첫 프로젝트",     "desc": "첫 미니 프로젝트를 완료했어요",       "icon": "rocket",     "condition": { "type": "project_count", "gte": 1 } },
+
+    { "id": "track1_done",    "name": "파이썬 입문자",   "desc": "트랙1을 완주했어요",                "icon": "python",     "condition": { "type": "track_complete", "trackId": "track1" } },
+    { "id": "track2_done",    "name": "수치 계산자",     "desc": "트랙2를 완주했어요",                "icon": "calculator", "condition": { "type": "track_complete", "trackId": "track2" } },
+    { "id": "track3_done",    "name": "판다스 입문",     "desc": "트랙3을 완주했어요",                "icon": "panda",      "condition": { "type": "track_complete", "trackId": "track3" } },
+    { "id": "track4_done",    "name": "데이터 정제사",   "desc": "트랙4를 완주했어요",                "icon": "broom",      "condition": { "type": "track_complete", "trackId": "track4" } },
+    { "id": "track5_done",    "name": "집계 전문가",     "desc": "트랙5를 완주했어요",                "icon": "layers",     "condition": { "type": "track_complete", "trackId": "track5" } },
+    { "id": "track6_done",    "name": "시각화 아티스트", "desc": "트랙6을 완주했어요",                "icon": "chart",      "condition": { "type": "track_complete", "trackId": "track6" } },
+    { "id": "track7_done",    "name": "데이터 분석가",   "desc": "종합 트랙을 완주했어요",            "icon": "medal",      "condition": { "type": "track_complete", "trackId": "track7" } },
+
+    { "id": "halfway",        "name": "절반의 여정",     "desc": "전체 토픽의 절반을 완료했어요",       "icon": "half",       "condition": { "type": "topic_percent", "gte": 50 } },
+    { "id": "all_tracks",     "name": "완주자",         "desc": "모든 트랙을 완주했어요",            "icon": "trophy",     "condition": { "type": "all_tracks_complete" } },
+    { "id": "all_projects",   "name": "프로젝트 마스터", "desc": "모든 미니 프로젝트를 완료했어요",     "icon": "briefcase",  "condition": { "type": "project_count", "gte": 7 } },
+
+    { "id": "perfect_1",      "name": "만점왕",         "desc": "퀴즈를 만점으로 통과했어요",         "icon": "star",       "condition": { "type": "perfect_quiz_count", "gte": 1 } },
+    { "id": "perfect_10",     "name": "완벽주의자",     "desc": "퀴즈 만점을 10번 달성했어요",        "icon": "stars",      "condition": { "type": "perfect_quiz_count", "gte": 10 } },
+    { "id": "flawless_track", "name": "무결점",         "desc": "한 트랙의 모든 퀴즈를 만점 통과했어요", "icon": "shield",    "condition": { "type": "flawless_track" } },
+
+    { "id": "streak_3",       "name": "3일의 약속",     "desc": "3일 연속 접속했어요",              "icon": "flame",      "condition": { "type": "streak", "gte": 3 } },
+    { "id": "streak_7",       "name": "일주일 개근",     "desc": "7일 연속 접속했어요",              "icon": "flame",      "condition": { "type": "streak", "gte": 7 } },
+    { "id": "streak_30",      "name": "한 달의 꾸준함",  "desc": "30일 연속 접속했어요",             "icon": "flame",      "condition": { "type": "streak", "gte": 30 } },
+    { "id": "streak_90",      "name": "계절을 넘어",     "desc": "90일 연속 접속했어요",             "icon": "flame",      "condition": { "type": "streak", "gte": 90 } },
+    { "id": "streak_180",     "name": "반년의 여정",     "desc": "180일 연속 접속했어요",            "icon": "flame",      "condition": { "type": "streak", "gte": 180 } },
+
+    { "id": "level_5",        "name": "레벨 5 달성",     "desc": "레벨 5에 도달했어요",              "icon": "level",      "condition": { "type": "level", "gte": 5 } },
+    { "id": "level_10",       "name": "레벨 10 달성",    "desc": "레벨 10에 도달했어요",             "icon": "level",      "condition": { "type": "level", "gte": 10 } },
+    { "id": "level_12",       "name": "최고 경지",       "desc": "레벨 12에 도달했어요",             "icon": "crown",      "condition": { "type": "level", "gte": 12 } }
+  ]
+}

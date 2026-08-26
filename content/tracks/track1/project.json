@@ -1,0 +1,32 @@
+{
+  "id": "track1.project",
+  "trackId": "track1",
+  "title": "학생 점수 분석기",
+  "intro": "트랙1에서 배운 변수, 리스트, 딕셔너리, 조건문, 반복문, 함수, 컴프리헨션을 모두 활용해 가상 학생 5명의 점수를 분석합니다. 외부 데이터 없이 아래 제공된 소형 데이터를 사용합니다.",
+  "dataset": {
+    "description": "가상 학생 5명의 이름과 점수",
+    "code": "students = [\n    {\"name\": \"김민준\", \"score\": 92},\n    {\"name\": \"이서연\", \"score\": 78},\n    {\"name\": \"박도윤\", \"score\": 55},\n    {\"name\": \"최지우\", \"score\": 88},\n    {\"name\": \"정하준\", \"score\": 63},\n]"
+  },
+  "missions": [
+    { "id": "m1", "prompt": "전체 학생 수 구하기", "code": "print(______(students))", "answers": ["len"], "output": "5" },
+    { "id": "m2", "prompt": "첫 번째 학생의 이름 출력하기", "code": "print(students[0][______])", "answers": ["\"name\"", "'name'"], "output": "김민준" },
+    { "id": "m3", "prompt": "모든 점수를 리스트로 모으기 (컴프리헨션)", "code": "scores = [s[______] for s in students]\nprint(scores)", "answers": ["\"score\"", "'score'"], "output": "[92, 78, 55, 88, 63]" },
+    { "id": "m4", "prompt": "평균 점수 구하기 (함수 + 내장함수)", "code": "def average(nums):\n    return sum(nums) / ______(nums)\n\nscores = [s[\"score\"] for s in students]\nprint(average(scores))", "answers": ["len"], "output": "75.2" },
+    { "id": "m5", "prompt": "최고 점수 구하기", "code": "scores = [s[\"score\"] for s in students]\nprint(______(scores))", "answers": ["max"], "output": "92" },
+    { "id": "m6", "prompt": "합격자(60점 이상) 이름만 골라내기 (컴프리헨션 + 조건)", "code": "passed = [s[\"name\"] for s in students ______ s[\"score\"] >= 60]\nprint(passed)", "answers": ["if"], "output": "['김민준', '이서연', '최지우', '정하준']" },
+    { "id": "m7", "prompt": "합격/불합격 판정 출력하기 (반복문 + 조건문)", "code": "for s in students:\n    if s[\"score\"] >= 60:\n        print(s[\"name\"], \"합격\")\n    ______:\n        print(s[\"name\"], \"불합격\")", "answers": ["else"], "output": "김민준 합격\n이서연 합격\n박도윤 불합격\n최지우 합격\n정하준 합격" }
+  ],
+  "report": {
+    "title": "학생 점수 분석 리포트",
+    "template": "전체 학생: {totalStudents}명\n평균 점수: {averageScore}점\n최고 점수: {maxScore}점 ({topStudent})\n합격자: {passCount}명 / 불합격자: {failCount}명",
+    "computedValues": {
+      "totalStudents": 5,
+      "averageScore": 75.2,
+      "maxScore": 92,
+      "topStudent": "김민준",
+      "passCount": 4,
+      "failCount": 1
+    },
+    "conceptsUsed": ["리스트", "딕셔너리", "조건문", "반복문", "함수", "컴프리헨션"]
+  }
+}

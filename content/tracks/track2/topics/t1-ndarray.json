@@ -1,0 +1,30 @@
+{
+  "id": "track2.ndarray",
+  "trackId": "track2",
+  "order": 1,
+  "title": "배열(ndarray) 생성과 개념",
+  "content": "## NumPy와 배열이란?\n\nNumPy는 숫자 데이터를 빠르고 편하게 다루는 파이썬 라이브러리입니다. 핵심 도구는 배열(ndarray)로, 리스트와 비슷하지만 수치 계산에 훨씬 강력합니다. pandas도 내부적으로 NumPy를 쓰기 때문에, 데이터 분석의 토대가 됩니다.\n\n## 불러오기 — import\n\nNumPy는 관례적으로 `np`라는 별명으로 불러옵니다.\n\n```python\nimport numpy as np\n```\n\n거의 모든 코드에서 이 한 줄로 시작합니다. `as np`는 \"앞으로 numpy를 np로 부르겠다\"는 뜻입니다.\n\n## 리스트로 배열 만들기 — np.array()\n\n```python\nimport numpy as np\narr = np.array([1, 2, 3, 4])\nprint(arr)        # [1 2 3 4]\n```\n\n리스트를 `np.array()`에 넣으면 배열이 됩니다. 출력할 때 리스트와 달리 쉼표 없이 표시되는 점에 주목하세요.\n\n## 배열과 리스트의 차이\n\n리스트는 값을 하나씩 처리해야 하지만, 배열은 전체에 한 번에 계산을 적용할 수 있습니다(다음 토픽에서 자세히).\n\n```python\nnums = [1, 2, 3]\nnums * 2          # [1, 2, 3, 1, 2, 3]  (리스트는 반복)\n\narr = np.array([1, 2, 3])\narr * 2           # [2 4 6]  (배열은 각 값에 곱셈)\n```\n\n## 자주 쓰는 배열 생성 함수\n\n| 함수 | 설명 | 예 |\n|---|---|---|\n| `np.zeros(n)` | 0으로 채운 배열 | `np.zeros(3)` -> `[0. 0. 0.]` |\n| `np.ones(n)` | 1로 채운 배열 | `np.ones(3)` -> `[1. 1. 1.]` |\n| `np.arange(n)` | 0부터 n-1까지 | `np.arange(5)` -> `[0 1 2 3 4]` |\n\n`np.arange`는 파이썬의 `range`와 비슷하지만 배열을 만든다는 점이 다릅니다.\n\n## 배열의 정보 — shape, dtype\n\n```python\narr = np.array([1, 2, 3, 4])\narr.shape    # (4,)      값이 4개\narr.dtype    # int64     정수형\n```\n\n`shape`는 배열의 모양(크기), `dtype`은 담긴 값의 자료형입니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "NumPy를 관례적인 별명으로 불러오세요.", "code": "import numpy ______ np", "answers": ["as"], "output": "", "explain": "NumPy는 거의 항상 import numpy as np로 불러옵니다. as np는 numpy라는 긴 이름을 np로 줄여 부르겠다는 별칭 지정입니다. 강제는 아니지만 전 세계 코드가 이 관례를 따르므로 그대로 쓰는 게 좋습니다." },
+    { "id": "fb2", "prompt": "리스트 [10, 20, 30]을 배열로 만드세요.", "code": "import numpy as np\narr = np.______([10, 20, 30])\nprint(arr)", "answers": ["array"], "output": "[10 20 30]", "explain": "np.array()에 리스트를 넣으면 ndarray가 됩니다. 출력 시 리스트([10, 20, 30])와 달리 쉼표 없이 [10 20 30]으로 표시되는데, 이것이 배열임을 알아보는 단서입니다." },
+    { "id": "fb3", "prompt": "0부터 4까지의 값을 가진 배열을 만드세요.", "code": "import numpy as np\narr = np.______(5)\nprint(arr)", "answers": ["arange"], "output": "[0 1 2 3 4]", "explain": "np.arange(5)는 0부터 5-1까지 5개의 값을 배열로 만듭니다. range(5)와 범위 규칙(0부터, 끝 불포함)은 같지만, range는 반복용 객체를 만들고 arange는 곧바로 계산에 쓸 수 있는 배열을 만든다는 점이 다릅니다." },
+    { "id": "fb4", "prompt": "배열의 모양(크기)을 확인하세요.", "code": "import numpy as np\narr = np.array([1, 2, 3, 4, 5])\nprint(arr.______)", "answers": ["shape"], "output": "(5,)", "explain": "shape는 배열의 모양을 튜플로 알려줍니다. 값이 5개인 1차원 배열이라 (5,)로 나옵니다. 괄호 안 숫자 뒤의 쉼표는 1차원임을 나타내는 표기이며, 2차원 데이터는 (행, 열) 형태로 표시됩니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import numpy as np\narr = np.array([2, 4, 6])\nprint(arr * 2)", "answers": ["[ 4  8 12]", "[4 8 12]"], "output": "[ 4  8 12]", "explain": "배열에 * 2를 하면 리스트처럼 반복되는 게 아니라 각 값에 2가 곱해집니다(2->4, 4->8, 6->12). 배열 전체에 한 번에 연산이 적용되는 것이 NumPy의 핵심 장점이며, 다음 토픽의 벡터 연산으로 이어집니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "NumPy를 불러오는 관례적인 코드는?", "options": ["import numpy", "import numpy as np", "import np", "from numpy"], "answer": 1, "explain": "관례적으로 as np 별칭을 붙입니다. import numpy도 문법상 되지만 이후 numpy.array()처럼 길게 써야 하고, import np와 from numpy는 잘못된 구문입니다." },
+      { "id": "q2", "type": "mcq", "q": "np.arange(4)의 결과는?", "options": ["[1 2 3 4]", "[0 1 2 3 4]", "[0 1 2 3]", "[1 2 3]"], "answer": 2, "explain": "0부터 시작해 4-1(=3)까지, 총 4개입니다. range와 마찬가지로 끝 값은 포함되지 않습니다." },
+      { "id": "q3", "type": "mcq", "q": "다음 코드의 출력은?\n`arr = np.array([1, 2, 3])`\n`print(arr * 3)`", "options": ["[1 2 3 1 2 3 1 2 3]", "[3 6 9]", "[1 2 3 3]", "에러"], "answer": 1, "explain": "배열은 각 값에 곱셈이 적용됩니다(1x3, 2x3, 3x3). 첫 번째 보기는 리스트에 * 3을 했을 때의 결과(반복)로, 배열과 리스트의 결정적 차이입니다." },
+      { "id": "q4", "type": "mcq", "q": "np.zeros(3)의 결과로 옳은 것은?", "options": ["[0 0 0]", "[0. 0. 0.]", "[3]", "[]"], "answer": 1, "explain": "0 세 개로 채운 배열입니다. 숫자 뒤에 점(.)이 붙은 이유는 zeros가 기본적으로 실수(float) 자료형으로 배열을 만들기 때문입니다." },
+      { "id": "q5", "type": "mcq", "q": "배열 arr = np.array([5, 6, 7, 8])에서 arr.shape의 결과는?", "options": ["4", "(4,)", "(1, 4)", "[4]"], "answer": 1, "explain": "값이 4개인 1차원 배열이라 (4,)입니다. 쉼표는 1차원임을 나타내며, 단순한 정수 4가 아니라 튜플 형태로 반환됩니다." }
+    ]
+  },
+  "faq": [
+    { "q": "리스트가 있는데 왜 배열을 또 쓰나요?", "a": "배열은 전체에 한 번에 계산을 적용할 수 있고(예: 모든 값에 2 곱하기), 대량의 숫자를 훨씬 빠르게 처리해요. 데이터 분석은 숫자를 대량으로 다루니 배열이 유리합니다." },
+    { "q": "as np 말고 다른 이름을 써도 되나요?", "a": "문법상 가능하지만 권하지 않아요. 전 세계 코드가 np를 쓰기 때문에, 다른 이름을 쓰면 남의 코드를 참고하거나 협업할 때 헷갈립니다." },
+    { "q": "출력에 왜 쉼표가 없나요?", "a": "NumPy 배열은 출력할 때 [1 2 3]처럼 공백으로 구분해요. 리스트는 [1, 2, 3]처럼 쉼표가 있고요. 이 차이로 배열인지 리스트인지 구분할 수 있습니다." },
+    { "q": "0.처럼 점이 붙은 건 뭔가요?", "a": "소수점이 붙었다는 건 실수(float)라는 뜻이에요. np.zeros나 np.ones는 기본적으로 실수형 배열을 만들기 때문에 0., 1.로 표시됩니다." }
+  ]
+}

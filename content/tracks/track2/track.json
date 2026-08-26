@@ -1,0 +1,23 @@
+{
+  "id": "track2",
+  "order": 2,
+  "title": "NumPy로 수치 다루기",
+  "description": "pandas 이해의 토대가 되는 NumPy 배열과 수치 연산을 익힙니다.",
+  "topicOrder": [
+    "track2.ndarray",
+    "track2.indexing",
+    "track2.vectorized",
+    "track2.broadcasting",
+    "track2.statistics",
+    "track2.boolean"
+  ],
+  "topicFiles": [
+    "topics/t1-ndarray.json",
+    "topics/t2-indexing.json",
+    "topics/t3-vectorized.json",
+    "topics/t4-broadcasting.json",
+    "topics/t5-statistics.json",
+    "topics/t6-boolean.json"
+  ],
+  "projectFile": "project.json"
+}

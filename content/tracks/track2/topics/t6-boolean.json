@@ -1,0 +1,30 @@
+{
+  "id": "track2.boolean",
+  "trackId": "track2",
+  "order": 6,
+  "title": "조건 필터링 (boolean indexing)",
+  "content": "## 조건으로 값 골라내기\n\nboolean indexing은 조건에 맞는 값만 배열에서 골라내는 기능입니다. \"60점 이상만\", \"0보다 큰 값만\"처럼 데이터를 걸러낼 때 핵심적으로 쓰입니다.\n\n## 배열에 조건을 걸면 True/False 배열이 나온다\n\n```python\nimport numpy as np\nscores = np.array([90, 50, 80, 40])\nscores >= 60\n# [ True False  True False]\n```\n\n각 값이 조건을 만족하는지 하나씩 판단해, 같은 크기의 True/False 배열이 나옵니다. 90은 60 이상이라 True, 50은 아니라 False입니다.\n\n## True/False 배열로 값 걸러내기\n\n이 True/False 배열을 대괄호에 넣으면, True인 위치의 값만 골라냅니다.\n\n```python\nscores = np.array([90, 50, 80, 40])\nscores[scores >= 60]\n# [90 80]\n```\n\n`scores[scores >= 60]`은 \"scores 중 60 이상인 값만\"이라고 읽으면 됩니다. 데이터 분석에서 가장 자주 쓰는 패턴 중 하나입니다.\n\n## 다양한 조건\n\n```python\narr = np.array([1, -2, 3, -4, 5])\n\narr[arr > 0]      # [1 3 5]   (양수만)\narr[arr < 0]      # [-2 -4]   (음수만)\narr[arr != 0]     # [ 1 -2  3 -4  5]  (0이 아닌 값)\n```\n\n## 조건을 만족하는 개수 세기\n\nTrue는 1, False는 0으로 취급되므로, 조건 배열에 `sum()`을 쓰면 조건을 만족하는 개수를 셀 수 있습니다.\n\n```python\nscores = np.array([90, 50, 80, 40])\n(scores >= 60).sum()    # 2  (60 이상인 값이 2개)\n```\n\n## 조건으로 값 바꾸기\n\n조건에 맞는 위치의 값만 한 번에 바꿀 수도 있습니다.\n\n```python\nscores = np.array([90, 50, 80, 40])\nscores[scores < 60] = 0\nprint(scores)     # [90  0 80  0]\n```\n\n60 미만인 값(50, 40)만 0으로 바뀝니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "배열에 50 이상인가? 조건을 걸어 True/False 배열을 만드세요.", "code": "import numpy as np\narr = np.array([30, 60, 90])\nprint(arr ______ 50)", "answers": [">="], "output": "[False  True  True]", "explain": "배열에 비교 연산자를 쓰면 각 값이 조건을 만족하는지 판단해 True/False 배열이 나옵니다(30은 미달 False, 60·90은 충족 True). 이 True/False 배열이 필터링의 재료가 됩니다." },
+    { "id": "fb2", "prompt": "60 이상인 값만 골라내세요.", "code": "import numpy as np\nscores = np.array([90, 50, 80, 40])\nprint(scores[scores ______ 60])", "answers": [">="], "output": "[90 80]", "explain": "scores[조건] 형태로 쓰면 조건이 True인 위치의 값만 골라냅니다. scores >= 60이 [True, False, True, False]가 되고, True인 자리의 값(90, 80)만 반환됩니다." },
+    { "id": "fb3", "prompt": "양수만 골라내세요.", "code": "import numpy as np\narr = np.array([1, -2, 3, -4])\nprint(arr[arr ______ 0])", "answers": [">"], "output": "[1 3]", "explain": "arr > 0 조건으로 0보다 큰 값(양수)만 걸러냅니다. 대괄호 안에 배열 이름과 조건을 함께 쓰는 arr[arr > 0] 형태가 boolean indexing의 표준 문법입니다." },
+    { "id": "fb4", "prompt": "60 이상인 값이 몇 개인지 세세요.", "code": "import numpy as np\nscores = np.array([90, 50, 80, 40, 70])\nprint((scores >= 60).______())", "answers": ["sum"], "output": "3", "explain": "True는 1, False는 0으로 취급되므로 조건 배열에 sum()을 하면 True의 개수가 나옵니다. 60 이상인 값(90, 80, 70)이 3개이므로 3입니다. 조건을 만족하는 데이터가 몇 개인가를 셀 때 매우 유용한 패턴입니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import numpy as np\narr = np.array([10, 20, 30, 40])\nprint(arr[arr > 25])", "answers": ["[30 40]"], "output": "[30 40]", "explain": "arr > 25 조건은 [False, False, True, True]가 되고, True인 위치의 값(30, 40)만 골라냅니다. 25보다 큰 값만 남는 것입니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "arr = np.array([1, 2, 3])에서 arr > 1의 결과는?", "options": ["[2 3]", "[False True True]", "[True True True]", "[1 2 3]"], "answer": 1, "explain": "조건만 걸면 값이 아니라 True/False 배열이 나옵니다. 1은 조건 미달(False), 2와 3은 충족(True)입니다. 값을 골라내려면 이 조건을 대괄호 안에 넣어야 합니다." },
+      { "id": "q2", "type": "mcq", "q": "60점 이상만 골라내는 올바른 코드는? (s = np.array([...]))", "options": ["s >= 60", "s[60]", "s[s >= 60]", "s.max(60)"], "answer": 2, "explain": "s[s >= 60] 형태가 조건에 맞는 값을 골라냅니다. s >= 60은 True/False 배열만 만들고, s[60]은 60번 인덱스 접근(에러), s.max(60)은 존재하지 않는 사용법입니다." },
+      { "id": "q3", "type": "mcq", "q": "다음 코드의 결과는?\n`arr = np.array([5, 10, 15, 20])`\n`print(arr[arr < 15])`", "options": ["[15 20]", "[5 10]", "[5 10 15]", "[True True False False]"], "answer": 1, "explain": "15보다 작은 값(5, 10)만 골라냅니다. 15는 미만 조건에 포함되지 않습니다(<는 같은 값 제외)." },
+      { "id": "q4", "type": "mcq", "q": "(arr >= 60).sum()이 세는 것은?", "options": ["전체 값의 합", "60 이상인 값의 개수", "최댓값", "평균"], "answer": 1, "explain": "조건 배열에서 True(=1)의 합이므로 조건을 만족하는 값의 개수가 됩니다. True는 1, False는 0으로 계산되기 때문입니다." },
+      { "id": "q5", "type": "mcq", "q": "다음 코드 실행 후 arr의 값은?\n`arr = np.array([10, 20, 30])`\n`arr[arr > 15] = 0`\n`print(arr)`", "options": ["[0 0 0]", "[10 0 0]", "[10 20 30]", "[0 20 30]"], "answer": 1, "explain": "15보다 큰 값(20, 30)의 위치에 0이 대입됩니다. 10은 조건에 안 맞아 그대로 남고, 20과 30이 0으로 바뀝니다. 조건 필터링과 값 대입을 결합한 형태입니다." }
+    ]
+  },
+  "faq": [
+    { "q": "arr > 5랑 arr[arr > 5]가 왜 다른가요?", "a": "arr > 5는 각 값이 조건에 맞는지 True/False로 알려주는 배열이에요. arr[arr > 5]는 그 True/False를 이용해 실제 값만 골라낸 거고요. 조건을 대괄호에 넣어야 값이 걸러집니다." },
+    { "q": "조건을 두 개 이상 걸 수 있나요?", "a": "네, &(그리고)와 |(또는)로 연결할 수 있어요. 예: arr[(arr > 10) & (arr < 50)]. 각 조건을 괄호로 감싸야 하는 점만 주의하세요." },
+    { "q": "True/False로 어떻게 개수를 세나요?", "a": "True는 1, False는 0으로 취급돼요. 그래서 조건 배열에 .sum()을 하면 True의 개수, 즉 조건을 만족하는 값의 개수가 나옵니다." },
+    { "q": "이게 데이터 분석에서 왜 중요한가요?", "a": "매출이 100 이상인 날만, 불량품만, 특정 지역만처럼 조건에 맞는 데이터만 뽑는 일이 분석의 핵심이거든요. pandas에서도 똑같은 방식으로 행을 걸러내기 때문에 지금 익혀두면 그대로 이어집니다." }
+  ]
+}

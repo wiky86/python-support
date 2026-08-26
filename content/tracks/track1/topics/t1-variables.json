@@ -1,0 +1,29 @@
+{
+  "id": "track1.variables",
+  "trackId": "track1",
+  "order": 1,
+  "title": "변수와 자료형",
+  "content": "## 변수란?\n\n변수는 값을 담아두는 상자입니다. 데이터 분석에서는 숫자, 이름, 참/거짓 같은 값을 변수에 담아 두고 필요할 때 꺼내 씁니다.\n\n```python\nscore = 90\nname = \"홍길동\"\n```\n\n`=`는 \"같다\"가 아니라 \"오른쪽 값을 왼쪽 변수에 넣어라\"라는 뜻입니다. 위에서 `score`라는 상자에 `90`을, `name`이라는 상자에 `\"홍길동\"`을 넣었습니다.\n\n## 데이터 분석에서 자주 쓰는 4가지 자료형\n\n| 자료형 | 이름 | 예시 | 쓰임 |\n|---|---|---|---|\n| `int` | 정수 | `90`, `-3`, `0` | 개수, 나이, 점수 |\n| `float` | 실수 | `3.14`, `98.6` | 평균, 비율, 측정값 |\n| `str` | 문자열 | `\"홍길동\"`, `\"서울\"` | 이름, 지역, 범주 |\n| `bool` | 불리언 | `True`, `False` | 조건 판단, 필터링 |\n\n## 정수(int)와 실수(float)\n\n정수는 소수점이 없는 숫자, 실수는 소수점이 있는 숫자입니다. 데이터 분석에서 평균을 내면 대부분 실수가 됩니다.\n\n```python\ncount = 5        # int\naverage = 4.2    # float\n```\n\n## 문자열(str)\n\n글자는 반드시 따옴표로 감쌉니다. 작은따옴표(`'`)와 큰따옴표(`\"`) 둘 다 되지만, 하나로 통일하는 게 좋습니다.\n\n```python\ncity = \"서울\"\n```\n\n따옴표를 빼먹으면 파이썬은 그걸 변수 이름으로 착각해서 에러가 납니다.\n\n## 불리언(bool)\n\n참(`True`) 또는 거짓(`False`) 두 가지 값만 가집니다. 첫 글자가 대문자라는 점에 주의하세요. 나중에 \"점수가 60점 이상인가?\" 같은 조건을 다룰 때 핵심이 됩니다.\n\n```python\npassed = True\n```\n\n## 자료형 확인하기 — type()\n\n어떤 값이 무슨 자료형인지 궁금하면 `type()`으로 확인합니다.\n\n```python\ntype(90)       # <class 'int'>\ntype(4.2)      # <class 'float'>\ntype(\"서울\")    # <class 'str'>\ntype(True)     # <class 'bool'>\n```",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "변수 age에 정수 25를 담으세요.", "code": "______ = 25", "answers": ["age"], "output": "" },
+    { "id": "fb2", "prompt": "아래 값의 자료형을 확인하는 코드를 완성하세요.", "code": "print(______(3.14))", "answers": ["type"], "output": "<class 'float'>" },
+    { "id": "fb3", "prompt": "문자열 \"데이터\"를 변수 word에 담으세요.", "code": "word = ______", "answers": ["\"데이터\"", "'데이터'"], "output": "" },
+    { "id": "fb4", "prompt": "다음 코드의 출력 결과를 예측해 입력하세요.", "code": "passed = True\nprint(type(passed))", "answers": ["<class 'bool'>"], "output": "<class 'bool'>" }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "다음 중 float 자료형인 것은?", "options": ["90", "\"3.14\"", "98.6", "True"], "answer": 2, "explain": "90은 int, \"3.14\"는 따옴표가 있으니 str, True는 bool입니다." },
+      { "id": "q2", "type": "mcq", "q": "다음 코드의 출력은?\n`x = \"100\"`\n`print(type(x))`", "options": ["<class 'int'>", "<class 'str'>", "<class 'float'>", "에러"], "answer": 1, "explain": "따옴표로 감쌌으므로 숫자처럼 보여도 문자열(str)입니다." },
+      { "id": "q3", "type": "mcq", "q": "아래 코드에서 에러가 나는 줄은?\n`a = 10`\n`b = 서울`\n`c = True`", "options": ["1번 줄", "2번 줄", "3번 줄", "에러 없음"], "answer": 1, "explain": "서울에 따옴표가 없어 변수로 착각되어 에러가 납니다." },
+      { "id": "q4", "type": "mcq", "q": "변수 temp에 담긴 값이 36.5일 때, type(temp)의 결과는?", "options": ["int", "float", "str", "bool"], "answer": 1, "explain": "소수점이 있으므로 float입니다." },
+      { "id": "q5", "type": "mcq", "q": "다음 중 불리언 값을 올바르게 담은 것은?", "options": ["flag = true", "flag = \"True\"", "flag = True", "flag = TRUE"], "answer": 2, "explain": "첫 글자만 대문자인 True가 정확한 표기입니다. true/TRUE는 오류, \"True\"는 문자열입니다." }
+    ]
+  },
+  "faq": [
+    { "q": "변수 이름은 아무렇게나 지어도 되나요?", "a": "영문자, 숫자, 밑줄(_)을 쓸 수 있고 숫자로 시작할 수 없어요. score, total_2는 되지만 2total은 안 됩니다. 의미가 드러나는 이름을 쓰는 게 좋아요." },
+    { "q": "작은따옴표랑 큰따옴표 중 뭘 써야 하나요?", "a": "둘 다 똑같이 동작해요. 다만 한 프로젝트 안에서는 하나로 통일하는 게 읽기 좋습니다." },
+    { "q": "90이랑 \"90\"은 같은 건가요?", "a": "아니에요. 90은 계산할 수 있는 숫자(int), \"90\"은 글자(str)예요. \"90\" + 10처럼 문자열과 숫자를 더하려 하면 에러가 납니다." },
+    { "q": "True를 true로 쓰면 왜 안 되나요?", "a": "파이썬에서 불리언은 첫 글자만 대문자인 True, False로 정해져 있어요. true나 TRUE는 인식하지 못해 에러가 납니다." }
+  ]
+}
