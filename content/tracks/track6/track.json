@@ -1,0 +1,23 @@
+{
+  "id": "track6",
+  "order": 6,
+  "title": "데이터 시각화",
+  "description": "분석 결과를 그래프로 표현하는 방법을 익힙니다. 목적에 맞는 그래프 선택이 핵심입니다.",
+  "topicOrder": [
+    "track6.why",
+    "track6.line",
+    "track6.bar",
+    "track6.histogram",
+    "track6.scatter",
+    "track6.decorate"
+  ],
+  "topicFiles": [
+    "topics/t1-why.json",
+    "topics/t2-line.json",
+    "topics/t3-bar.json",
+    "topics/t4-histogram.json",
+    "topics/t5-scatter.json",
+    "topics/t6-decorate.json"
+  ],
+  "projectFile": "project.json"
+}

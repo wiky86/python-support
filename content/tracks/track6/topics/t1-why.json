@@ -1,0 +1,30 @@
+{
+  "id": "track6.why",
+  "trackId": "track6",
+  "order": 1,
+  "title": "시각화가 필요한 이유",
+  "content": "## 왜 그래프로 보나?\n\n숫자 표만 봐서는 데이터의 흐름이나 패턴을 파악하기 어렵습니다. 같은 데이터라도 그래프로 그리면 \"점점 늘고 있다\", \"여기서 갑자기 떨어졌다\", \"이 둘은 관계가 있다\" 같은 것이 한눈에 보입니다. 시각화는 데이터 분석의 마지막 단계이자, 결과를 남에게 전달하는 가장 강력한 방법입니다.\n\n## 표 vs 그래프\n\n예를 들어 월별 매출이 이렇게 있다고 합시다.\n\n```\n1월 100, 2월 105, 3월 98, 4월 130, 5월 145\n```\n\n숫자만 보면 4월부터 오른다는 걸 알아채는 데 시간이 걸립니다. 하지만 이걸 선 그래프로 그리면 \"4월부터 급상승\"이 즉시 보입니다.\n\n## matplotlib 소개\n\n파이썬에서 가장 널리 쓰는 시각화 도구는 matplotlib입니다. 그중 `pyplot` 모듈을 관례적으로 `plt`로 불러옵니다.\n\n```python\nimport matplotlib.pyplot as plt\n```\n\nNumPy의 `np`, pandas의 `pd`처럼, matplotlib.pyplot은 `plt`로 씁니다.\n\n## 가장 기본적인 그래프 그리기\n\n```python\nimport matplotlib.pyplot as plt\n\nplt.plot([100, 105, 98, 130, 145])\nplt.show()\n```\n\n`plt.plot(데이터)`로 선 그래프를 그리고, `plt.show()`로 화면에 표시합니다. 이 코드는 값들이 순서대로 이어진 선 그래프를 만듭니다.\n\n## 시각화의 기본 흐름\n\n시각화는 보통 세 단계입니다.\n1. 그래프 종류 선택해 그리기 (`plt.plot`, `plt.bar` 등)\n2. 꾸미기 (제목, 축 이름 등 — 뒤 토픽에서)\n3. 보여주기 (`plt.show()`)\n\n## 어떤 그래프를 언제 쓰나 (미리보기)\n\n| 그래프 | 언제 쓰나 |\n|---|---|\n| 선 그래프 | 시간에 따른 변화(추세) |\n| 막대 그래프 | 항목 간 크기 비교 |\n| 히스토그램 | 값의 분포 |\n| 산점도 | 두 값의 관계 |\n\n이 트랙에서 이 네 가지를 하나씩 배웁니다. 데이터에 맞는 그래프를 고르는 것이 시각화의 핵심입니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "matplotlib의 pyplot을 관례적인 별명으로 불러오세요.", "code": "import matplotlib.pyplot ______ plt", "answers": ["as"], "output": "", "explain": "matplotlib의 pyplot 모듈은 관례적으로 import matplotlib.pyplot as plt로 불러옵니다. NumPy를 np, pandas를 pd로 부르는 것과 같은 관례로, 거의 모든 시각화 코드가 plt를 씁니다." },
+    { "id": "fb2", "prompt": "pyplot 모듈의 관례적 별명을 채우세요.", "code": "import matplotlib.pyplot as ______", "answers": ["plt"], "output": "", "explain": "pyplot은 관례적으로 plt라는 별명을 씁니다. 이후 plt.plot(), plt.show()처럼 짧게 부를 수 있습니다. 전 세계 시각화 코드가 이 약속을 따르므로 그대로 쓰는 것이 좋습니다." },
+    { "id": "fb3", "prompt": "리스트를 선 그래프로 그리세요.", "code": "import matplotlib.pyplot as plt\nplt.______([100, 105, 98, 130, 145])\nplt.show()", "answers": ["plot"], "output": "다섯 개의 값이 순서대로 이어진 선 그래프가 그려집니다. 4번째 값(130)부터 선이 위로 올라가는 상승 형태가 나타납니다.", "explain": "plt.plot(데이터)는 값들을 순서대로 선으로 이어 그립니다. 가장 기본적인 시각화 함수이며, 시간 흐름에 따른 변화를 볼 때 주로 씁니다. 리스트의 값이 y축, 순서(0,1,2...)가 x축이 됩니다." },
+    { "id": "fb4", "prompt": "그래프를 화면에 표시하세요.", "code": "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3])\nplt.______()", "answers": ["show"], "output": "앞서 그린 선 그래프가 화면에 표시됩니다.", "explain": "plt.show()는 지금까지 그린 그래프를 화면에 띄웁니다. 그리기(plot) 명령만으로는 표시되지 않고, show()를 호출해야 실제로 보입니다. 시각화 코드의 마지막에 오는 마무리 명령입니다." },
+    { "id": "fb5", "prompt": "월별 방문자 수의 변화를 보려면 어떤 그래프가 적합할까요? (한 단어: 선, 막대, 히스토그램, 산점도)", "code": "# 월별 방문자 수의 변화를 보고 싶다\n방문자 = [120, 135, 150, 145, 180]\n# 적합한 그래프 종류는?", "answers": ["선", "선 그래프"], "output": "선", "explain": "시간(월)에 따른 변화를 보려면 선 그래프가 가장 적합합니다. 선 그래프는 값이 시간 순서로 어떻게 오르내리는지(추세)를 보여주는 데 특화되어 있습니다. 항목 비교라면 막대, 분포라면 히스토그램이 맞습니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "시각화를 하는 주된 이유는?", "options": ["데이터를 삭제하려고", "숫자 표로는 보기 어려운 패턴을 한눈에 보려고", "계산을 빠르게 하려고", "데이터를 저장하려고"], "answer": 1, "explain": "시각화는 숫자만으로는 파악하기 어려운 추세·비교·관계·분포를 한눈에 보여줍니다. 데이터를 이해하고 전달하는 강력한 방법입니다." },
+      { "id": "q2", "type": "mcq", "q": "matplotlib의 pyplot을 불러오는 관례적인 코드는?", "options": ["import matplotlib", "import matplotlib.pyplot as plt", "import plt", "import pyplot"], "answer": 1, "explain": "import matplotlib.pyplot as plt가 표준입니다. 관례적으로 plt 별칭을 붙여 이후 짧게 부릅니다." },
+      { "id": "q3", "type": "mcq", "q": "plt.plot([1, 2, 3])이 그리는 것은?", "options": ["막대 그래프", "선 그래프", "원 그래프", "표"], "answer": 1, "explain": "plt.plot()은 값들을 순서대로 선으로 이어 그리는 선 그래프를 만듭니다." },
+      { "id": "q4", "type": "mcq", "q": "그래프를 화면에 표시하는 명령은?", "options": ["plt.draw()", "plt.show()", "plt.print()", "plt.display()"], "answer": 1, "explain": "plt.show()가 그린 그래프를 화면에 띄웁니다. plot만으로는 표시되지 않고 show()를 호출해야 보입니다." },
+      { "id": "q5", "type": "mcq", "q": "시간에 따른 매출 변화를 보기에 가장 적합한 그래프는?", "options": ["산점도", "히스토그램", "선 그래프", "원 그래프"], "answer": 2, "explain": "시간 흐름에 따른 변화(추세)는 선 그래프가 가장 적합합니다. 값이 순서대로 어떻게 변하는지 잘 보여줍니다." }
+    ]
+  },
+  "faq": [
+    { "q": "matplotlib 말고 다른 시각화 도구는 없나요?", "a": "있어요. seaborn, plotly 같은 도구도 많이 써요. 다만 matplotlib이 가장 기본이고 널리 쓰여서, 이걸 먼저 익히면 다른 도구도 이해하기 쉬워집니다." },
+    { "q": "plt.show()를 꼭 써야 하나요?", "a": "환경에 따라 달라요. 어떤 환경(주피터 노트북 등)에서는 자동으로 그래프가 보이기도 하지만, 일반적으로는 show()를 호출해야 그래프가 표시됩니다. 습관적으로 붙여주는 게 안전해요." },
+    { "q": "그래프 종류가 이렇게 많은데 어떻게 고르나요?", "a": "데이터로 무엇을 보고 싶은지에 따라 골라요. 변화는 선, 비교는 막대, 분포는 히스토그램, 관계는 산점도. 이 트랙에서 하나씩 배우면 감이 잡힐 거예요." },
+    { "q": "왜 pyplot을 plt로 부르나요?", "a": "관례예요. 전 세계 코드가 plt를 쓰기 때문에, 다르게 쓰면 남의 코드를 볼 때 헷갈려요. np(NumPy), pd(pandas)처럼 약속된 별명이라고 생각하면 됩니다." }
+  ]
+}

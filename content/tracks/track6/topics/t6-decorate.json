@@ -1,0 +1,30 @@
+{
+  "id": "track6.decorate",
+  "trackId": "track6",
+  "order": 6,
+  "title": "그래프 꾸미기 (제목·축·범례)",
+  "content": "## 왜 꾸미나?\n\n그래프만 덩그러니 있으면 보는 사람이 \"이게 무슨 데이터지?\"라고 헷갈립니다. 제목, 축 이름, 범례를 붙이면 그래프가 스스로 무엇을 말하는지 설명해줍니다. 남에게 전달하는 그래프라면 꾸미기는 필수입니다.\n\n예제 데이터:\n\n```python\nimport matplotlib.pyplot as plt\n월 = [\"1월\", \"2월\", \"3월\"]\n매출 = [100, 120, 90]\n```\n\n## 제목 붙이기 — plt.title()\n\n```python\nplt.plot(월, 매출)\nplt.title(\"월별 매출\")\nplt.show()\n```\n\n그래프 위에 \"월별 매출\"이라는 제목이 표시됩니다.\n\n## 축 이름 붙이기 — plt.xlabel(), plt.ylabel()\n\n```python\nplt.plot(월, 매출)\nplt.xlabel(\"월\")\nplt.ylabel(\"매출(만원)\")\nplt.show()\n```\n\nx축 아래에 \"월\", y축 옆에 \"매출(만원)\"이 표시되어, 각 축이 무엇을 나타내는지 알려줍니다.\n\n## 범례 붙이기 — label + plt.legend()\n\n여러 선을 그릴 때 어느 선이 무엇인지 표시하려면, 각 선에 `label`을 주고 `plt.legend()`를 호출합니다.\n\n```python\nplt.plot(월, 서울매출, label=\"서울\")\nplt.plot(월, 부산매출, label=\"부산\")\nplt.legend()\nplt.show()\n```\n\n그래프 한쪽에 \"서울\", \"부산\"이 색과 함께 표시되어 어느 선이 어느 지점인지 구분됩니다.\n\n## 전체를 갖춘 그래프\n\n```python\nplt.plot(월, 매출)\nplt.title(\"월별 매출 추이\")\nplt.xlabel(\"월\")\nplt.ylabel(\"매출(만원)\")\nplt.show()\n```\n\n제목·축 이름까지 갖추면 그래프만 봐도 내용을 이해할 수 있습니다.\n\n## 꾸미기 명령의 순서\n\n그리기(plot/bar 등) -> 꾸미기(title/xlabel 등) -> 보여주기(show) 순서로 씁니다. 꾸미기 명령은 show() 전에 오면 순서가 조금 바뀌어도 괜찮습니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "그래프에 월별 매출 제목을 붙이세요.", "code": "import matplotlib.pyplot as plt\nplt.plot([100, 120, 90])\nplt.______(\"월별 매출\")\nplt.show()", "answers": ["title"], "output": "선 그래프 위에 \"월별 매출\"이라는 제목이 표시됩니다.", "explain": "plt.title(\"제목\")은 그래프 위에 제목을 붙입니다. 제목이 있으면 이 그래프가 무엇에 관한 것인지 한눈에 알 수 있어, 남에게 보여줄 그래프에는 반드시 넣는 것이 좋습니다." },
+    { "id": "fb2", "prompt": "x축 이름을 월로 지정하세요.", "code": "import matplotlib.pyplot as plt\nplt.plot([100, 120, 90])\nplt.______(\"월\")\nplt.show()", "answers": ["xlabel"], "output": "x축 아래에 \"월\"이라는 축 이름이 표시됩니다.", "explain": "plt.xlabel(\"이름\")은 x축(가로 축)의 이름을 붙입니다. 축에 이름이 있으면 그 축의 값이 무엇을 의미하는지 명확해집니다. y축은 ylabel을 씁니다." },
+    { "id": "fb3", "prompt": "y축 이름을 매출로 지정하세요.", "code": "import matplotlib.pyplot as plt\nplt.plot([100, 120, 90])\nplt.______(\"매출\")\nplt.show()", "answers": ["ylabel"], "output": "y축 옆에 \"매출\"이라는 축 이름이 표시됩니다.", "explain": "plt.ylabel(\"이름\")은 y축(세로 축)의 이름을 붙입니다. xlabel(가로)과 ylabel(세로)를 함께 쓰면 두 축이 각각 무엇을 나타내는지 알 수 있습니다. 이름 앞의 x, y가 어느 축인지를 뜻합니다." },
+    { "id": "fb4", "prompt": "여러 선의 범례를 표시하세요.", "code": "import matplotlib.pyplot as plt\nplt.plot([100, 120], label=\"서울\")\nplt.plot([80, 90], label=\"부산\")\nplt.______()\nplt.show()", "answers": ["legend"], "output": "그래프 한쪽에 \"서울\", \"부산\"이 각 선의 색과 함께 표시된 범례가 나타납니다.", "explain": "plt.legend()는 각 선에 붙인 label을 모아 범례로 보여줍니다. 여러 선을 그릴 때 어느 선이 무엇인지 구분하려면, 각 plot에 label을 주고 legend()를 호출해야 합니다. legend() 없이 label만 주면 범례가 표시되지 않습니다." },
+    { "id": "fb5", "prompt": "범례가 표시되게 하려면 마지막에 무엇을 추가해야 할까요? (함수 호출 형태로)", "code": "import matplotlib.pyplot as plt\nplt.plot([100, 120], label=\"A\")\nplt.plot([80, 90], label=\"B\")\n# 여기에 무엇을 추가?\nplt.show()", "answers": ["plt.legend()", "legend()", "plt.legend"], "output": "범례가 표시됩니다.", "explain": "label만 주고 plt.legend()를 호출하지 않으면 범례가 나타나지 않습니다. legend()를 추가해야 각 선의 label(A, B)이 범례로 표시됩니다. label 지정과 legend() 호출은 짝으로 함께 써야 합니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "그래프에 제목을 붙이는 함수는?", "options": ["plt.title()", "plt.name()", "plt.head()", "plt.label()"], "answer": 0, "explain": "plt.title(\"제목\")이 그래프 위에 제목을 붙입니다." },
+      { "id": "q2", "type": "mcq", "q": "x축 이름을 붙이는 함수는?", "options": ["plt.ylabel()", "plt.xlabel()", "plt.xaxis()", "plt.title()"], "answer": 1, "explain": "plt.xlabel()이 x축(가로) 이름, plt.ylabel()이 y축(세로) 이름을 붙입니다." },
+      { "id": "q3", "type": "mcq", "q": "여러 선을 구분하는 범례를 표시하려면?", "options": ["label만 주면 된다", "각 선에 label을 주고 plt.legend() 호출", "plt.title() 사용", "자동으로 표시됨"], "answer": 1, "explain": "각 plot에 label을 주고 plt.legend()를 호출해야 범례가 표시됩니다. 둘은 짝으로 써야 합니다." },
+      { "id": "q4", "type": "mcq", "q": "y축 이름을 붙이는 함수는?", "options": ["plt.xlabel()", "plt.ylabel()", "plt.yname()", "plt.legend()"], "answer": 1, "explain": "plt.ylabel()이 y축(세로 축) 이름을 붙입니다. x축은 xlabel입니다." },
+      { "id": "q5", "type": "mcq", "q": "시각화 코드의 일반적인 순서로 옳은 것은?", "options": ["show -> plot -> title", "plot -> 꾸미기(title 등) -> show", "title -> show -> plot", "순서 상관없음"], "answer": 1, "explain": "그리기(plot/bar) -> 꾸미기(title/xlabel 등) -> 보여주기(show) 순서로 씁니다. show()는 항상 마지막에 옵니다." }
+    ]
+  },
+  "faq": [
+    { "q": "제목이나 축 이름을 꼭 붙여야 하나요?", "a": "혼자 확인용이면 생략해도 되지만, 남에게 보여줄 그래프라면 꼭 붙이는 게 좋아요. 제목과 축 이름이 없으면 보는 사람이 무슨 데이터인지 알 수 없거든요." },
+    { "q": "label을 줬는데 범례가 안 보여요.", "a": "plt.legend()를 호출하지 않아서예요. label은 이름표를 붙이는 것이고, legend()가 그 이름표들을 실제로 화면에 표시하는 명령이에요. 둘을 함께 써야 합니다." },
+    { "q": "xlabel이랑 ylabel이 헷갈려요.", "a": "x는 가로 축(보통 시간·항목), y는 세로 축(보통 값·수치)이에요. \"가로가 x, 세로가 y\"로 기억하면 됩니다." },
+    { "q": "한글이 깨져서 나와요.", "a": "matplotlib이 기본적으로 한글 폰트를 설정하지 않아서 그럴 수 있어요. 폰트를 지정하면 해결되는데, 환경마다 방법이 조금 달라요. 지금은 \"한글 폰트 설정이 필요하다\"는 것만 알아두면 됩니다." }
+  ]
+}
