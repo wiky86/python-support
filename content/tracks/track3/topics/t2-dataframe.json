@@ -1,0 +1,30 @@
+{
+  "id": "track3.dataframe",
+  "trackId": "track3",
+  "order": 2,
+  "title": "DataFrame 생성과 구조",
+  "content": "## DataFrame이란?\n\nDataFrame은 행과 열로 이루어진 표입니다. 엑셀 시트나 데이터베이스 테이블과 같은 구조로, pandas에서 데이터 분석의 중심이 됩니다. Series(한 열)가 여러 개 모인 것이라고 보면 됩니다.\n\n## 딕셔너리로 DataFrame 만들기\n\n가장 흔한 방법은 딕셔너리를 넣는 것입니다. 키가 열 이름, 값(리스트)이 그 열의 데이터가 됩니다.\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [90, 85, 70]\n})\nprint(df)\n```\n\n출력:\n```\n    이름  점수\n0  김철수  90\n1  이영희  85\n2  박민수  70\n```\n\n왼쪽의 0, 1, 2는 행 인덱스, 위쪽의 \"이름\", \"점수\"는 열 이름입니다.\n\n## 표의 구조 살펴보기\n\n| 속성/함수 | 설명 |\n|---|---|\n| `df.shape` | (행 수, 열 수) |\n| `df.columns` | 열 이름 목록 |\n| `df.head()` | 앞부분 몇 행 미리보기 |\n| `df.info()` | 전체 구조 요약 |\n\n```python\ndf.shape       # (3, 2)   행 3개, 열 2개\ndf.columns     # Index(['이름', '점수'], ...)\n```\n\n## head() — 앞부분 미리보기\n\n데이터가 많을 때 앞의 몇 행만 확인합니다. 기본은 5행입니다.\n\n```python\ndf.head()      # 앞 5행\ndf.head(2)     # 앞 2행\n```\n\n## 한 열 꺼내기 — Series가 나온다\n\n열 이름으로 접근하면 그 열이 Series로 나옵니다.\n\n```python\ndf[\"점수\"]\n```\n\n출력:\n```\n0    90\n1    85\n2    70\nName: 점수, dtype: int64\n```\n\nDataFrame의 한 열은 곧 Series라는 점을 확인할 수 있습니다.\n\n## 행 개수 세기 — len()\n\n```python\nlen(df)      # 3  (행의 개수)\n```",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "딕셔너리로 DataFrame을 만드세요.", "code": "import pandas as pd\ndf = pd.______({\"이름\": [\"A\", \"B\"], \"점수\": [80, 90]})\nprint(df)", "answers": ["DataFrame"], "output": "  이름  점수\n0  A  80\n1  B  90", "explain": "pd.DataFrame()에 딕셔너리를 넣으면 표가 만들어집니다. 대소문자(DataFrame의 D와 F가 대문자)에 주의하세요. 딕셔너리의 키(이름, 점수)가 열 이름이 되고, 각 리스트가 해당 열의 데이터가 됩니다." },
+    { "id": "fb2", "prompt": "표의 모양(행 수, 열 수)을 확인하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"a\": [1, 2, 3], \"b\": [4, 5, 6]})\nprint(df.______)", "answers": ["shape"], "output": "(3, 2)", "explain": "shape는 (행 수, 열 수)를 튜플로 알려줍니다. 각 열에 값이 3개씩, 열이 2개이므로 (3, 2)입니다. NumPy 배열의 shape와 같은 개념이지만, DataFrame은 항상 (행, 열) 2차원으로 나옵니다." },
+    { "id": "fb3", "prompt": "앞 2행만 미리 보세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"n\": [1, 2, 3, 4, 5]})\nprint(df.______(2))", "answers": ["head"], "output": "   n\n0  1\n1  2", "explain": "head(2)는 표의 앞 2행만 보여줍니다. 데이터가 많을 때 전체를 출력하지 않고 구조와 내용을 빠르게 확인하는 용도입니다. 숫자를 생략하면 기본 5행이 나옵니다." },
+    { "id": "fb4", "prompt": "점수 열을 꺼내세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\"], \"점수\": [80, 90]})\nprint(df[______])", "answers": ["\"점수\"", "'점수'"], "output": "0    80\n1    90\nName: 점수, dtype: int64", "explain": "대괄호에 열 이름을 넣으면 그 열이 Series로 반환됩니다. 출력 맨 아래 Name: 점수는 이 Series가 어느 열에서 나왔는지 알려줍니다. DataFrame의 한 열은 곧 Series라는 것을 보여주는 예입니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"x\": [1, 2], \"y\": [3, 4], \"z\": [5, 6]})\nprint(df.shape)", "answers": ["(2, 3)"], "output": "(2, 3)", "explain": "각 열에 값이 2개씩 있으니 행은 2개, 열은 x·y·z 3개이므로 (2, 3)입니다. shape는 항상 (행, 열) 순서로 나온다는 점을 기억하세요. 열이 3개라고 앞에 3이 오는 게 아닙니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "DataFrame을 가장 잘 설명한 것은?", "options": ["1차원 데이터", "행과 열로 된 표", "하나의 값", "그래프"], "answer": 1, "explain": "DataFrame은 행과 열로 이루어진 2차원 표입니다. 1차원 데이터는 Series입니다." },
+      { "id": "q2", "type": "mcq", "q": "딕셔너리로 DataFrame을 만들 때, 딕셔너리의 키는 무엇이 되나요?", "options": ["행 인덱스", "열 이름", "값", "무시된다"], "answer": 1, "explain": "딕셔너리의 키가 열 이름이 되고, 각 값(리스트)이 그 열의 데이터가 됩니다." },
+      { "id": "q3", "type": "mcq", "q": "df.shape가 (4, 3)이면?", "options": ["행 3개, 열 4개", "행 4개, 열 3개", "값이 12개인 리스트", "4번째 행, 3번째 열"], "answer": 1, "explain": "shape는 (행 수, 열 수) 순서입니다. 따라서 행 4개, 열 3개를 뜻합니다." },
+      { "id": "q4", "type": "mcq", "q": "df[\"점수\"]처럼 열 하나를 꺼내면 무엇이 나오나요?", "options": ["DataFrame", "Series", "리스트", "딕셔너리"], "answer": 1, "explain": "DataFrame의 한 열을 꺼내면 Series가 나옵니다. DataFrame은 Series 여러 개가 모인 표라는 것을 보여줍니다." },
+      { "id": "q5", "type": "mcq", "q": "df.head()에 대한 설명으로 옳은 것은?", "options": ["마지막 행을 보여준다", "기본으로 앞 5행을 보여준다", "전체를 보여준다", "열 이름만 보여준다"], "answer": 1, "explain": "head()는 기본으로 앞 5행을 보여줍니다. 숫자를 넣으면(head(2)) 그만큼만 나옵니다. 데이터가 많을 때 앞부분을 빠르게 확인하는 용도입니다." }
+    ]
+  },
+  "faq": [
+    { "q": "Series랑 DataFrame이 어떻게 다른가요?", "a": "Series는 한 열(1차원), DataFrame은 여러 열이 모인 표(2차원)예요. DataFrame에서 열 하나를 꺼내면 Series가 나옵니다. Series가 벽돌이라면 DataFrame은 그 벽돌로 쌓은 벽이라고 보면 됩니다." },
+    { "q": "df.head()는 왜 쓰나요?", "a": "데이터가 수천, 수만 행이면 전부 출력하기 곤란하죠. head()로 앞 몇 행만 보면서 데이터가 어떻게 생겼는지 빠르게 확인할 때 씁니다." },
+    { "q": "열 이름에 한글을 써도 되나요?", "a": "네, 이름, 점수처럼 한글 열 이름도 문제없이 됩니다. 다만 열을 꺼낼 때 df[\"점수\"]처럼 정확한 이름을 따옴표로 감싸 써야 합니다." },
+    { "q": "shape가 왜 (행, 열) 순서인가요?", "a": "pandas와 NumPy의 약속이에요. 항상 행이 먼저, 열이 나중입니다. (3, 2)면 3행 2열로 읽으면 됩니다." }
+  ]
+}

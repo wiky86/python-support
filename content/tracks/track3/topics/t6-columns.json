@@ -1,0 +1,30 @@
+{
+  "id": "track3.columns",
+  "trackId": "track3",
+  "order": 6,
+  "title": "열 추가·삭제·이름 변경",
+  "content": "## 표의 열을 다루기\n\n분석 과정에서 새 열을 만들거나, 필요 없는 열을 지우거나, 열 이름을 바꾸는 일이 자주 생깁니다. 이번엔 이 세 가지를 배웁니다.\n\n예제 데이터:\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\"],\n    \"국어\": [90, 80],\n    \"영어\": [85, 95]\n})\n```\n\n## 새 열 추가하기\n\n없는 열 이름에 값을 지정하면 새 열이 추가됩니다.\n\n```python\ndf[\"반\"] = [1, 2]\n```\n\n기존 열을 계산해서 새 열을 만들 수도 있습니다. 이것이 실전에서 특히 유용합니다.\n\n```python\ndf[\"총점\"] = df[\"국어\"] + df[\"영어\"]\n```\n\n`df[\"국어\"] + df[\"영어\"]`는 두 열의 같은 행끼리 더해집니다(벡터 연산). 김철수는 175, 이영희는 175가 됩니다.\n\n## 열 삭제하기 — drop\n\n`drop`으로 열을 지웁니다. `axis=1`은 \"열을 지운다\"는 뜻입니다(행은 axis=0).\n\n```python\ndf = df.drop(\"반\", axis=1)\n```\n\n`drop`은 원본을 바로 바꾸지 않고 지운 결과를 새로 돌려주므로, 보통 `df = df.drop(...)`처럼 다시 담습니다.\n\n## 열 이름 바꾸기 — rename\n\n`rename`에 `columns` 딕셔너리로 \"바꿀 이름: 새 이름\"을 지정합니다.\n\n```python\ndf = df.rename(columns={\"국어\": \"국어점수\"})\n```\n\n여러 개를 한 번에 바꿀 수도 있습니다.\n\n```python\ndf = df.rename(columns={\"국어\": \"국어점수\", \"영어\": \"영어점수\"})\n```\n\n## 정리\n\n| 작업 | 방법 |\n|---|---|\n| 새 열 추가 | `df[\"새열\"] = 값 또는 계산식` |\n| 열 삭제 | `df = df.drop(\"열이름\", axis=1)` |\n| 열 이름 변경 | `df = df.rename(columns={\"기존\": \"새이름\"})` |",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "새 열 반에 값을 추가하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\"]})\ndf[______] = [1, 2]\nprint(df)", "answers": ["\"반\"", "'반'"], "output": "  이름  반\n0  A  1\n1  B  2", "explain": "존재하지 않는 열 이름에 값을 지정하면 새 열이 만들어집니다. 값의 개수는 행 수와 같아야 합니다(여기선 2개). 이미 있는 열 이름을 쓰면 새로 추가되는 대신 기존 값이 덮어써집니다." },
+    { "id": "fb2", "prompt": "국어와 영어를 더한 총점 열을 만드세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"국어\": [90, 80], \"영어\": [85, 95]})\ndf[\"총점\"] = df[\"국어\"] ______ df[\"영어\"]\nprint(df)", "answers": ["+"], "output": "   국어  영어   총점\n0  90  85  175\n1  80  95  175", "explain": "두 열을 더하면 같은 행끼리 계산됩니다(90+85, 80+95). 이는 트랙2에서 배운 벡터 연산과 같은 원리입니다. 기존 열을 조합해 새 열(총점, 평균 등)을 만드는 것은 데이터 분석에서 매우 자주 하는 작업입니다." },
+    { "id": "fb3", "prompt": "반 열을 삭제하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\"], \"반\": [1, 2]})\ndf = df.______(\"반\", axis=1)\nprint(df)", "answers": ["drop"], "output": "  이름\n0  A\n1  B", "explain": "drop(\"반\", axis=1)은 반 열을 삭제합니다. axis=1은 열 방향을 의미합니다(행은 axis=0). drop은 결과를 새로 돌려주므로 df = df.drop(...)처럼 다시 담아야 실제로 반영됩니다." },
+    { "id": "fb4", "prompt": "열 삭제에서 열을 의미하는 axis 값을 채우세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"a\": [1], \"b\": [2]})\ndf = df.drop(\"b\", axis=______)\nprint(df)", "answers": ["1"], "output": "   a\n0  1", "explain": "axis=1은 열, axis=0은 행을 뜻합니다. 열을 지울 때는 axis=1을 씁니다. 방향 개념이 헷갈리면 1은 열(세로줄), 0은 행(가로줄)로 기억하면 됩니다." },
+    { "id": "fb5", "prompt": "다음 코드 실행 후 열 이름을 예측하세요. (리스트 형태로)", "code": "import pandas as pd\ndf = pd.DataFrame({\"kor\": [90], \"eng\": [85]})\ndf = df.rename(columns={\"kor\": \"국어\"})\nprint(list(df.columns))", "answers": ["['국어', 'eng']", "[\"국어\", \"eng\"]", "['국어','eng']"], "output": "['국어', 'eng']", "explain": "rename(columns={\"kor\": \"국어\"})는 kor 열 이름만 국어로 바꿉니다. 지정하지 않은 eng는 그대로 유지되므로, 결과 열 이름은 국어와 eng가 됩니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "새 열을 추가하는 올바른 방법은?", "options": ["df.add(\"반\")", "df[\"반\"] = [1, 2]", "df.column(\"반\")", "df + \"반\""], "answer": 1, "explain": "존재하지 않는 열 이름에 값을 지정하면 새 열이 추가됩니다. 값의 개수는 행 수와 일치해야 합니다." },
+      { "id": "q2", "type": "mcq", "q": "df[\"총점\"] = df[\"국어\"] + df[\"영어\"]가 하는 일은?", "options": ["두 열을 삭제", "두 열의 같은 행끼리 더해 새 열 생성", "열 이름 변경", "에러"], "answer": 1, "explain": "두 열을 더하면 같은 행끼리 계산되어(벡터 연산) 그 결과가 새 열 총점에 담깁니다." },
+      { "id": "q3", "type": "mcq", "q": "열을 삭제할 때 axis에 넣는 값은?", "options": ["axis=0", "axis=1", "axis=\"column\"", "axis 불필요"], "answer": 1, "explain": "열 삭제는 axis=1입니다. axis=0은 행 방향입니다." },
+      { "id": "q4", "type": "mcq", "q": "열 이름을 바꾸는 함수는?", "options": ["rename", "drop", "change", "replace"], "answer": 0, "explain": "rename(columns={...})으로 열 이름을 바꿉니다. drop은 삭제, change/replace는 이 용도의 함수명이 아닙니다." },
+      { "id": "q5", "type": "mcq", "q": "df = df.drop(\"반\", axis=1)에서 df =를 다시 붙이는 이유는?", "options": ["습관", "drop이 결과를 새로 돌려주기 때문", "에러 방지", "불필요하다"], "answer": 1, "explain": "drop은 원본을 직접 바꾸지 않고 삭제된 결과를 새로 반환합니다. 그래서 df = df.drop(...)으로 다시 담아야 실제로 반영됩니다." }
+    ]
+  },
+  "faq": [
+    { "q": "새 열을 추가할 때 값 개수가 안 맞으면요?", "a": "행 수와 값의 개수가 다르면 에러가 나요. 행이 3개면 값도 3개를 줘야 합니다. 모든 행에 같은 값을 넣고 싶으면 df[\"구분\"] = \"A\"처럼 값 하나만 줘도 됩니다(브로드캐스팅)." },
+    { "q": "axis가 계속 헷갈려요.", "a": "axis=0은 행(가로줄), axis=1은 열(세로줄)이에요. 열을 지우거나 열 방향으로 작업할 땐 1, 행이면 0으로 기억하세요." },
+    { "q": "drop을 했는데 왜 안 지워졌나요?", "a": "df.drop(\"반\", axis=1)만 쓰면 결과만 반환되고 원본은 그대로예요. df = df.drop(\"반\", axis=1)처럼 다시 담아야 반영됩니다." },
+    { "q": "열 이름을 여러 개 한 번에 바꿀 수 있나요?", "a": "네, rename(columns={\"kor\": \"국어\", \"eng\": \"영어\"})처럼 딕셔너리에 여러 쌍을 넣으면 한 번에 바뀝니다." }
+  ]
+}

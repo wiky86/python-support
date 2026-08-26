@@ -1,0 +1,30 @@
+{
+  "id": "track3.sorting",
+  "trackId": "track3",
+  "order": 7,
+  "title": "정렬 (sort_values)",
+  "content": "## 데이터를 순서대로 정렬하기\n\n\"점수가 높은 순\", \"가격이 싼 순\"처럼 데이터를 특정 열 기준으로 정렬하는 것은 분석의 기본입니다. pandas는 `sort_values`로 정렬합니다.\n\n예제 데이터:\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [70, 95, 85]\n})\n```\n\n## 기본 정렬 — 오름차순\n\n`sort_values(\"열이름\")`은 그 열을 기준으로 작은 값부터(오름차순) 정렬합니다.\n\n```python\ndf.sort_values(\"점수\")\n```\n\n출력:\n```\n    이름  점수\n0  김철수  70\n2  박민수  85\n1  이영희  95\n```\n\n## 내림차순 정렬 — ascending=False\n\n큰 값부터 정렬하려면 `ascending=False`를 줍니다.\n\n```python\ndf.sort_values(\"점수\", ascending=False)\n```\n\n출력:\n```\n    이름  점수\n1  이영희  95\n2  박민수  85\n0  김철수  70\n```\n\n\"점수 높은 순 등수\"를 만들 때 자주 씁니다.\n\n## 정렬해도 인덱스는 따라온다\n\n정렬하면 행 순서는 바뀌지만 원래 인덱스(0, 1, 2)는 각 행에 그대로 붙어 따라옵니다. 위 결과에서 인덱스가 뒤섞인 것을 볼 수 있습니다.\n\n## 여러 열 기준 정렬\n\n여러 열을 리스트로 주면, 앞 열을 먼저 기준으로 정렬하고 같은 값일 때 다음 열로 정렬합니다.\n\n```python\ndf.sort_values([\"반\", \"점수\"])\n```\n\n## 정렬 결과 활용 — 상위 N개\n\n정렬한 뒤 `head()`를 붙이면 상위 몇 개를 뽑을 수 있습니다.\n\n```python\n# 점수 상위 2명\ndf.sort_values(\"점수\", ascending=False).head(2)\n```",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "점수 기준으로 오름차순 정렬하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"C\"], \"점수\": [70, 95, 85]})\nprint(df.______(\"점수\"))", "answers": ["sort_values"], "output": "  이름  점수\n0  A  70\n2  C  85\n1  B  95", "explain": "sort_values(\"점수\")는 점수 열을 기준으로 작은 값부터 정렬합니다. 기본값이 오름차순이라 70, 85, 95 순으로 나옵니다. 행 순서는 바뀌지만 원래 인덱스(0, 2, 1)는 각 행에 붙어 따라옵니다." },
+    { "id": "fb2", "prompt": "점수 기준으로 내림차순(높은 순) 정렬하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"C\"], \"점수\": [70, 95, 85]})\nprint(df.sort_values(\"점수\", ______=False))", "answers": ["ascending"], "output": "  이름  점수\n1  B  95\n2  C  85\n0  A  70", "explain": "ascending=False를 주면 큰 값부터(내림차순) 정렬됩니다. 95, 85, 70 순으로 나오며, 등수나 순위를 매길 때 자주 쓰는 방식입니다. ascending은 오름차순이라는 뜻이라 False로 두면 반대(내림차순)가 됩니다." },
+    { "id": "fb3", "prompt": "점수 높은 순으로 상위 2명만 뽑으세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"C\", \"D\"], \"점수\": [70, 95, 85, 60]})\nprint(df.sort_values(\"점수\", ascending=False).______(2))", "answers": ["head"], "output": "  이름  점수\n1  B  95\n2  C  85", "explain": "내림차순 정렬 후 head(2)를 붙이면 상위 2개 행만 나옵니다. 정렬과 head를 이어 쓰는(체이닝) 이 패턴은 매출 상위 5개, 점수 상위 3명처럼 상위 N개를 뽑을 때 표준적으로 쓰입니다." },
+    { "id": "fb4", "prompt": "오름차순으로 가장 낮은 점수 1명을 뽑으세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"C\"], \"점수\": [70, 95, 85]})\nprint(df.sort_values(\"점수\").head(______))", "answers": ["1"], "output": "  이름  점수\n0  A  70", "explain": "오름차순 정렬은 작은 값이 맨 위로 오므로, head(1)을 붙이면 가장 낮은 점수 1명이 나옵니다. 반대로 가장 높은 값을 뽑으려면 내림차순 정렬 후 head(1)을 쓰면 됩니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"C\"], \"점수\": [88, 72, 95]})\nresult = df.sort_values(\"점수\", ascending=False)\nprint(result.iloc[0][\"이름\"])", "answers": ["C"], "output": "C", "explain": "내림차순 정렬하면 점수 95인 C가 맨 위(첫 번째 행)로 옵니다. iloc[0]으로 첫 행을 꺼내고 [\"이름\"]으로 그 행의 이름 값을 가져오면 C가 나옵니다. 1등이 누구인가를 찾는 전형적인 방법입니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "특정 열 기준으로 정렬하는 함수는?", "options": ["sort()", "sort_values()", "order()", "arrange()"], "answer": 1, "explain": "pandas에서 값 기준 정렬은 sort_values(\"열이름\")입니다. 나머지는 이 용도의 함수가 아닙니다." },
+      { "id": "q2", "type": "mcq", "q": "sort_values(\"점수\")는 기본적으로 어떤 순서인가요?", "options": ["내림차순(큰 값부터)", "오름차순(작은 값부터)", "무작위", "원래 순서"], "answer": 1, "explain": "기본값은 오름차순(ascending=True)이라 작은 값부터 정렬됩니다. 큰 값부터 하려면 ascending=False를 줍니다." },
+      { "id": "q3", "type": "mcq", "q": "내림차순으로 정렬하려면?", "options": ["descending=True", "ascending=False", "reverse=True", "sort_desc()"], "answer": 1, "explain": "ascending=False를 주면 내림차순이 됩니다. ascending은 오름차순이라는 뜻이라 False로 두면 반대가 됩니다." },
+      { "id": "q4", "type": "mcq", "q": "점수 상위 3명을 뽑는 코드로 옳은 것은?", "options": ["df.head(3)", "df.sort_values(\"점수\").head(3)", "df.sort_values(\"점수\", ascending=False).head(3)", "df.max(3)"], "answer": 2, "explain": "내림차순 정렬로 높은 점수를 위로 올린 뒤 head(3)으로 상위 3개를 뽑습니다. 오름차순 정렬 후 head(3)은 낮은 순 3명, 정렬 없는 head(3)은 앞 3행입니다." },
+      { "id": "q5", "type": "mcq", "q": "정렬한 뒤 인덱스는 어떻게 되나요?", "options": ["0,1,2로 다시 매겨진다", "원래 인덱스가 각 행을 따라 유지된다", "사라진다", "항상 뒤집힌다"], "answer": 1, "explain": "정렬하면 행 순서는 바뀌지만 원래 인덱스는 각 행에 붙어 따라옵니다. 그래서 정렬 결과에서 인덱스가 뒤섞여 보입니다." }
+    ]
+  },
+  "faq": [
+    { "q": "sort_values를 했는데 원본이 안 바뀌었어요.", "a": "sort_values도 정렬된 결과를 새로 돌려줄 뿐 원본은 그대로예요. 바꾸려면 df = df.sort_values(\"점수\")처럼 다시 담아야 합니다." },
+    { "q": "ascending이 뭔가요?", "a": "오름차순이라는 뜻이에요. 기본값이 True(작은 값부터)라서, 큰 값부터 하고 싶으면 ascending=False로 바꿔주면 됩니다." },
+    { "q": "같은 값이 여러 개면 어떻게 정렬되나요?", "a": "같은 값끼리는 원래 순서가 대체로 유지돼요. 세부 기준을 더 두고 싶으면 여러 열을 리스트로 주면 됩니다. 예: sort_values([\"점수\", \"이름\"])은 점수가 같을 때 이름으로 정렬합니다." },
+    { "q": "상위 N개를 뽑는 건 정렬이랑 어떻게 연결되나요?", "a": "내림차순으로 정렬한 뒤 head(N)을 붙이면 상위 N개가 나와요. 예: df.sort_values(\"매출\", ascending=False).head(5)는 매출 상위 5개입니다." }
+  ]
+}

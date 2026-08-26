@@ -1,0 +1,25 @@
+{
+  "id": "track3",
+  "order": 3,
+  "title": "pandas 핵심 - 데이터 구조",
+  "description": "데이터 분석의 중심 도구인 pandas의 Series와 DataFrame을 익힙니다.",
+  "topicOrder": [
+    "track3.series",
+    "track3.dataframe",
+    "track3.loading",
+    "track3.selection",
+    "track3.filtering",
+    "track3.columns",
+    "track3.sorting"
+  ],
+  "topicFiles": [
+    "topics/t1-series.json",
+    "topics/t2-dataframe.json",
+    "topics/t3-loading.json",
+    "topics/t4-selection.json",
+    "topics/t5-filtering.json",
+    "topics/t6-columns.json",
+    "topics/t7-sorting.json"
+  ],
+  "projectFile": "project.json"
+}

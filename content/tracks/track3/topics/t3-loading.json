@@ -1,0 +1,30 @@
+{
+  "id": "track3.loading",
+  "trackId": "track3",
+  "order": 3,
+  "title": "데이터 불러오기 개념 (딕셔너리/CSV)",
+  "content": "## 데이터는 어디서 오나?\n\n실제 분석에서는 데이터를 직접 타이핑하기보다 이미 있는 데이터를 불러옵니다. pandas는 여러 형식의 데이터를 DataFrame으로 읽어올 수 있는데, 이번엔 가장 기본이 되는 두 가지 개념을 익힙니다: 코드 안의 딕셔너리로 만들기, 그리고 CSV 파일 읽기.\n\n## 방법 1 — 딕셔너리로 직접 만들기\n\n앞 토픽에서 배운 방식입니다. 작은 데이터를 코드 안에서 만들 때 씁니다.\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\"],\n    \"점수\": [90, 85]\n})\n```\n\n이 학습 공간의 미니 프로젝트도 이 방식으로 소형 데이터를 만듭니다.\n\n## 방법 2 — CSV 파일 읽기\n\nCSV는 값을 쉼표로 구분한 표 형식의 텍스트 파일입니다. 엑셀에서도 열 수 있는 가장 흔한 데이터 형식으로, `pd.read_csv()`로 읽습니다.\n\n```python\ndf = pd.read_csv(\"students.csv\")\n```\n\n이 한 줄이면 파일 전체가 DataFrame으로 들어옵니다. 파일 경로(이름)를 문자열로 넣어줍니다.\n\n## CSV 파일의 생김새\n\n`students.csv` 파일 내용이 이렇다면:\n\n```\n이름,점수\n김철수,90\n이영희,85\n```\n\n읽어들이면 이렇게 됩니다:\n\n```\n    이름  점수\n0  김철수  90\n1  이영희  85\n```\n\n첫 줄(이름,점수)이 자동으로 열 이름이 되고, 나머지가 데이터 행이 됩니다.\n\n## 읽은 뒤 첫 확인 습관\n\nCSV를 읽으면 데이터가 제대로 들어왔는지 먼저 확인하는 게 좋습니다.\n\n```python\ndf = pd.read_csv(\"students.csv\")\ndf.head()      # 앞부분 확인\ndf.shape       # 크기 확인\n```\n\n## CSV로 저장하기 — to_csv\n\n반대로 DataFrame을 CSV 파일로 저장할 수도 있습니다.\n\n```python\ndf.to_csv(\"result.csv\", index=False)\n```\n\n`index=False`는 행 번호(0, 1, 2...)를 파일에 저장하지 않겠다는 뜻입니다. 보통 이렇게 저장하면 깔끔합니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "CSV 파일을 읽는 함수를 채우세요.", "code": "import pandas as pd\ndf = pd.______(\"data.csv\")", "answers": ["read_csv"], "output": "", "explain": "pd.read_csv()는 CSV 파일을 DataFrame으로 읽어오는 가장 기본적인 함수입니다. 괄호 안에 파일 경로를 문자열로 넣습니다. CSV의 첫 줄은 자동으로 열 이름이 되고, 나머지 줄이 데이터 행이 됩니다." },
+    { "id": "fb2", "prompt": "딕셔너리로 표를 만드세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"도시\": [\"서울\", \"부산\"], \"인구\": [960, 340]})\nprint(df.______(2))", "answers": ["head"], "output": "   도시   인구\n0  서울  960\n1  부산  340", "explain": "딕셔너리로 DataFrame을 만든 뒤 head(2)로 앞 2행을 확인합니다. 데이터를 만들거나 불러온 직후에 head()로 내용을 점검하는 것은 좋은 습관입니다." },
+    { "id": "fb3", "prompt": "읽어온 데이터의 크기(행·열 수)를 확인하세요.", "code": "import pandas as pd\ndf = pd.read_csv(\"sales.csv\")\nprint(df.______)", "answers": ["shape"], "output": "", "explain": "CSV를 읽은 직후 shape로 데이터가 몇 행 몇 열인지 확인합니다. 예상한 크기와 다르면 파일이 잘못 읽혔을 수 있으니, 불러오기 직후 점검하는 것이 중요합니다." },
+    { "id": "fb4", "prompt": "DataFrame을 CSV로 저장하되 행 번호는 빼세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"a\": [1, 2]})\ndf.to_csv(\"out.csv\", ______=False)", "answers": ["index"], "output": "", "explain": "to_csv()로 저장할 때 index=False를 주면 0, 1, 2 같은 행 번호가 파일에 저장되지 않습니다. 이를 생략하면 불필요한 인덱스 열이 파일에 함께 저장되므로, 보통 index=False로 저장합니다." },
+    { "id": "fb5", "prompt": "다음 CSV의 첫 줄이 name,age일 때 두 열의 이름을 쉼표로 구분해 입력하세요.", "code": "# CSV 내용:\n# name,age\n# Tom,20\ndf = pd.read_csv(\"people.csv\")\n# df의 두 열 이름은?", "answers": ["name,age", "name, age"], "output": "name age", "explain": "CSV의 첫 줄은 자동으로 열 이름(헤더)이 됩니다. 따라서 name과 age가 두 열의 이름이 되고, 그 아래 Tom,20이 첫 번째 데이터 행이 됩니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "CSV 파일을 DataFrame으로 읽는 함수는?", "options": ["pd.open_csv()", "pd.read_csv()", "pd.load_csv()", "pd.csv()"], "answer": 1, "explain": "pd.read_csv()가 표준 함수입니다. 나머지는 존재하지 않는 함수명입니다." },
+      { "id": "q2", "type": "mcq", "q": "CSV 파일의 첫 줄은 보통 무엇이 되나요?", "options": ["첫 번째 데이터", "열 이름(헤더)", "행 번호", "무시된다"], "answer": 1, "explain": "CSV의 첫 줄은 자동으로 열 이름(헤더)이 됩니다. 그 아래 줄들이 실제 데이터 행이 됩니다." },
+      { "id": "q3", "type": "mcq", "q": "df.to_csv(\"out.csv\", index=False)에서 index=False의 의미는?", "options": ["열을 저장하지 않는다", "행 번호를 파일에 저장하지 않는다", "파일을 읽는다", "첫 행을 지운다"], "answer": 1, "explain": "index=False는 0, 1, 2 같은 행 번호(인덱스)를 파일에 저장하지 않겠다는 뜻입니다. 보통 이렇게 저장하면 깔끔합니다." },
+      { "id": "q4", "type": "mcq", "q": "CSV를 읽은 직후 하면 좋은 것은?", "options": ["바로 삭제", "head()나 shape로 내용·크기 확인", "파일 이름 변경", "아무것도 안 함"], "answer": 1, "explain": "데이터가 제대로 들어왔는지 head()로 내용을, shape로 크기를 확인하는 것이 좋은 습관입니다. 잘못 읽힌 경우를 초기에 발견할 수 있습니다." },
+      { "id": "q5", "type": "mcq", "q": "작은 데이터를 코드 안에서 직접 만들 때 쓰는 방법은?", "options": ["pd.read_csv()", "pd.DataFrame(딕셔너리)", "pd.to_csv()", "pd.open()"], "answer": 1, "explain": "코드 안에서 소량의 데이터를 만들 때는 딕셔너리를 pd.DataFrame()에 넣습니다. read_csv는 외부 파일을 읽을 때, to_csv는 저장할 때 씁니다." }
+    ]
+  },
+  "faq": [
+    { "q": "CSV가 뭔가요?", "a": "Comma-Separated Values의 약자로, 값을 쉼표로 구분한 텍스트 표예요. 엑셀로도 열 수 있고, 데이터 분석에서 가장 흔히 쓰는 파일 형식입니다." },
+    { "q": "read_csv에 파일 이름만 넣으면 되나요?", "a": "파일이 코드와 같은 폴더에 있으면 이름만으로 됩니다. 다른 폴더에 있으면 data/students.csv처럼 경로를 함께 적어야 해요." },
+    { "q": "엑셀 파일(.xlsx)도 읽을 수 있나요?", "a": "네, pd.read_excel()이라는 함수가 따로 있어요. 다만 CSV가 더 가볍고 흔해서 입문에서는 read_csv를 먼저 익히는 게 좋습니다." },
+    { "q": "왜 이 학습 공간은 CSV 대신 딕셔너리를 쓰나요?", "a": "미니 프로젝트에서 작고 통제된 데이터를 쓰기 위해서예요. 실전에서는 read_csv로 파일을 읽는 경우가 많지만, 개념과 분석 흐름을 익히는 데는 딕셔너리로 만든 소형 데이터가 더 편합니다." }
+  ]
+}
