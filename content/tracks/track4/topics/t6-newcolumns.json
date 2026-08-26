@@ -1,0 +1,30 @@
+{
+  "id": "track4.newcolumns",
+  "trackId": "track4",
+  "order": 6,
+  "title": "새 열 계산해서 만들기",
+  "content": "## 여러 기법을 모아 새 열 만들기\n\n이번 토픽은 트랙4의 종합 정리입니다. 지금까지 배운 벡터 연산, 조건, apply를 활용해 기존 데이터로부터 의미 있는 새 열을 만드는 여러 방법을 살펴봅니다. 실제 분석에서 \"파생 변수를 만든다\"고 부르는 핵심 작업입니다.\n\n예제 데이터:\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"국어\": [90, 75, 60],\n    \"영어\": [80, 85, 50]\n})\n```\n\n## 방법 1 — 벡터 연산으로 계산\n\n여러 열을 직접 계산해 새 열을 만듭니다.\n\n```python\ndf[\"총점\"] = df[\"국어\"] + df[\"영어\"]\ndf[\"평균\"] = (df[\"국어\"] + df[\"영어\"]) / 2\n```\n\n## 방법 2 — 조건으로 True/False 열\n\n조건식의 결과(True/False)를 그대로 열로 만들 수 있습니다.\n\n```python\ndf[\"합격여부\"] = df[\"평균\"] >= 60\n```\n\n각 행의 평균이 60 이상인지 True/False로 담깁니다.\n\n## 방법 3 — apply로 복잡한 분류\n\n조건 분기가 필요하면 apply를 씁니다.\n\n```python\ndef grade(avg):\n    if avg >= 80:\n        return \"우수\"\n    elif avg >= 60:\n        return \"보통\"\n    else:\n        return \"미흡\"\n\ndf[\"등급\"] = df[\"평균\"].apply(grade)\n```\n\n## 방법 4 — np.where로 조건 분기 (간단한 두 갈래)\n\n두 갈래 조건은 `np.where`로 간단히 처리할 수 있습니다.\n\n```python\nimport numpy as np\ndf[\"결과\"] = np.where(df[\"평균\"] >= 60, \"합격\", \"불합격\")\n```\n\n`np.where(조건, 참일때, 거짓일때)` 형태로, 조건이 참이면 \"합격\", 거짓이면 \"불합격\"을 넣습니다.\n\n## 어떤 방법을 쓸까?\n\n단순 계산은 벡터 연산, 두 갈래 조건은 `np.where`, 세 갈래 이상 복잡한 분류는 `apply`가 적합합니다. 결과는 모두 새 열로 추가됩니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "국어와 영어의 평균으로 평균 열을 만드세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"국어\": [90, 70], \"영어\": [80, 60]})\ndf[\"평균\"] = (df[\"국어\"] + df[\"영어\"]) ______ 2\nprint(list(df[\"평균\"]))", "answers": ["/"], "output": "[85.0, 65.0]", "explain": "두 열을 더한 뒤 2로 나누면 각 행의 평균이 나옵니다((90+80)/2=85, (70+60)/2=65). 괄호로 덧셈을 먼저 하고 나눗셈을 해야 정확한 평균이 됩니다. 나눗셈이라 결과는 실수형입니다." },
+    { "id": "fb2", "prompt": "평균이 60 이상인지 True/False 열을 만드세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"평균\": [85, 50, 65]})\ndf[\"합격여부\"] = df[\"평균\"] ______ 60\nprint(list(df[\"합격여부\"]))", "answers": [">="], "output": "[True, False, True]", "explain": "조건식 df[\"평균\"] >= 60의 결과(True/False)를 그대로 새 열로 담을 수 있습니다. 85와 65는 60 이상이라 True, 50은 False입니다. 조건 결과 자체를 열로 저장하는 방식입니다." },
+    { "id": "fb3", "prompt": "apply로 평균을 등급으로 바꾸세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"평균\": [85, 65, 45]})\n\ndef grade(avg):\n    if avg >= 80:\n        return \"우수\"\n    elif avg >= 60:\n        return \"보통\"\n    else:\n        return \"미흡\"\n\ndf[\"등급\"] = df[\"평균\"].______(grade)\nprint(list(df[\"등급\"]))", "answers": ["apply"], "output": "['우수', '보통', '미흡']", "explain": "apply(grade)는 평균 열의 각 값을 grade 함수에 넣어 등급으로 바꿉니다. 85->우수, 65->보통, 45->미흡입니다. 세 갈래 이상의 조건 분류에는 apply가 적합합니다." },
+    { "id": "fb4", "prompt": "np.where로 평균 60 이상이면 합격, 아니면 불합격을 넣으세요.", "code": "import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\"평균\": [85, 50, 70]})\ndf[\"결과\"] = np.______(df[\"평균\"] >= 60, \"합격\", \"불합격\")\nprint(list(df[\"결과\"]))", "answers": ["where"], "output": "['합격', '불합격', '합격']", "explain": "np.where(조건, 참일때, 거짓일때)는 조건에 따라 두 값 중 하나를 넣습니다. 평균이 60 이상이면 합격, 아니면 불합격입니다. 두 갈래 조건은 apply보다 np.where가 간결합니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"수량\": [3, 5, 2], \"단가\": [1000, 500, 2000]})\ndf[\"금액\"] = df[\"수량\"] * df[\"단가\"]\nprint(list(df[\"금액\"]))", "answers": ["[3000, 2500, 4000]", "[3000,2500,4000]"], "output": "[3000, 2500, 4000]", "explain": "수량과 단가를 곱하면 같은 행끼리 계산되어(벡터 연산) 각 행의 금액이 나옵니다(3x1000, 5x500, 2x2000). 매출·금액처럼 두 열을 곱해 파생 열을 만드는 것은 실무에서 매우 흔한 작업입니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "두 열을 더해 새 열을 만드는 방법은?", "options": ["df.add()", "df[\"합\"] = df[\"a\"] + df[\"b\"]", "df.sum(\"a\", \"b\")", "df[\"합\"].apply()"], "answer": 1, "explain": "두 열을 직접 더해(벡터 연산) 새 열에 담습니다. 같은 행끼리 계산됩니다." },
+      { "id": "q2", "type": "mcq", "q": "조건식 df[\"평균\"] >= 60을 새 열에 담으면?", "options": ["평균값이 담긴다", "True/False가 담긴다", "에러", "60이 담긴다"], "answer": 1, "explain": "조건식의 결과는 True/False Series이므로, 그대로 열에 담으면 각 행의 조건 만족 여부가 저장됩니다." },
+      { "id": "q3", "type": "mcq", "q": "np.where(조건, \"합격\", \"불합격\")의 동작은?", "options": ["조건이 참이면 합격, 거짓이면 불합격", "항상 합격", "조건을 삭제", "개수를 센다"], "answer": 0, "explain": "np.where(조건, 참일때, 거짓일때)는 조건에 따라 두 값 중 하나를 넣습니다. 두 갈래 분기에 간편합니다." },
+      { "id": "q4", "type": "mcq", "q": "세 갈래 이상(우수/보통/미흡)의 분류에 가장 적합한 것은?", "options": ["벡터 연산", "np.where", "apply + 함수", "drop"], "answer": 2, "explain": "조건이 세 갈래 이상이면 if/elif를 담은 함수를 만들어 apply로 적용하는 것이 적합합니다. np.where는 기본이 두 갈래입니다." },
+      { "id": "q5", "type": "mcq", "q": "df[\"금액\"] = df[\"수량\"] * df[\"단가\"]의 결과는?", "options": ["수량과 단가를 이어붙임", "같은 행끼리 곱한 금액 열", "전체 합계", "에러"], "answer": 1, "explain": "두 열을 곱하면 같은 행끼리 계산되어(벡터 연산) 각 행의 금액이 새 열로 만들어집니다." }
+    ]
+  },
+  "faq": [
+    { "q": "벡터 연산, np.where, apply 중 뭘 써야 할지 모르겠어요.", "a": "단순 계산(더하기·곱하기)은 벡터 연산, 참/거짓 두 갈래는 np.where, 우수·보통·미흡처럼 세 갈래 이상은 apply를 쓰면 돼요. 목적에 맞는 걸 고르면 됩니다." },
+    { "q": "파생 변수가 뭔가요?", "a": "기존 열을 조합·가공해서 만든 새 열이에요. 예를 들어 국어·영어로 만든 총점, 수량·단가로 만든 금액이 파생 변수입니다. 분석에서 매우 중요한 작업이에요." },
+    { "q": "조건식을 그냥 열로 저장해도 되나요?", "a": "네, df[\"합격\"] = df[\"점수\"] >= 60처럼 하면 True/False 열이 만들어져요. 나중에 이 열로 필터링하거나 개수를 셀 때 유용합니다." },
+    { "q": "np.where를 쓰려면 뭘 import해야 하나요?", "a": "import numpy as np가 필요해요. np.where는 NumPy 함수라서 numpy를 불러와야 씁니다." }
+  ]
+}

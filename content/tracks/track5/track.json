@@ -1,0 +1,21 @@
+{
+  "id": "track5",
+  "order": 5,
+  "title": "그룹화와 집계",
+  "description": "데이터에서 인사이트를 뽑는 핵심 기술인 그룹화와 집계를 익힙니다.",
+  "topicOrder": [
+    "track5.groupby",
+    "track5.aggregation",
+    "track5.agg",
+    "track5.pivot",
+    "track5.multigroup"
+  ],
+  "topicFiles": [
+    "topics/t1-groupby.json",
+    "topics/t2-aggregation.json",
+    "topics/t3-agg.json",
+    "topics/t4-pivot.json",
+    "topics/t5-multigroup.json"
+  ],
+  "projectFile": "project.json"
+}

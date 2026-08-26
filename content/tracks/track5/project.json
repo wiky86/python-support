@@ -1,0 +1,36 @@
+{
+  "id": "track5.project",
+  "trackId": "track5",
+  "title": "매출 데이터 지점별·월별 요약",
+  "intro": "트랙5에서 배운 groupby, 집계 함수, agg, pivot_table, 여러 열 그룹화를 활용해 가상 매출 데이터를 다양한 각도로 요약합니다. 외부 데이터 없이 아래 제공된 소형 데이터를 사용합니다.",
+  "dataset": {
+    "description": "가상 매출 데이터 (지점·월·매출)",
+    "code": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"지점\": [\"서울\", \"서울\", \"부산\", \"부산\", \"서울\", \"부산\"],\n    \"월\": [\"1월\", \"2월\", \"1월\", \"2월\", \"1월\", \"1월\"],\n    \"매출\": [100, 120, 80, 90, 110, 70]\n})"
+  },
+  "missions": [
+    { "id": "m1", "prompt": "지점별 총매출 구하기", "code": "print(df.groupby(\"지점\")[\"매출\"].______())", "answers": ["sum"], "output": "지점\n부산    240\n서울    330\nName: 매출, dtype: int64", "explain": "지점으로 묶어 매출 합계를 냅니다. 서울은 100+120+110=330, 부산은 80+90+70=240입니다. groupby + sum은 \"~별 총합\"을 구하는 가장 기본적인 집계입니다." },
+    { "id": "m2", "prompt": "지점별 평균 매출 구하기", "code": "print(df.groupby(\"지점\")[\"매출\"].______())", "answers": ["mean"], "output": "지점\n부산     80.0\n서울    110.0\nName: 매출, dtype: float64", "explain": "mean()으로 지점별 평균 매출을 구합니다. 서울은 330/3=110, 부산은 240/3=80입니다. 총합과 함께 평균을 보면 지점별 거래 규모를 더 잘 파악할 수 있습니다." },
+    { "id": "m3", "prompt": "지점별 매출 합계·평균·건수를 한 번에 구하기 (agg)", "code": "print(df.groupby(\"지점\")[\"매출\"].______([\"sum\", \"mean\", \"count\"]))", "answers": ["agg"], "output": "      sum   mean  count\n지점\n부산   240   80.0      3\n서울   330  110.0      3", "explain": "agg에 집계 리스트를 넣어 합계·평균·건수를 한 표로 구합니다. 각 지점이 3건씩이고 서울이 총매출·평균 모두 높습니다. 여러 지표를 한눈에 비교할 때 agg가 효율적입니다." },
+    { "id": "m4", "prompt": "지점(행)x월(열) 매출 합계 피벗 테이블 만들기", "code": "print(df.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", ______=\"sum\"))", "answers": ["aggfunc"], "output": "월    1월   2월\n지점\n부산  150   90\n서울  210  120", "explain": "pivot_table로 지점을 행, 월을 열로 둔 교차 집계표를 만듭니다. 서울 1월은 100+110=210, 부산 1월은 80+70=150입니다. 이 데이터는 모든 조합에 값이 있어 결측치 없이 정수로 나옵니다. 지점별·월별을 한눈에 비교하기 좋은 형태입니다." },
+    { "id": "m5", "prompt": "피벗 테이블의 빈 칸을 0으로 채우기", "code": "print(df.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"sum\", ______=0))", "answers": ["fill_value"], "output": "월    1월   2월\n지점\n부산  150   90\n서울  210  120", "explain": "fill_value=0으로 데이터가 없는 칸을 0으로 채웁니다. 이 데이터는 모든 조합에 값이 있어 빈 칸이 없지만, 실제 데이터에서는 특정 지점·월 조합이 비는 경우가 많아 이 옵션이 유용합니다. 빈 칸을 0으로 채우면 NaN이 사라져 계산과 표시가 깔끔해집니다." },
+    { "id": "m6", "prompt": "지점·월 두 기준으로 묶어 매출 합계 구하기", "code": "print(df.groupby([______])[\"매출\"].sum())", "answers": ["\"지점\", \"월\"", "'지점', '월'", "\"지점\",\"월\"", "'지점','월'"], "output": "지점  월 \n부산  1월    150\n     2월     90\n서울  1월    210\n     2월    120\nName: 매출, dtype: int64", "explain": "지점과 월 두 열로 묶어 각 조합의 매출 합계를 구합니다. 미션 4의 피벗 테이블과 같은 값이지만, 세로로 긴 형태로 나옵니다. unstack()을 붙이면 피벗 테이블과 같은 2차원 표가 됩니다." },
+    { "id": "m7", "prompt": "지점별 총매출을 높은 순으로 정렬하기", "code": "print(df.groupby(\"지점\")[\"매출\"].sum().sort_values(______=False))", "answers": ["ascending"], "output": "지점\n서울    330\n부산    240\nName: 매출, dtype: int64", "explain": "groupby로 총매출을 구한 뒤 sort_values(ascending=False)로 내림차순 정렬합니다. 서울(330)이 부산(240)보다 높아 위로 옵니다. 집계와 정렬을 이어 붙여 \"매출 상위 지점\"을 만드는 마무리 미션입니다." }
+  ],
+  "report": {
+    "title": "매출 데이터 요약 리포트",
+    "template": "1위 지점: {topBranch} (총매출 {topSales})\n2위 지점: {secondBranch} (총매출 {secondSales})\n전체 총매출: {totalSales}\n지점 평균: {branch1} {avg1} / {branch2} {avg2}\n최다 매출 월: {topMonth}",
+    "computedValues": {
+      "topBranch": "서울",
+      "topSales": 330,
+      "secondBranch": "부산",
+      "secondSales": 240,
+      "totalSales": 570,
+      "branch1": "서울",
+      "avg1": 110,
+      "branch2": "부산",
+      "avg2": 80,
+      "topMonth": "1월"
+    },
+    "conceptsUsed": ["groupby", "집계 함수", "agg", "피벗 테이블", "여러 열 그룹화"]
+  }
+}

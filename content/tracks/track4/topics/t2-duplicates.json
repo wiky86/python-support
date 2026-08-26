@@ -1,0 +1,30 @@
+{
+  "id": "track4.duplicates",
+  "trackId": "track4",
+  "order": 2,
+  "title": "중복 처리",
+  "content": "## 중복 데이터란?\n\n같은 데이터가 두 번 이상 들어간 경우입니다. 데이터를 여러 번 입력했거나 파일을 합치는 과정에서 흔히 생깁니다. 중복이 있으면 집계나 통계가 왜곡되므로, 정제 단계에서 확인하고 제거합니다.\n\n예제 데이터 (박민수가 중복):\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\", \"박민수\"],\n    \"점수\": [90, 85, 70, 70]\n})\n```\n\n## 중복 여부 확인 — duplicated()\n\n`duplicated()`는 각 행이 (앞에 이미 나온 것과) 중복인지 True/False로 보여줍니다. 처음 나온 행은 False, 두 번째부터 True입니다.\n\n```python\ndf.duplicated()\n```\n\n출력:\n```\n0    False\n1    False\n2    False\n3     True\ndtype: bool\n```\n\n마지막 박민수 행(3번)이 앞의 박민수와 같아 True입니다.\n\n## 중복 개수 세기\n\n```python\ndf.duplicated().sum()     # 1\n```\n\n## 중복 제거 — drop_duplicates()\n\n`drop_duplicates()`는 중복된 행을 제거하고, 각 값의 첫 번째만 남깁니다.\n\n```python\ndf.drop_duplicates()\n```\n\n출력:\n```\n    이름  점수\n0  김철수  90\n1  이영희  85\n2  박민수  70\n```\n\n중복이던 3번 행이 사라졌습니다.\n\n## 특정 열 기준으로 중복 제거\n\n`subset`으로 특정 열만 기준 삼아 중복을 판단할 수 있습니다. 예를 들어 이름만 같으면 중복으로 볼 때:\n\n```python\ndf.drop_duplicates(subset=\"이름\")\n```\n\n이름이 같으면 점수가 달라도 중복으로 처리해 첫 번째만 남깁니다.\n\n## 정리\n\n| 작업 | 방법 |\n|---|---|\n| 중복 여부 확인 | `df.duplicated()` |\n| 중복 개수 | `df.duplicated().sum()` |\n| 중복 제거 | `df.drop_duplicates()` |\n| 특정 열 기준 제거 | `df.drop_duplicates(subset=\"열이름\")` |",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "각 행이 중복인지 True/False로 확인하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"A\"], \"점수\": [90, 80, 90]})\nprint(df.______())", "answers": ["duplicated"], "output": "0    False\n1    False\n2     True\ndtype: bool", "explain": "duplicated()는 각 행이 앞에 이미 나온 행과 중복되는지를 True/False로 알려줍니다. 처음 등장한 행은 False, 같은 내용이 다시 나오면 True입니다. 2번 행(A, 90)이 0번과 같아 True가 됩니다." },
+    { "id": "fb2", "prompt": "중복된 행이 몇 개인지 세세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"값\": [1, 2, 2, 3, 3]})\nprint(df.duplicated().______())", "answers": ["sum"], "output": "2", "explain": "duplicated()가 만든 True/False에서 True는 1로 계산되므로, sum()으로 중복 행 수를 셉니다. 2와 3이 각각 한 번씩 중복되어 총 2개입니다. 첫 등장은 중복으로 세지 않는다는 점에 주의하세요." },
+    { "id": "fb3", "prompt": "중복된 행을 제거하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"A\"], \"점수\": [90, 80, 90]})\nprint(df.______())", "answers": ["drop_duplicates"], "output": "  이름  점수\n0  A  90\n1  B  80", "explain": "drop_duplicates()는 중복된 행을 제거하고 첫 번째 것만 남깁니다. 2번 행(A, 90)이 0번과 같아 삭제됩니다. 원본을 바꾸려면 df = df.drop_duplicates()처럼 다시 담아야 합니다." },
+    { "id": "fb4", "prompt": "이름 열만 기준으로 중복을 제거하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"이름\": [\"A\", \"A\", \"B\"], \"점수\": [90, 80, 70]})\nprint(df.drop_duplicates(______=\"이름\"))", "answers": ["subset"], "output": "  이름  점수\n0  A  90\n2  B  70", "explain": "subset=\"이름\"은 이름 열만 기준으로 중복을 판단합니다. 점수가 달라도(90 vs 80) 이름이 같으면 중복으로 보고 첫 번째(A, 90)만 남깁니다. 특정 열을 기준으로 삼고 싶을 때 subset을 씁니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"값\": [5, 5, 6, 7, 7, 7]})\nprint(df.duplicated().sum())", "answers": ["3"], "output": "3", "explain": "5는 한 번 중복(1개), 7은 두 번 중복(2개)이므로 총 3개입니다. 각 값의 첫 등장은 중복으로 세지 않고, 두 번째부터를 중복으로 셉니다. 5->1개, 6->0개, 7->2개로 합이 3입니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "duplicated()가 하는 일은?", "options": ["중복 행 삭제", "각 행이 중복인지 True/False로 표시", "중복을 채움", "정렬"], "answer": 1, "explain": "duplicated()는 각 행이 앞의 행과 중복되는지를 True/False로 알려줍니다. 삭제는 drop_duplicates()입니다." },
+      { "id": "q2", "type": "mcq", "q": "duplicated()에서 처음 나온 행은 어떻게 표시되나요?", "options": ["True", "False", "NaN", "0"], "answer": 1, "explain": "처음 등장한 행은 중복이 아니므로 False, 같은 내용이 다시 나오는 두 번째부터 True가 됩니다." },
+      { "id": "q3", "type": "mcq", "q": "중복 행을 제거하는 함수는?", "options": ["drop()", "dropna()", "drop_duplicates()", "remove()"], "answer": 2, "explain": "drop_duplicates()가 중복 행을 제거합니다. drop()은 특정 행·열 삭제, dropna()는 결측치 행 삭제입니다." },
+      { "id": "q4", "type": "mcq", "q": "df.duplicated().sum()이 알려주는 것은?", "options": ["전체 행 수", "중복된 행의 개수", "결측치 개수", "고유값 개수"], "answer": 1, "explain": "True(중복)의 합이므로 중복된 행의 개수입니다. 각 값의 첫 등장은 세지 않습니다." },
+      { "id": "q5", "type": "mcq", "q": "drop_duplicates(subset=\"이름\")의 의미는?", "options": ["이름 열을 삭제", "이름이 같으면 중복으로 보고 제거", "이름을 정렬", "이름의 결측치 제거"], "answer": 1, "explain": "subset으로 지정한 열(이름)만 기준으로 중복을 판단합니다. 다른 열 값이 달라도 이름이 같으면 중복 처리해 첫 번째만 남깁니다." }
+    ]
+  },
+  "faq": [
+    { "q": "중복이 왜 문제가 되나요?", "a": "같은 데이터가 여러 번 세어지면 합계·평균 같은 통계가 왜곡돼요. 예를 들어 한 사람이 두 번 들어가면 인원 수나 평균이 실제와 달라집니다. 그래서 정제 단계에서 제거합니다." },
+    { "q": "duplicated는 왜 첫 번째를 False로 하나요?", "a": "원본은 남기고 그 뒤 복사본만 중복으로 보자는 기본 방침이에요. 그래서 첫 등장은 False(유지), 두 번째부터 True(제거 대상)가 됩니다." },
+    { "q": "완전히 똑같은 행만 중복인가요?", "a": "기본은 모든 열이 같아야 중복이에요. 하지만 subset으로 특정 열만 기준 삼으면, 그 열만 같아도 중복으로 처리할 수 있습니다." },
+    { "q": "drop_duplicates를 했는데 원본이 그대로예요.", "a": "결과만 새로 반환되기 때문이에요. df = df.drop_duplicates()처럼 다시 담아야 원본에 반영됩니다. dropna, fillna와 같은 방식입니다." }
+  ]
+}

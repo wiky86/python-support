@@ -1,0 +1,23 @@
+{
+  "id": "track4",
+  "order": 4,
+  "title": "pandas 실전 - 데이터 가공",
+  "description": "실제 분석에서 가장 많이 쓰는 데이터 정제와 가공 기법을 익힙니다.",
+  "topicOrder": [
+    "track4.missing",
+    "track4.duplicates",
+    "track4.dtype",
+    "track4.string",
+    "track4.apply",
+    "track4.newcolumns"
+  ],
+  "topicFiles": [
+    "topics/t1-missing.json",
+    "topics/t2-duplicates.json",
+    "topics/t3-dtype.json",
+    "topics/t4-string.json",
+    "topics/t5-apply.json",
+    "topics/t6-newcolumns.json"
+  ],
+  "projectFile": "project.json"
+}

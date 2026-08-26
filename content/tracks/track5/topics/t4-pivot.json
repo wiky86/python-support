@@ -1,0 +1,30 @@
+{
+  "id": "track5.pivot",
+  "trackId": "track5",
+  "order": 4,
+  "title": "피벗 테이블 (pivot_table)",
+  "content": "## 피벗 테이블이란?\n\n피벗 테이블은 데이터를 \"행 기준 x 열 기준\"의 2차원 표로 요약하는 도구입니다. 엑셀의 피벗 테이블과 같은 개념입니다. 예를 들어 \"지점(행) x 월(열)별 매출 합계\"처럼 두 기준으로 교차 집계할 때 강력합니다.\n\n예제 데이터:\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"지점\": [\"서울\", \"서울\", \"부산\", \"부산\"],\n    \"월\": [\"1월\", \"2월\", \"1월\", \"2월\"],\n    \"매출\": [100, 120, 80, 90]\n})\n```\n\n## pivot_table의 기본 구조\n\n```python\ndf.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"sum\")\n```\n\n출력:\n```\n월      1월   2월\n지점\n부산     80   90\n서울    100  120\n```\n\n네 가지를 지정합니다:\n- `index=\"지점\"` -> 행 기준\n- `columns=\"월\"` -> 열 기준\n- `values=\"매출\"` -> 집계할 값\n- `aggfunc=\"sum\"` -> 집계 방법\n\n지점이 세로, 월이 가로로 배치되어 교차 지점에 매출 합계가 들어갑니다.\n\n## groupby와 뭐가 다른가?\n\ngroupby는 보통 결과가 세로로 길게 나오지만, 피벗 테이블은 두 기준을 행과 열로 나눠 2차원 표로 보여줍니다. \"지점별 월별\"처럼 두 축으로 비교할 때 피벗 테이블이 훨씬 읽기 좋습니다.\n\n## 집계 방법 바꾸기 — aggfunc\n\n`aggfunc`로 합계 대신 평균, 개수 등을 지정할 수 있습니다.\n\n```python\ndf.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"mean\")\n```\n\n## 빈 칸은 NaN\n\n특정 조합에 데이터가 없으면 그 칸은 NaN(결측치)이 됩니다. 예를 들어 부산의 3월 데이터가 없으면 부산-3월 칸이 비게 됩니다. 이럴 때 `fill_value=0`을 주면 빈 칸을 0으로 채울 수 있습니다.\n\n```python\ndf.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"sum\", fill_value=0)\n```",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "피벗 테이블을 만드는 함수를 채우세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"지점\": [\"A\", \"A\", \"B\"], \"월\": [\"1월\", \"2월\", \"1월\"], \"매출\": [100, 120, 80]})\nprint(df.______(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"sum\"))", "answers": ["pivot_table"], "output": "월     1월     2월\n지점\nA    100.0  120.0\nB     80.0    NaN", "explain": "pivot_table은 행 기준(index)과 열 기준(columns)으로 교차 집계표를 만듭니다. A는 1월 100, 2월 120이고, B는 1월 80만 있어 2월은 NaN(데이터 없음)이 됩니다. 두 축으로 데이터를 요약할 때 씁니다." },
+    { "id": "fb2", "prompt": "행 기준을 지점으로 지정하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"지점\": [\"A\", \"B\"], \"월\": [\"1월\", \"1월\"], \"매출\": [100, 80]})\nprint(df.pivot_table(______=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"sum\"))", "answers": ["index"], "output": "월     1월\n지점\nA    100\nB     80", "explain": "index는 피벗 테이블에서 행(세로 축) 기준을 정합니다. 지점을 index로 두면 지점 값이 각 행이 됩니다. index(행)와 columns(열)를 어떻게 두느냐에 따라 표의 방향이 결정됩니다." },
+    { "id": "fb3", "prompt": "집계할 값으로 매출을 지정하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"지점\": [\"A\", \"A\"], \"월\": [\"1월\", \"2월\"], \"매출\": [100, 120]})\nprint(df.pivot_table(index=\"지점\", columns=\"월\", values=______, aggfunc=\"sum\"))", "answers": ["\"매출\"", "'매출'"], "output": "월    1월   2월\n지점\nA   100  120", "explain": "values는 교차 지점에 채울 집계 대상 값을 정합니다. 매출을 values로 두면 각 칸에 매출 집계값이 들어갑니다. index·columns가 \"어떻게 나눌지\"라면, values는 \"무엇을 계산할지\"입니다." },
+    { "id": "fb4", "prompt": "집계 방법을 평균으로 지정하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"지점\": [\"A\", \"A\"], \"월\": [\"1월\", \"1월\"], \"매출\": [100, 200]})\nprint(df.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=______))", "answers": ["\"mean\"", "'mean'"], "output": "월      1월\n지점\nA    150.0", "explain": "aggfunc는 집계 방법을 정합니다. \"mean\"을 주면 평균이 계산됩니다. A의 1월에 100과 200이 있으므로 평균은 150입니다. aggfunc를 \"sum\", \"count\", \"max\" 등으로 바꿔 원하는 집계를 할 수 있습니다." },
+    { "id": "fb5", "prompt": "빈 칸을 0으로 채우는 옵션을 완성하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"지점\": [\"A\", \"B\"], \"월\": [\"1월\", \"2월\"], \"매출\": [100, 80]})\nprint(df.pivot_table(index=\"지점\", columns=\"월\", values=\"매출\", aggfunc=\"sum\", ______=0))", "answers": ["fill_value"], "output": "월    1월  2월\n지점\nA   100   0\nB     0  80", "explain": "fill_value=0은 데이터가 없어 비어 있는 칸(NaN)을 0으로 채웁니다. A는 2월, B는 1월 데이터가 없어 원래 NaN이지만 0으로 표시됩니다. 매출표처럼 빈 칸을 0으로 보고 싶을 때 유용합니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "피벗 테이블의 특징으로 옳은 것은?", "options": ["1차원으로 나열한다", "두 기준을 행과 열로 나눠 2차원 표로 요약", "결측치를 제거한다", "정렬만 한다"], "answer": 1, "explain": "피벗 테이블은 index(행)와 columns(열) 두 기준으로 데이터를 교차 집계해 2차원 표로 만듭니다." },
+      { "id": "q2", "type": "mcq", "q": "pivot_table에서 행 기준을 정하는 매개변수는?", "options": ["columns", "index", "values", "aggfunc"], "answer": 1, "explain": "index가 행(세로 축) 기준, columns가 열(가로 축) 기준입니다." },
+      { "id": "q3", "type": "mcq", "q": "values가 정하는 것은?", "options": ["행 기준", "열 기준", "집계할 대상 값", "정렬 순서"], "answer": 2, "explain": "values는 교차 지점에 채울 집계 대상(예: 매출)을 정합니다. index·columns는 나누는 기준, values는 계산 대상입니다." },
+      { "id": "q4", "type": "mcq", "q": "집계 방법(합계/평균 등)을 정하는 매개변수는?", "options": ["aggfunc", "index", "fill_value", "values"], "answer": 0, "explain": "aggfunc로 집계 방법을 정합니다. \"sum\", \"mean\", \"count\" 등을 지정할 수 있습니다." },
+      { "id": "q5", "type": "mcq", "q": "데이터가 없는 칸을 0으로 채우려면?", "options": ["aggfunc=0", "fill_value=0", "values=0", "dropna()"], "answer": 1, "explain": "fill_value=0을 주면 데이터가 없어 NaN이 되는 칸을 0으로 채웁니다." }
+    ]
+  },
+  "faq": [
+    { "q": "groupby랑 pivot_table 중 뭘 써야 하나요?", "a": "한 기준으로 요약하면 groupby, 두 기준을 행x열로 교차해 보고 싶으면 pivot_table이 편해요. \"지점별 월별\"처럼 두 축이 있으면 피벗 테이블이 훨씬 읽기 좋습니다." },
+    { "q": "index랑 columns가 헷갈려요.", "a": "index는 세로(행) 방향, columns는 가로(열) 방향이에요. \"지점을 세로로, 월을 가로로\" 두고 싶으면 index=\"지점\", columns=\"월\"으로 지정하면 됩니다." },
+    { "q": "왜 어떤 칸은 NaN이 나오나요?", "a": "그 조합에 데이터가 아예 없어서예요. 예를 들어 부산의 2월 매출 기록이 없으면 부산-2월 칸이 비어 NaN이 됩니다. fill_value=0으로 0으로 채울 수 있어요." },
+    { "q": "aggfunc를 안 쓰면 어떻게 되나요?", "a": "생략하면 기본값이 평균(mean)이에요. 합계를 원하면 꼭 aggfunc=\"sum\"을 지정해야 합니다. 의도한 집계가 나오도록 명시하는 게 좋아요." }
+  ]
+}

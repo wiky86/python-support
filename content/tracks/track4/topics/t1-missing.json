@@ -1,0 +1,30 @@
+{
+  "id": "track4.missing",
+  "trackId": "track4",
+  "order": 1,
+  "title": "결측치 확인과 처리",
+  "content": "## 결측치란?\n\n결측치(missing value)는 값이 비어 있는 칸입니다. 실제 데이터에는 설문 미응답, 기록 누락 등으로 빈 칸이 흔하게 생깁니다. pandas는 이런 빈 값을 `NaN`(Not a Number)으로 표시하며, 분석 전에 이를 확인하고 처리하는 것이 데이터 정제의 첫걸음입니다.\n\n예제 데이터 (일부 값이 비어 있음):\n\n```python\nimport pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [90, np.nan, 70]\n})\nprint(df)\n```\n\n출력:\n```\n    이름    점수\n0  김철수  90.0\n1  이영희   NaN\n2  박민수  70.0\n```\n\n이영희의 점수가 `NaN`(결측치)입니다.\n\n## 결측치 확인 — isna()\n\n`isna()`는 각 칸이 결측치인지 True/False로 보여줍니다.\n\n```python\ndf[\"점수\"].isna()\n```\n\n출력:\n```\n0    False\n1     True\n2    False\nName: 점수, dtype: bool\n```\n\n## 결측치 개수 세기\n\n`isna()`에 `sum()`을 붙이면 결측치 개수를 셀 수 있습니다(True=1).\n\n```python\ndf[\"점수\"].isna().sum()     # 1\n```\n\n전체 표의 열별 결측치 개수도 한 번에 볼 수 있습니다.\n\n```python\ndf.isna().sum()\n```\n\n## 결측치 채우기 — fillna()\n\n`fillna(값)`은 결측치를 지정한 값으로 채웁니다.\n\n```python\ndf[\"점수\"].fillna(0)        # NaN을 0으로\n```\n\n평균으로 채우는 것도 흔한 방법입니다.\n\n```python\ndf[\"점수\"].fillna(df[\"점수\"].mean())\n```\n\n## 결측치 있는 행 삭제 — dropna()\n\n`dropna()`는 결측치가 있는 행을 통째로 지웁니다.\n\n```python\ndf.dropna()\n```\n\n출력:\n```\n    이름    점수\n0  김철수  90.0\n2  박민수  70.0\n```\n\n## 채울까 지울까?\n\n결측치가 적고 값을 추정할 수 있으면 `fillna`로 채우고, 결측치가 많거나 그 행 자체가 신뢰하기 어려우면 `dropna`로 지웁니다. 정답은 없고 데이터 상황에 따라 판단합니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "점수 열의 결측치 여부를 True/False로 확인하세요.", "code": "import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\"점수\": [90, np.nan, 70]})\nprint(df[\"점수\"].______())", "answers": ["isna", "isnull"], "output": "0    False\n1     True\n2    False\nName: 점수, dtype: bool", "explain": "isna()는 각 칸이 결측치(NaN)인지를 True/False로 알려줍니다. 결측치인 자리만 True가 됩니다. 이 결과가 결측치 처리의 출발점입니다. (isnull()도 같은 기능이며 이름만 다릅니다.)" },
+    { "id": "fb2", "prompt": "점수 열의 결측치 개수를 세세요.", "code": "import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\"점수\": [90, np.nan, 70, np.nan]})\nprint(df[\"점수\"].isna().______())", "answers": ["sum"], "output": "2", "explain": "isna()가 만든 True/False에서 True는 1로 계산되므로, sum()을 붙이면 결측치 개수가 나옵니다. NaN이 2개이므로 2입니다. 어느 열에 결측치가 몇 개인가를 파악하는 필수 패턴입니다." },
+    { "id": "fb3", "prompt": "결측치를 0으로 채우세요.", "code": "import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\"점수\": [90, np.nan, 70]})\nprint(df[\"점수\"].______(0))", "answers": ["fillna"], "output": "0    90.0\n1     0.0\n2    70.0\nName: 점수, dtype: float64", "explain": "fillna(0)은 결측치를 0으로 채웁니다. 비어 있던 자리가 0.0이 됩니다. 결측치를 특정 값(0, 평균 등)으로 대체할 때 쓰며, 원본을 바꾸려면 df[\"점수\"] = df[\"점수\"].fillna(0)처럼 다시 담아야 합니다." },
+    { "id": "fb4", "prompt": "결측치가 있는 행을 삭제하세요.", "code": "import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\"이름\": [\"A\", \"B\", \"C\"], \"점수\": [90, np.nan, 70]})\nprint(df.______())", "answers": ["dropna"], "output": "  이름    점수\n0  A  90.0\n2  C  70.0", "explain": "dropna()는 결측치가 하나라도 있는 행을 통째로 삭제합니다. B 행(점수가 NaN)이 제거되고, 남은 행의 인덱스(0, 2)는 유지됩니다. 결측치가 많거나 그 행을 신뢰하기 어려울 때 사용합니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\"값\": [10, np.nan, 30, np.nan, 50]})\nprint(df[\"값\"].isna().sum())", "answers": ["2"], "output": "2", "explain": "NaN이 2개(2번째, 4번째 위치)이므로 결측치 개수는 2입니다. isna()로 True/False를 만들고 sum()으로 True 개수를 세는 조합입니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "결측치(비어 있는 값)를 pandas에서 표시하는 것은?", "options": ["0", "NaN", "None만", "빈 문자열"], "answer": 1, "explain": "pandas는 결측치를 NaN(Not a Number)으로 표시합니다. 0이나 빈 문자열은 실제 값이므로 결측치와 다릅니다." },
+      { "id": "q2", "type": "mcq", "q": "df[\"점수\"].isna()의 결과는?", "options": ["결측치 개수", "각 칸이 결측치인지 True/False", "평균", "결측치를 채운 결과"], "answer": 1, "explain": "isna()는 각 칸이 결측치인지를 True/False Series로 알려줍니다. 개수를 세려면 뒤에 sum()을 붙입니다." },
+      { "id": "q3", "type": "mcq", "q": "결측치 개수를 세는 코드는?", "options": ["df.isna()", "df.isna().sum()", "df.dropna()", "df.count()"], "answer": 1, "explain": "isna()로 True/False를 만든 뒤 sum()으로 True(결측치) 개수를 셉니다. isna()만으로는 개수가 아니라 True/False 표가 나옵니다." },
+      { "id": "q4", "type": "mcq", "q": "fillna(0)이 하는 일은?", "options": ["결측치가 있는 행 삭제", "결측치를 0으로 채움", "0인 값을 삭제", "결측치 개수 세기"], "answer": 1, "explain": "fillna(값)은 결측치를 지정한 값(여기선 0)으로 채웁니다. 행 삭제는 dropna()입니다." },
+      { "id": "q5", "type": "mcq", "q": "다음 중 결측치가 있는 행을 삭제하는 함수는?", "options": ["fillna()", "isna()", "dropna()", "drop()"], "answer": 2, "explain": "dropna()가 결측치가 있는 행을 삭제합니다. drop()은 특정 행·열을 이름으로 지울 때 쓰는 다른 함수입니다." }
+    ]
+  },
+  "faq": [
+    { "q": "NaN이 정확히 뭔가요?", "a": "Not a Number의 약자로, 값이 없음을 나타내는 pandas의 결측치 표시예요. 숫자 0이나 빈 문자열과는 달라요. 0은 0이라는 값이 있는 거고, NaN은 값 자체가 비었다는 뜻입니다." },
+    { "q": "isna랑 isnull은 뭐가 다른가요?", "a": "완전히 같은 기능이에요. 이름만 두 가지일 뿐이라 아무거나 써도 됩니다. 결측치인지 True/False로 알려줍니다." },
+    { "q": "결측치는 채우는 게 나아요, 지우는 게 나아요?", "a": "상황에 따라 달라요. 결측치가 적고 값을 추정할 수 있으면 fillna로 채우고, 너무 많거나 그 행을 믿기 어려우면 dropna로 지웁니다. 정답이 정해져 있진 않습니다." },
+    { "q": "fillna를 했는데 원본이 안 바뀌었어요.", "a": "fillna도 결과를 새로 돌려줄 뿐 원본은 그대로예요. df[\"점수\"] = df[\"점수\"].fillna(0)처럼 다시 담아야 반영됩니다." }
+  ]
+}

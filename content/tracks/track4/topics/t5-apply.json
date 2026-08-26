@@ -1,0 +1,30 @@
+{
+  "id": "track4.apply",
+  "trackId": "track4",
+  "order": 5,
+  "title": "apply로 함수 적용",
+  "content": "## apply란?\n\n`apply`는 열의 각 값에 함수를 적용해 새로운 값을 만드는 도구입니다. 지금까지 배운 벡터 연산(`+`, `*`)이나 `.str` 메서드로 안 되는, 좀 더 복잡한 처리를 할 때 씁니다. \"점수를 등급으로 바꾸기\", \"조건에 따라 다른 값 넣기\" 같은 작업이 대표적입니다.\n\n예제 데이터:\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [90, 75, 55]\n})\n```\n\n## 함수를 만들어 적용하기\n\n먼저 점수를 등급으로 바꾸는 함수를 만듭니다.\n\n```python\ndef to_grade(score):\n    if score >= 80:\n        return \"A\"\n    elif score >= 60:\n        return \"B\"\n    else:\n        return \"C\"\n```\n\n이 함수를 `apply`로 점수 열에 적용합니다.\n\n```python\ndf[\"등급\"] = df[\"점수\"].apply(to_grade)\nprint(df)\n```\n\n출력:\n```\n    이름  점수 등급\n0  김철수  90  A\n1  이영희  75  B\n2  박민수  55  C\n```\n\n각 점수가 함수를 거쳐 등급으로 바뀌었습니다. `apply(to_grade)`는 함수 이름만 넣고 괄호는 붙이지 않는 점에 주의하세요.\n\n## lambda로 간단한 함수 바로 쓰기\n\n간단한 처리는 함수를 따로 정의하지 않고 `lambda`로 한 줄에 쓸 수 있습니다.\n\n```python\ndf[\"점수2배\"] = df[\"점수\"].apply(lambda x: x * 2)\n```\n\n`lambda x: x * 2`는 \"x를 받아 x*2를 돌려주는 이름 없는 함수\"입니다. `x`가 각 점수 값이 됩니다.\n\n## 조건을 lambda로\n\n```python\ndf[\"합격\"] = df[\"점수\"].apply(lambda x: \"합격\" if x >= 60 else \"불합격\")\n```\n\n`값 if 조건 else 다른값` 형태로, 조건에 따라 다른 결과를 냅니다.\n\n## apply는 언제 쓰나?\n\n단순 계산(`df[\"점수\"] * 2`)은 벡터 연산이 더 간단합니다. apply는 if/elif처럼 조건 분기가 있거나, 직접 만든 함수로 복잡하게 변환할 때 진가를 발휘합니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "점수 열에 to_grade 함수를 적용하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [90, 75, 55]})\n\ndef to_grade(score):\n    if score >= 80:\n        return \"A\"\n    elif score >= 60:\n        return \"B\"\n    else:\n        return \"C\"\n\ndf[\"등급\"] = df[\"점수\"].______(to_grade)\nprint(list(df[\"등급\"]))", "answers": ["apply"], "output": "['A', 'B', 'C']", "explain": "apply(to_grade)는 점수 열의 각 값을 to_grade 함수에 하나씩 넣어 결과를 모읍니다. 90->A, 75->B, 55->C로 변환됩니다. 함수 이름만 넣고 괄호(to_grade())는 붙이지 않는다는 점이 중요합니다." },
+    { "id": "fb2", "prompt": "lambda로 각 점수를 2배로 만드세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [10, 20, 30]})\ndf[\"2배\"] = df[\"점수\"].apply(lambda x: x ______ 2)\nprint(list(df[\"2배\"]))", "answers": ["*"], "output": "[20, 40, 60]", "explain": "lambda x: x * 2는 x를 받아 2배로 돌려주는 이름 없는 함수입니다. apply가 각 점수를 x에 넣어 실행하므로 10->20, 20->40, 30->60이 됩니다. (참고: 이런 단순 계산은 df[\"점수\"] * 2처럼 벡터 연산이 더 간단합니다.)" },
+    { "id": "fb3", "prompt": "lambda로 60 이상이면 합격, 아니면 불합격을 넣으세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [90, 50, 70]})\ndf[\"결과\"] = df[\"점수\"].apply(lambda x: \"합격\" ______ x >= 60 else \"불합격\")\nprint(list(df[\"결과\"]))", "answers": ["if"], "output": "['합격', '불합격', '합격']", "explain": "\"합격\" if x >= 60 else \"불합격\"은 조건에 따라 다른 값을 돌려주는 표현입니다. x가 60 이상이면 합격, 아니면 불합격이 됩니다. apply와 lambda를 조합하면 조건에 따른 값 분류를 한 줄로 처리할 수 있습니다." },
+    { "id": "fb4", "prompt": "lambda의 시작 키워드를 채우세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"값\": [1, 2, 3]})\ndf[\"제곱\"] = df[\"값\"].apply(______ x: x * x)\nprint(list(df[\"제곱\"]))", "answers": ["lambda"], "output": "[1, 4, 9]", "explain": "lambda는 이름 없는 함수를 만드는 키워드입니다. lambda x: x * x는 x를 받아 제곱을 돌려줍니다. 각 값 1, 2, 3이 1, 4, 9가 됩니다. 간단한 변환을 함수 정의 없이 한 줄로 쓸 때 유용합니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [85, 40, 65]})\ndf[\"판정\"] = df[\"점수\"].apply(lambda x: \"통과\" if x >= 60 else \"미달\")\nprint(list(df[\"판정\"]))", "answers": ["['통과', '미달', '통과']", "[\"통과\", \"미달\", \"통과\"]", "['통과','미달','통과']"], "output": "['통과', '미달', '통과']", "explain": "각 점수를 조건에 넣으면 85(>=60)->통과, 40(<60)->미달, 65(>=60)->통과가 됩니다. apply가 각 값을 lambda에 넣어 조건을 평가한 결과를 모읍니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "apply가 하는 일은?", "options": ["열을 삭제", "열의 각 값에 함수를 적용", "열을 정렬", "결측치 채우기"], "answer": 1, "explain": "apply는 열의 각 값에 함수를 하나씩 적용해 결과를 만듭니다. 조건 분기나 복잡한 변환에 유용합니다." },
+      { "id": "q2", "type": "mcq", "q": "df[\"점수\"].apply(to_grade)에서 함수 이름 뒤에 괄호를 붙이지 않는 이유는?", "options": ["실수 방지", "함수를 실행하지 말고 apply에 넘겨주기 위해", "괄호를 붙여도 같다", "규칙상 금지"], "answer": 1, "explain": "to_grade(괄호 없이)는 함수 자체를 apply에 넘겨, apply가 각 값에 대신 실행하게 합니다. to_grade()처럼 괄호를 붙이면 지금 실행하려 해서 에러가 납니다." },
+      { "id": "q3", "type": "mcq", "q": "lambda x: x * 2의 의미는?", "options": ["x를 2로 나눈다", "x를 받아 2배로 돌려주는 이름 없는 함수", "x를 삭제", "2를 출력"], "answer": 1, "explain": "lambda는 이름 없는 함수를 만듭니다. lambda x: x * 2는 x를 입력받아 x*2를 반환합니다." },
+      { "id": "q4", "type": "mcq", "q": "lambda x: \"합격\" if x >= 60 else \"불합격\"이 하는 일은?", "options": ["항상 합격", "60 이상이면 합격, 아니면 불합격", "x를 60으로 바꿈", "에러"], "answer": 1, "explain": "값 if 조건 else 다른값 형태로, x가 60 이상이면 합격, 아니면 불합격을 돌려줍니다. 조건에 따른 분류에 씁니다." },
+      { "id": "q5", "type": "mcq", "q": "다음 중 apply가 특히 유용한 경우는?", "options": ["단순히 모든 값에 10 더하기", "if/elif로 조건에 따라 등급 매기기", "열 이름 바꾸기", "행 개수 세기"], "answer": 1, "explain": "apply는 조건 분기(if/elif)나 직접 만든 함수로 복잡하게 변환할 때 유용합니다. 단순한 사칙연산은 벡터 연산(df[\"값\"] + 10)이 더 간단합니다." }
+    ]
+  },
+  "faq": [
+    { "q": "apply랑 벡터 연산(df[\"점수\"] * 2)은 언제 구분해서 쓰나요?", "a": "단순한 사칙연산은 벡터 연산이 더 짧고 빨라요. apply는 if/elif 같은 조건 분기나, 직접 만든 복잡한 함수를 적용할 때 씁니다." },
+    { "q": "lambda가 꼭 필요한가요?", "a": "아니에요. def로 함수를 만들어 apply에 넘겨도 됩니다. 다만 한 줄짜리 간단한 처리는 lambda로 바로 쓰는 게 편해서 자주 씁니다." },
+    { "q": "apply(to_grade)에서 왜 괄호를 안 붙이나요?", "a": "괄호를 붙이면(to_grade()) 그 자리에서 함수를 실행하려 해요. 우리는 함수 자체를 apply에 넘겨서, apply가 각 값마다 대신 실행하게 하려는 거라 괄호 없이 이름만 넣습니다." },
+    { "q": "lambda의 x는 무엇인가요?", "a": "열의 각 값이 순서대로 x에 들어가요. 점수 열이면 90, 75, 55가 차례로 x가 되어 lambda 뒤의 식이 계산됩니다." }
+  ]
+}

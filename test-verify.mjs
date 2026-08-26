@@ -49,7 +49,7 @@ const TRACKS_DIR = path.join(CONTENT_DIR, "tracks");
 const CONFIG_DIR = path.join(CONTENT_DIR, "config");
 
 const trackDirs = fs.readdirSync(TRACKS_DIR).filter((d) => fs.statSync(path.join(TRACKS_DIR, d)).isDirectory());
-assert(trackDirs.length >= 3, `Found ${trackDirs.length} tracks (track1, track2, track3)`);
+assert(trackDirs.length >= 5, `Found ${trackDirs.length} tracks (track1 ~ track5)`);
 
 let totalTopicsCount = 0;
 
@@ -82,7 +82,7 @@ trackDirs.forEach((dir) => {
   }
 });
 
-assert(totalTopicsCount === 20, `Total topics count is 20 (Track1: 7, Track2: 6, Track3: 7)`);
+assert(totalTopicsCount === 31, `Total topics count is 31 (Track1: 7, Track2: 6, Track3: 7, Track4: 6, Track5: 5)`);
 
 const xpRules = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, "xp-rules.json"), "utf-8"));
 assert(xpRules.awards.quizPass === 20, "xpRules quizPass is 20");

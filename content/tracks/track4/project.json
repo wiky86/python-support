@@ -1,0 +1,32 @@
+{
+  "id": "track4.project",
+  "trackId": "track4",
+  "title": "지저분한 회원 데이터 정제하기",
+  "intro": "트랙4에서 배운 결측치 처리, 중복 제거, 타입 변환, 문자열 처리, 파생 열 만들기를 활용해 지저분한 가상 회원 데이터를 깨끗하게 정제합니다. 실제 데이터 정제 흐름을 압축해 경험하는 프로젝트입니다. 각 미션은 앞 미션의 결과에 이어서 진행됩니다.",
+  "dataset": {
+    "description": "일부러 문제를 심어둔 회원 데이터 (공백, 대소문자 불일치, 결측치, 중복, 문자열로 된 나이)",
+    "code": "import pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame({\n    \"이름\": [\" 김철수\", \"이영희\", \"박민수\", \"박민수\", \"최지우\"],\n    \"이메일\": [\"KIM@A.COM\", \"lee@b.com\", \"park@c.com\", \"park@c.com\", \"choi@d.com\"],\n    \"나이\": [\"25\", \"30\", \"28\", \"28\", np.nan]\n})"
+  },
+  "missions": [
+    { "id": "m1", "prompt": "나이 열의 결측치 개수 확인하기", "code": "print(df[\"나이\"].isna().______())", "answers": ["sum"], "output": "1", "explain": "isna().sum()으로 나이 열의 결측치 개수를 셉니다. 최지우의 나이가 NaN이므로 1개입니다. 정제를 시작하기 전에 어느 열에 결측치가 얼마나 있는지 파악하는 첫 단계입니다." },
+    { "id": "m2", "prompt": "이름의 앞뒤 공백 제거하기", "code": "df[\"이름\"] = df[\"이름\"].str.______()\nprint(list(df[\"이름\"]))", "answers": ["strip"], "output": "['김철수', '이영희', '박민수', '박민수', '최지우']", "explain": ".str.strip()으로 ' 김철수'의 앞 공백을 제거합니다. 공백이 남아 있으면 ' 김철수'와 '김철수'가 다른 값으로 취급되어 중복 제거가 제대로 되지 않으므로, 중복 처리 전에 공백부터 정리합니다." },
+    { "id": "m3", "prompt": "이메일을 모두 소문자로 통일하기", "code": "df[\"이메일\"] = df[\"이메일\"].str.______()\nprint(list(df[\"이메일\"]))", "answers": ["lower"], "output": "['kim@a.com', 'lee@b.com', 'park@c.com', 'park@c.com', 'choi@d.com']", "explain": ".str.lower()로 'KIM@A.COM'을 소문자로 바꿔 다른 이메일과 형식을 통일합니다. 대소문자만 다른 같은 이메일을 동일하게 취급하기 위한 정제입니다." },
+    { "id": "m4", "prompt": "중복된 회원 제거하기", "code": "df = df.______()\nprint(len(df))", "answers": ["drop_duplicates"], "output": "4", "explain": "drop_duplicates()로 완전히 같은 행을 제거합니다. 박민수(park@c.com, 28)가 두 번 있었으므로 하나가 제거되어 5명에서 4명이 됩니다. 앞서 공백·대소문자를 정리했기 때문에 중복이 정확히 걸러집니다." },
+    { "id": "m5", "prompt": "나이 결측치를 0으로 채우기", "code": "df[\"나이\"] = df[\"나이\"].______(0)\nprint(list(df[\"나이\"]))", "answers": ["fillna"], "output": "['25', '30', '28', 0]", "explain": "fillna(0)으로 최지우의 결측치(NaN)를 0으로 채웁니다. 다른 값은 아직 문자열이라 그대로이고 결측치 자리만 정수 0으로 채워지므로 값이 섞여 있는 상태입니다. 다음 단계에서 나이를 숫자로 변환하려면 결측치가 없어야 하므로 변환 전에 먼저 처리합니다. (중복 제거로 인덱스는 0,1,2,4가 남습니다.)" },
+    { "id": "m6", "prompt": "나이를 정수형으로 변환하기", "code": "df[\"나이\"] = df[\"나이\"].astype(______)\nprint(df[\"나이\"].dtype)", "answers": ["int"], "output": "int64", "explain": "astype(int)로 문자열 나이('25', '30'...)를 정수로 변환합니다. 앞 미션에서 결측치를 0으로 채웠기 때문에 에러 없이 변환됩니다. 이제 나이로 평균 등의 계산이 가능해집니다." },
+    { "id": "m7", "prompt": "성인 여부(20세 이상) 열 만들기", "code": "import numpy as np\ndf[\"성인\"] = np.where(df[\"나이\"] >= 20, \"성인\", \"미성년\")\nprint(list(df[\"성인\"]))", "answers": ["where"], "output": "['성인', '성인', '성인', '미성년']", "explain": "np.where로 나이가 20 이상이면 성인, 아니면 미성년인 파생 열을 만듭니다. 0으로 채워진 최지우만 미성년이 됩니다. 정제된 데이터로 새로운 분석 열을 만드는 마무리 단계입니다." }
+  ],
+  "report": {
+    "title": "회원 데이터 정제 리포트",
+    "template": "정제 전: {beforeRows}행 (공백·중복·결측치·문자열 나이 포함)\n정제 후: {afterRows}명 (중복 {duplicatesRemoved}건 제거)\n결측치 처리: 나이 {missingFilled}건 -> 0으로 대체\n성인 회원: {adultCount}명 / 미성년: {minorCount}명",
+    "computedValues": {
+      "beforeRows": 5,
+      "afterRows": 4,
+      "duplicatesRemoved": 1,
+      "missingFilled": 1,
+      "adultCount": 3,
+      "minorCount": 1
+    },
+    "conceptsUsed": ["결측치 처리", "문자열 정제", "중복 제거", "타입 변환", "파생 열"]
+  }
+}

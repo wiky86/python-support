@@ -1,0 +1,30 @@
+{
+  "id": "track5.aggregation",
+  "trackId": "track5",
+  "order": 2,
+  "title": "그룹별 집계 (sum, mean, count)",
+  "content": "## 다양한 집계 함수\n\ngroupby로 묶은 뒤에는 합계뿐 아니라 평균, 개수, 최댓값 등 여러 집계를 낼 수 있습니다. 이번엔 자주 쓰는 집계 함수들을 살펴봅니다.\n\n예제 데이터:\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\n    \"부서\": [\"영업\", \"개발\", \"영업\", \"개발\", \"영업\"],\n    \"연봉\": [4000, 5000, 4500, 6000, 3500]\n})\n```\n\n## 합계 — sum()\n\n```python\ndf.groupby(\"부서\")[\"연봉\"].sum()\n```\n\n부서별 연봉 총합입니다.\n\n## 평균 — mean()\n\n```python\ndf.groupby(\"부서\")[\"연봉\"].mean()\n```\n\n출력:\n```\n부서\n개발    5500.0\n영업    4000.0\nName: 연봉, dtype: float64\n```\n\n영업 평균 (4000+4500+3500)/3=4000, 개발 (5000+6000)/2=5500입니다.\n\n## 개수 — count()\n\n```python\ndf.groupby(\"부서\")[\"연봉\"].count()\n```\n\n각 그룹에서 연봉 값이 몇 개인지(결측치 제외) 셉니다.\n\n## 최댓값·최솟값 — max(), min()\n\n```python\ndf.groupby(\"부서\")[\"연봉\"].max()      # 부서별 최고 연봉\ndf.groupby(\"부서\")[\"연봉\"].min()      # 부서별 최저 연봉\n```\n\n## 주요 집계 함수 정리\n\n| 함수 | 의미 |\n|---|---|\n| `sum()` | 그룹별 합계 |\n| `mean()` | 그룹별 평균 |\n| `count()` | 그룹별 개수(결측치 제외) |\n| `max()` / `min()` | 그룹별 최대 / 최소 |\n| `size()` | 그룹별 행 수(결측치 포함) |\n\n## 집계 결과 정렬하기\n\n집계 결과도 정렬할 수 있습니다. \"평균 연봉이 높은 부서 순\"으로 보고 싶다면:\n\n```python\ndf.groupby(\"부서\")[\"연봉\"].mean().sort_values(ascending=False)\n```\n\ngroupby로 집계한 뒤 `sort_values`를 이어 붙이는 이 패턴은 실무에서 아주 자주 씁니다.",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "부서별 연봉 평균을 구하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"부서\": [\"A\", \"B\", \"A\"], \"연봉\": [4000, 5000, 6000]})\nprint(df.groupby(\"부서\")[\"연봉\"].______())", "answers": ["mean"], "output": "부서\nA    5000.0\nB    5000.0\nName: 연봉, dtype: float64", "explain": "mean()으로 그룹별 평균을 구합니다. A는 (4000+6000)/2=5000, B는 5000입니다. 평균은 나눗셈을 포함하므로 결과가 실수형(5000.0)으로 나옵니다." },
+    { "id": "fb2", "prompt": "부서별 인원수(연봉 값의 개수)를 세세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"부서\": [\"A\", \"B\", \"A\", \"A\"], \"연봉\": [4000, 5000, 6000, 4500]})\nprint(df.groupby(\"부서\")[\"연봉\"].______())", "answers": ["count"], "output": "부서\nA    3\nB    1\nName: 연봉, dtype: int64", "explain": "count()는 각 그룹에서 값이 있는 행의 개수를 셉니다(결측치 제외). A는 3명, B는 1명입니다. 그룹별 인원이나 건수를 셀 때 씁니다." },
+    { "id": "fb3", "prompt": "부서별 최고 연봉을 구하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"부서\": [\"A\", \"B\", \"A\"], \"연봉\": [4000, 5000, 6000]})\nprint(df.groupby(\"부서\")[\"연봉\"].______())", "answers": ["max"], "output": "부서\nA    6000\nB    5000\nName: 연봉, dtype: int64", "explain": "max()는 각 그룹의 최댓값을 구합니다. A 그룹의 최고 연봉은 6000, B는 5000입니다. 반대로 최저값은 min()으로 구합니다. 그룹 내에서 가장 크거나 작은 값을 찾을 때 유용합니다." },
+    { "id": "fb4", "prompt": "부서별 평균 연봉을 높은 순으로 정렬하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"부서\": [\"A\", \"B\", \"A\", \"B\"], \"연봉\": [4000, 6000, 5000, 8000]})\nprint(df.groupby(\"부서\")[\"연봉\"].mean().sort_values(______=False))", "answers": ["ascending"], "output": "부서\nB    7000.0\nA    4500.0\nName: 연봉, dtype: float64", "explain": "groupby로 평균을 낸 뒤 sort_values(ascending=False)로 내림차순 정렬합니다. B(7000)가 A(4500)보다 높아 위로 옵니다. 집계와 정렬을 이어 붙이는 이 패턴으로 \"평균이 높은 그룹 순위\"를 만들 수 있습니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요. (나 팀의 값)", "code": "import pandas as pd\ndf = pd.DataFrame({\"팀\": [\"가\", \"나\", \"가\", \"나\"], \"점수\": [10, 20, 30, 40]})\nresult = df.groupby(\"팀\")[\"점수\"].sum()\nprint(result[\"나\"])", "answers": ["60"], "output": "60", "explain": "팀으로 묶어 점수 합계를 냅니다. 나 팀은 20+40=60입니다. 결과 인덱스가 그룹 이름(가, 나)이므로 result[\"나\"]로 해당 그룹 값을 꺼낼 수 있습니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "그룹별 평균을 구하는 집계 함수는?", "options": ["sum()", "mean()", "count()", "size()"], "answer": 1, "explain": "mean()이 그룹별 평균을 구합니다. sum은 합계, count/size는 개수입니다." },
+      { "id": "q2", "type": "mcq", "q": "df.groupby(\"부서\")[\"연봉\"].count()가 세는 것은?", "options": ["부서 종류 수", "각 부서의 연봉 값 개수", "연봉 합계", "평균"], "answer": 1, "explain": "count()는 각 그룹에서 값이 있는 행의 개수(결측치 제외)를 셉니다. 그룹별 인원이나 건수를 구할 때 씁니다." },
+      { "id": "q3", "type": "mcq", "q": "그룹별 최고값을 구하는 것은?", "options": ["min()", "mean()", "max()", "sum()"], "answer": 2, "explain": "max()가 각 그룹의 최댓값을 구합니다. 최솟값은 min()입니다." },
+      { "id": "q4", "type": "mcq", "q": "집계 결과를 값이 큰 순으로 정렬하려면?", "options": [".sort_values()", ".sort_values(ascending=False)", ".max()", ".sort()"], "answer": 1, "explain": "집계 뒤에 sort_values(ascending=False)를 이어 붙이면 내림차순 정렬됩니다. groupby + 정렬은 그룹 순위를 만드는 표준 패턴입니다." },
+      { "id": "q5", "type": "mcq", "q": "count()와 size()의 차이로 옳은 것은?", "options": ["완전히 같다", "count는 결측치 제외, size는 결측치 포함", "count는 합계, size는 평균", "size는 정렬한다"], "answer": 1, "explain": "count()는 값이 있는 행만(결측치 제외), size()는 결측치를 포함한 전체 행 수를 셉니다. 결측치가 없으면 결과가 같습니다." }
+    ]
+  },
+  "faq": [
+    { "q": "집계 함수는 이것만 있나요?", "a": "자주 쓰는 게 sum, mean, count, max, min, size예요. 이 밖에도 중앙값(median), 표준편차(std) 등이 있는데, 쓰는 방법은 모두 같아요. groupby 뒤에 붙이면 됩니다." },
+    { "q": "mean 결과에 왜 .0이 붙나요?", "a": "평균은 나눗셈이라 결과가 실수(float)가 되기 때문이에요. 5000이 5000.0으로 표시됩니다. 반올림해서 보여주고 싶으면 .round(0) 등을 쓸 수 있어요." },
+    { "q": "집계하고 정렬까지 한 줄로 되나요?", "a": "네, df.groupby(\"부서\")[\"연봉\"].mean().sort_values(ascending=False)처럼 이어 쓰면 돼요. 집계 결과에 바로 정렬을 연결하는 방식(체이닝)입니다." },
+    { "q": "여러 집계를 한 번에 볼 수는 없나요?", "a": "있어요. 다음 토픽에서 배울 agg를 쓰면 합계·평균·개수를 한 번에 구할 수 있습니다. 지금은 함수 하나씩 쓰는 것부터 익히면 됩니다." }
+  ]
+}

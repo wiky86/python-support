@@ -1,0 +1,30 @@
+{
+  "id": "track4.dtype",
+  "trackId": "track4",
+  "order": 3,
+  "title": "데이터 타입 변환 (astype)",
+  "content": "## 자료형이 왜 중요한가?\n\n같은 \"90\"이라도 숫자 90과 문자열 \"90\"은 다르게 동작합니다. 문자열이면 계산이 안 되고, 숫자여야 평균·합계를 낼 수 있습니다. 실제 데이터는 숫자가 문자열로 들어와 있는 경우가 많아, 분석 전에 올바른 자료형으로 바꿔줘야 합니다.\n\n## 열의 자료형 확인 — dtype\n\n```python\nimport pandas as pd\ndf = pd.DataFrame({\"점수\": [\"90\", \"85\", \"70\"]})\ndf[\"점수\"].dtype\n```\n\n출력:\n```\ndtype('O')\n```\n\n`O`는 object로, 보통 문자열을 뜻합니다. 점수가 숫자처럼 보이지만 실제로는 문자열로 저장되어 있습니다.\n\n## 타입 변환 — astype()\n\n`astype(자료형)`으로 열의 자료형을 바꿉니다.\n\n```python\ndf[\"점수\"] = df[\"점수\"].astype(int)\ndf[\"점수\"].dtype       # dtype('int64')\n```\n\n문자열 \"90\"이 숫자 90으로 바뀌어 계산이 가능해집니다.\n\n```python\ndf[\"점수\"].mean()      # 이제 평균 계산 가능\n```\n\n## 자주 쓰는 변환 대상\n\n| 변환 | 코드 | 용도 |\n|---|---|---|\n| 정수로 | `astype(int)` | 개수, 나이, 점수 |\n| 실수로 | `astype(float)` | 평균, 비율 |\n| 문자열로 | `astype(str)` | 코드번호, 라벨 |\n\n## 문자열 → 숫자, 주의점\n\n`astype(int)`는 값이 깔끔한 숫자 형태일 때만 됩니다. \"abc\"처럼 숫자로 바꿀 수 없는 값이 섞여 있으면 에러가 납니다. 또한 결측치(NaN)가 있으면 int로 바로 변환할 수 없어, 먼저 결측치를 처리해야 합니다.\n\n## 숫자를 문자열로 바꾸기\n\n반대로 숫자를 문자열로 바꿀 수도 있습니다. 우편번호나 상품코드처럼 계산할 필요 없는 숫자에 유용합니다.\n\n```python\ndf[\"코드\"] = df[\"코드\"].astype(str)\n```",
+  "fillBlanks": [
+    { "id": "fb1", "prompt": "점수 열의 자료형을 확인하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [\"90\", \"85\"]})\nprint(df[\"점수\"].______)", "answers": ["dtype"], "output": "object", "explain": "dtype은 열의 자료형을 알려줍니다. 결과 object(O)는 보통 문자열을 뜻합니다. 숫자처럼 보여도 따옴표로 저장돼 있으면 문자열이므로, 분석 전에 dtype으로 확인하는 습관이 중요합니다." },
+    { "id": "fb2", "prompt": "점수 열을 정수형으로 변환하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [\"90\", \"85\", \"70\"]})\ndf[\"점수\"] = df[\"점수\"].______(int)\nprint(df[\"점수\"].dtype)", "answers": ["astype"], "output": "int64", "explain": "astype(int)는 열을 정수형으로 변환합니다. 문자열 \"90\"이 숫자 90이 되어 계산이 가능해집니다. 변환 결과를 원래 열에 다시 담아야(df[\"점수\"] = ...) 반영됩니다." },
+    { "id": "fb3", "prompt": "점수 열을 실수형으로 변환하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"점수\": [\"90\", \"85\"]})\ndf[\"점수\"] = df[\"점수\"].astype(______)\nprint(df[\"점수\"].dtype)", "answers": ["float"], "output": "float64", "explain": "astype(float)은 열을 실수형으로 변환합니다. 평균이나 비율처럼 소수가 필요한 계산을 할 때 float으로 바꿉니다. 문자열 \"90\"이 90.0이 됩니다." },
+    { "id": "fb4", "prompt": "코드 열을 문자열로 변환하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"코드\": [101, 102, 103]})\ndf[\"코드\"] = df[\"코드\"].astype(______)\nprint(df[\"코드\"].dtype)", "answers": ["str"], "output": "object", "explain": "astype(str)은 숫자를 문자열로 바꿉니다. 우편번호나 상품코드처럼 계산할 필요가 없고 라벨로만 쓰는 숫자는 문자열로 두는 것이 안전합니다. 문자열이 되면 dtype이 object로 표시됩니다." },
+    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "import pandas as pd\ndf = pd.DataFrame({\"값\": [\"10\", \"20\", \"30\"]})\ndf[\"값\"] = df[\"값\"].astype(int)\nprint(df[\"값\"].sum())", "answers": ["60"], "output": "60", "explain": "문자열 \"10\", \"20\", \"30\"을 정수로 변환한 뒤 합을 구하면 60입니다. 만약 변환 없이 문자열 상태로 sum()을 하면 \"102030\"처럼 이어붙기가 되므로, 계산 전에 숫자로 변환하는 것이 중요합니다." }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      { "id": "q1", "type": "mcq", "q": "열의 자료형을 확인하는 것은?", "options": ["df.type()", "df[\"열\"].dtype", "df.astype()", "df.info 만"], "answer": 1, "explain": "dtype으로 열의 자료형을 확인합니다. astype은 변환하는 함수이고, dtype이 확인용입니다." },
+      { "id": "q2", "type": "mcq", "q": "dtype이 object로 나오면 보통 무엇을 뜻하나요?", "options": ["정수", "실수", "문자열", "결측치"], "answer": 2, "explain": "object(O)는 보통 문자열을 의미합니다. 숫자처럼 보여도 object면 문자열로 저장된 것입니다." },
+      { "id": "q3", "type": "mcq", "q": "문자열 \"90\"을 숫자로 바꾸는 코드는?", "options": ["astype(str)", "astype(int)", "dtype(int)", "to_int()"], "answer": 1, "explain": "astype(int)가 정수로 변환합니다. astype(str)은 반대로 문자열로 바꾸는 것이고, 나머지는 잘못된 사용입니다." },
+      { "id": "q4", "type": "mcq", "q": "문자열 상태의 숫자 열에 그냥 sum()을 하면?", "options": ["정상적으로 합계", "문자열이 이어붙는다", "에러 없이 0", "평균이 나온다"], "answer": 1, "explain": "문자열끼리 더하면 \"102030\"처럼 이어붙습니다. 숫자 합계를 내려면 먼저 astype(int)로 변환해야 합니다." },
+      { "id": "q5", "type": "mcq", "q": "astype(int)가 에러 없이 잘 되는 경우는?", "options": ["\"abc\" 같은 값이 섞여 있을 때", "값이 모두 깔끔한 숫자 형태일 때", "NaN이 있을 때", "열이 비어 있을 때"], "answer": 1, "explain": "astype(int)는 모든 값이 숫자로 변환 가능할 때 작동합니다. \"abc\"처럼 숫자가 아닌 값이나 결측치(NaN)가 있으면 에러가 나므로 먼저 처리해야 합니다." }
+    ]
+  },
+  "faq": [
+    { "q": "숫자처럼 보이는데 왜 문자열인가요?", "a": "CSV나 외부 데이터를 읽을 때 숫자가 따옴표에 싸인 문자열로 들어오는 경우가 많아요. 눈으로는 90이지만 실제로는 \"90\"이라 계산이 안 됩니다. dtype으로 확인하면 알 수 있어요." },
+    { "q": "object가 무슨 뜻이에요?", "a": "pandas에서 문자열이 섞인 열은 dtype이 object로 나와요. 사실상 문자열이라고 이해하면 됩니다." },
+    { "q": "astype(int)를 했는데 에러가 나요.", "a": "값 중에 숫자로 바꿀 수 없는 게 있을 거예요. \"abc\" 같은 문자나 결측치(NaN)가 섞여 있으면 변환이 안 됩니다. 먼저 그런 값을 정리한 뒤 변환하세요." },
+    { "q": "숫자를 굳이 문자열로 바꾸는 이유가 있나요?", "a": "우편번호, 상품코드, 전화번호처럼 계산할 필요가 없는 숫자는 문자열이 안전해요. 예를 들어 우편번호 \"01234\"를 숫자로 두면 앞의 0이 사라지는 문제가 생깁니다." }
+  ]
+}
