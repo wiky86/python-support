@@ -190,26 +190,26 @@ export function QuizRunner({
           return (
             <div
               key={q.id}
-              className={`p-6 rounded-xl border transition-all ${
+              className={`p-5 sm:p-6 rounded-2xl border transition-all w-full ${
                 submitted
                   ? isCorrect
                     ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800"
                     : "bg-rose-50/40 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800"
-                  : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm"
+                  : "bg-slate-50/60 dark:bg-slate-950/40 border-slate-200/80 dark:border-slate-800/80 shadow-none"
               }`}
             >
               {/* Question title */}
               <div className="flex items-start gap-3 mb-4">
-                <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
                   Q{idx + 1}
                 </span>
-                <div className="text-sm font-semibold text-slate-900 dark:text-white whitespace-pre-line leading-relaxed">
+                <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white whitespace-pre-line leading-relaxed flex-1">
                   {q.q}
                 </div>
               </div>
 
-              {/* 4-Choice Options */}
-              <div className="space-y-2.5 pl-9">
+              {/* 4-Choice Options (Full width) */}
+              <div className="space-y-2.5 w-full">
                 {q.options.map((option, optIdx) => {
                   const isThisSelected = selected === optIdx;
                   const isThisAnswer = q.answer === optIdx;

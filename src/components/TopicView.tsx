@@ -277,18 +277,7 @@ export function TopicView({
 
         {/* Tab 4: FAQ Bot */}
         <div className={activeTab === "faq" ? `${tabCardClassName} block` : "hidden"}>
-          <div className="space-y-4">
-            <div className="pb-3 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Bot className="w-5 h-5 text-indigo-500" />
-                토픽 전용 학습 FAQ 봇
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                학습 중 자주 발생하는 질문과 개념을 대화형으로 빠르게 확인할 수 있습니다.
-              </p>
-            </div>
-            <FaqChatbot faqList={topic.faq} topicTitle={topic.title} />
-          </div>
+          <FaqChatbot faqList={topic.faq} topicTitle={topic.title} />
         </div>
       </div>
 

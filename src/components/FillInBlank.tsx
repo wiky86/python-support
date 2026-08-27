@@ -57,14 +57,19 @@ export function FillInBlankList({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
-        <Terminal className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-          {title}
-        </h3>
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <Terminal className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            {title}
+          </h3>
+        </div>
+        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          총 {items.length}개 실습
+        </span>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         {items.map((item, idx) => {
           const isCorrect = results[item.id] === true;
           const isWrong = results[item.id] === false;
@@ -77,12 +82,12 @@ export function FillInBlankList({
           return (
             <div
               key={item.id}
-              className={`p-5 rounded-xl border transition-all ${
+              className={`p-5 sm:p-6 rounded-2xl border transition-all w-full ${
                 isCorrect
                   ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800"
                   : isWrong
                   ? "bg-rose-50/50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800"
-                  : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm"
+                  : "bg-slate-50/60 dark:bg-slate-950/40 border-slate-200/80 dark:border-slate-800/80 shadow-none"
               }`}
             >
               {/* Question / Prompt */}

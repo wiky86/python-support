@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { FAQItem } from "@/types/content";
-import { Bot, User, MessageSquare, Sparkles, Send } from "lucide-react";
+import { Bot, User, MessageSquare, Sparkles } from "lucide-react";
 
 interface FaqChatbotProps {
   faqList: FAQItem[];
@@ -67,9 +67,9 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm flex flex-col h-[480px]">
+    <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 overflow-hidden flex flex-col h-[540px]">
       {/* Chatbot Header */}
-      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-sm">
             <Bot className="w-4 h-4" />
@@ -80,7 +80,7 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              토픽 관련 자주 묻는 질문 챗봇
+              {topicTitle} 관련 자주 묻는 질문 챗봇
             </p>
           </div>
         </div>
@@ -91,7 +91,7 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {messages.map((msg, idx) => {
           const isBot = msg.sender === "bot";
           const isCurrentlyTyping = typingIndex === idx;
@@ -100,7 +100,7 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
           return (
             <div
               key={idx}
-              className={`flex items-start gap-2.5 ${
+              className={`flex items-start gap-2.5 w-full ${
                 isBot ? "justify-start" : "justify-end"
               }`}
             >
@@ -111,13 +111,13 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
               )}
 
               <div
-                className={`max-w-[80%] p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                className={`max-w-[85%] p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   isBot
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-200/60 dark:border-slate-700/60"
+                    ? "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-200/80 dark:border-slate-700/80 shadow-xs"
                     : "bg-emerald-600 text-white rounded-tr-none shadow-sm font-medium"
                 }`}
               >
-                {textToShow}
+                <div className="whitespace-pre-line">{textToShow}</div>
                 {isCurrentlyTyping && (
                   <span className="inline-block w-1.5 h-4 ml-1 bg-emerald-500 animate-pulse align-middle" />
                 )}
@@ -134,19 +134,20 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Question Chips Panel (SPEC 3.5) */}
-      <div className="p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200 dark:border-slate-800">
-        <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
+      {/* Question Chips Panel */}
+      <div className="p-4 bg-white/90 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 w-full">
+        <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1">
           <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
-          질문을 선택하세요:
+          질문을 클릭하면 즉시 답변을 확인하실 수 있습니다:
         </div>
-        <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
           {faqList.map((faq, idx) => (
             <button
               key={idx}
+              type="button"
               disabled={typingIndex !== null}
               onClick={() => handleSelectFaq(faq)}
-              className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-emerald-50 hover:border-emerald-300 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs text-left transition-all shadow-xs disabled:opacity-50"
+              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 hover:border-emerald-300 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs text-left transition-all shadow-xs disabled:opacity-50 cursor-pointer"
             >
               💬 {faq.q}
             </button>
