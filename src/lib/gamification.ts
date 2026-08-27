@@ -208,3 +208,41 @@ export function evaluateBadges({
 
   return newBadges;
 }
+
+/**
+ * Converts badge condition object into a natural human-readable Korean sentence.
+ */
+export function describeBadgeCondition(
+  condition: { type: string; gte?: number; trackId?: string },
+  trackTitles?: Record<string, string>
+): string {
+  const gte = condition.gte ?? 1;
+
+  switch (condition.type) {
+    case "topic_count":
+      return `토픽 ${gte}개를 완료하면 획득`;
+    case "quiz_pass_count":
+      return `퀴즈 ${gte}개를 통과하면 획득`;
+    case "project_count":
+      return `미니 프로젝트 ${gte}개를 완료하면 획득`;
+    case "perfect_quiz_count":
+      return `퀴즈를 ${gte}번 만점 통과하면 획득`;
+    case "topic_percent":
+      return `전체 토픽의 ${gte}%를 완료하면 획득`;
+    case "streak":
+      return `${gte}일 연속 접속하면 획득`;
+    case "level":
+      return `레벨 ${gte}에 도달하면 획득`;
+    case "track_complete": {
+      const trackName = (condition.trackId && trackTitles?.[condition.trackId]) || condition.trackId || "해당 트랙";
+      return `${trackName}의 모든 토픽을 완료하면 획득`;
+    }
+    case "all_tracks_complete":
+      return "모든 트랙을 완주하면 획득";
+    case "flawless_track":
+      return "한 트랙의 모든 퀴즈를 만점 통과하면 획득";
+    default:
+      return "조건 달성 시 획득";
+  }
+}
+

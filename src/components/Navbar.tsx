@@ -46,25 +46,25 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           {/* Streak Flame */}
           <div
-            title={`연속 학습 ${stats.streak_count || 0}일째!`}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900 text-xs font-semibold"
+            title={`연속 학습 ${stats.streak_count || 0}일`}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900 text-xs font-semibold cursor-default"
           >
-            <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500 animate-pulse" />
+            <span aria-hidden="true" className="text-sm leading-none">🔥</span>
             <span>{stats.streak_count || 0}일</span>
           </div>
 
           {/* Level & XP Bar */}
           <div
-            title={`누적 XP: ${xp} XP\n다음 레벨까지: ${xpInCurrentLevel}/${xpRequiredForNext} XP (${percent}%)`}
-            className="hidden sm:flex flex-col gap-0.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 min-w-[120px]"
+            title={`누적 XP: ${xp.toLocaleString()} XP\n다음 레벨(Lv.${level + 1})까지: ${xpInCurrentLevel.toLocaleString()} / ${xpRequiredForNext.toLocaleString()} XP (${percent}%)`}
+            className="hidden sm:flex flex-col gap-0.5 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 min-w-[130px] cursor-default"
           >
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <div className="flex items-center justify-between text-xs gap-2">
+              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 whitespace-nowrap">
                 <Sparkles className="w-3 h-3" />
                 Lv.{level}
               </span>
-              <span className="text-slate-500 dark:text-slate-400 text-[10px] font-mono">
-                {xp} XP
+              <span className="text-slate-600 dark:text-slate-300 text-[11px] font-mono whitespace-nowrap font-medium">
+                {xp.toLocaleString()} XP
               </span>
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">

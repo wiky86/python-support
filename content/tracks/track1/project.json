@@ -8,13 +8,78 @@
     "code": "students = [\n    {\"name\": \"김민준\", \"score\": 92},\n    {\"name\": \"이서연\", \"score\": 78},\n    {\"name\": \"박도윤\", \"score\": 55},\n    {\"name\": \"최지우\", \"score\": 88},\n    {\"name\": \"정하준\", \"score\": 63},\n]"
   },
   "missions": [
-    { "id": "m1", "prompt": "전체 학생 수 구하기", "code": "print(______(students))", "answers": ["len"], "output": "5" },
-    { "id": "m2", "prompt": "첫 번째 학생의 이름 출력하기", "code": "print(students[0][______])", "answers": ["\"name\"", "'name'"], "output": "김민준" },
-    { "id": "m3", "prompt": "모든 점수를 리스트로 모으기 (컴프리헨션)", "code": "scores = [s[______] for s in students]\nprint(scores)", "answers": ["\"score\"", "'score'"], "output": "[92, 78, 55, 88, 63]" },
-    { "id": "m4", "prompt": "평균 점수 구하기 (함수 + 내장함수)", "code": "def average(nums):\n    return sum(nums) / ______(nums)\n\nscores = [s[\"score\"] for s in students]\nprint(average(scores))", "answers": ["len"], "output": "75.2" },
-    { "id": "m5", "prompt": "최고 점수 구하기", "code": "scores = [s[\"score\"] for s in students]\nprint(______(scores))", "answers": ["max"], "output": "92" },
-    { "id": "m6", "prompt": "합격자(60점 이상) 이름만 골라내기 (컴프리헨션 + 조건)", "code": "passed = [s[\"name\"] for s in students ______ s[\"score\"] >= 60]\nprint(passed)", "answers": ["if"], "output": "['김민준', '이서연', '최지우', '정하준']" },
-    { "id": "m7", "prompt": "합격/불합격 판정 출력하기 (반복문 + 조건문)", "code": "for s in students:\n    if s[\"score\"] >= 60:\n        print(s[\"name\"], \"합격\")\n    ______:\n        print(s[\"name\"], \"불합격\")", "answers": ["else"], "output": "김민준 합격\n이서연 합격\n박도윤 불합격\n최지우 합격\n정하준 합격" }
+    {
+      "id": "m1",
+      "prompt": "전체 학생 수 구하기",
+      "code": "print(______(students))",
+      "answers": [
+        "len"
+      ],
+      "output": "5",
+      "explain": "len()은 리스트에 담긴 항목의 개수를 셉니다. 학생 5명이 리스트에 들어 있으므로 5가 나옵니다. 분석의 첫걸음으로 데이터가 몇 건인지 확인하는 작업입니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "첫 번째 학생의 이름 출력하기",
+      "code": "print(students[0][______])",
+      "answers": [
+        "\"name\"",
+        "'name'"
+      ],
+      "output": "김민준",
+      "explain": "students[0]은 첫 번째 학생 딕셔너리이고, 거기에 [\"name\"]을 붙이면 이름 값을 꺼냅니다. 리스트 인덱싱(0번)과 딕셔너리 키 접근(\"name\")을 결합한 패턴입니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "모든 점수를 리스트로 모으기 (컴프리헨션)",
+      "code": "scores = [s[______] for s in students]\nprint(scores)",
+      "answers": [
+        "\"score\"",
+        "'score'"
+      ],
+      "output": "[92, 78, 55, 88, 63]",
+      "explain": "리스트 컴프리헨션으로 각 학생 딕셔너리에서 score 값만 뽑아 새 리스트를 만듭니다. 딕셔너리들의 리스트에서 특정 항목만 모을 때 자주 쓰는 방법으로, 결과는 [92, 78, 55, 88, 63]입니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "평균 점수 구하기 (함수 + 내장함수)",
+      "code": "def average(nums):\n    return sum(nums) / ______(nums)\n\nscores = [s[\"score\"] for s in students]\nprint(average(scores))",
+      "answers": [
+        "len"
+      ],
+      "output": "75.2",
+      "explain": "average 함수에서 sum(합계)을 len(개수)으로 나눠 평균을 구합니다. (92+78+55+88+63)/5 = 75.2입니다. 직접 만든 함수와 내장 함수(sum, len)를 함께 쓴 예입니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "최고 점수 구하기",
+      "code": "scores = [s[\"score\"] for s in students]\nprint(______(scores))",
+      "answers": [
+        "max"
+      ],
+      "output": "92",
+      "explain": "max()는 리스트에서 가장 큰 값을 찾습니다. 점수 중 최고는 92(김민준)입니다. 반대로 최저값은 min()으로 구할 수 있습니다."
+    },
+    {
+      "id": "m6",
+      "prompt": "합격자(60점 이상) 이름만 골라내기 (컴프리헨션 + 조건)",
+      "code": "passed = [s[\"name\"] for s in students ______ s[\"score\"] >= 60]\nprint(passed)",
+      "answers": [
+        "if"
+      ],
+      "output": "['김민준', '이서연', '최지우', '정하준']",
+      "explain": "컴프리헨션에 if 조건을 붙여 60점 이상인 학생의 이름만 골라냅니다. 박도윤(55)만 제외되어 4명의 이름이 남습니다. 필터링과 값 추출을 한 줄로 처리한 것입니다."
+    },
+    {
+      "id": "m7",
+      "prompt": "합격/불합격 판정 출력하기 (반복문 + 조건문)",
+      "code": "for s in students:\n    if s[\"score\"] >= 60:\n        print(s[\"name\"], \"합격\")\n    ______:\n        print(s[\"name\"], \"불합격\")",
+      "answers": [
+        "else"
+      ],
+      "output": "김민준 합격\n이서연 합격\n박도윤 불합격\n최지우 합격\n정하준 합격",
+      "explain": "반복문으로 학생을 하나씩 보며 if/else로 60점 기준 합격·불합격을 판정해 출력합니다. 박도윤만 불합격이고 나머지는 합격입니다. 반복문과 조건문을 결합한 실전 패턴입니다."
+    }
   ],
   "report": {
     "title": "학생 점수 분석 리포트",
@@ -27,6 +92,13 @@
       "passCount": 4,
       "failCount": 1
     },
-    "conceptsUsed": ["리스트", "딕셔너리", "조건문", "반복문", "함수", "컴프리헨션"]
+    "conceptsUsed": [
+      "리스트",
+      "딕셔너리",
+      "조건문",
+      "반복문",
+      "함수",
+      "컴프리헨션"
+    ]
   }
 }

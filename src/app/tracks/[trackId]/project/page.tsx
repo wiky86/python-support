@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getAllTracks,
@@ -21,6 +22,20 @@ export function generateStaticParams() {
     .map((track) => ({
       trackId: track.id,
     }));
+}
+
+export function generateMetadata({ params }: ProjectPageProps): Metadata {
+  const project = getProject(params.trackId);
+  if (!project) {
+    return {
+      title: "미니 프로젝트 · PyDataLab",
+    };
+  }
+
+  return {
+    title: `${project.title} · PyDataLab`,
+    description: `파이썬 데이터 분석 ${project.title} 실전 미니 프로젝트`,
+  };
 }
 
 export default function ProjectPage({ params }: ProjectPageProps) {

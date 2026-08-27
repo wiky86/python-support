@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { BadgeDefinition, BadgesConfig } from "@/types/content";
 import { useAuth } from "@/lib/auth-context";
+import { describeBadgeCondition } from "@/lib/gamification";
 import { BadgeIcon } from "@/components/BadgeIcons";
 import {
   Award,
@@ -16,9 +17,10 @@ import {
 
 interface BadgesViewProps {
   badgesConfig: BadgesConfig;
+  trackTitles?: Record<string, string>;
 }
 
-export function BadgesView({ badgesConfig }: BadgesViewProps) {
+export function BadgesView({ badgesConfig, trackTitles }: BadgesViewProps) {
   const { badges: userBadges } = useAuth();
   const earnedMap = new Map(userBadges.map((b) => [b.badge_id, b.earned_at]));
 
@@ -128,8 +130,8 @@ export function BadgesView({ badgesConfig }: BadgesViewProps) {
                     </span>
                   </div>
                 ) : (
-                  <div className="text-slate-400">
-                    조건: {badgesConfig.conditionTypes[badge.condition.type] || badge.desc}
+                  <div className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                    {describeBadgeCondition(badge.condition, trackTitles)}
                   </div>
                 )}
               </div>

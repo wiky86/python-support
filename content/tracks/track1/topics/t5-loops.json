@@ -5,26 +5,143 @@
   "title": "반복문 (for, while)",
   "content": "## 반복문이란?\n\n반복문은 같은 작업을 여러 번 되풀이합니다. 데이터 분석에서 \"학생 100명의 점수를 하나씩 확인\", \"리스트의 모든 값을 더하기\"처럼 여러 값을 차례로 처리할 때 필수입니다.\n\n## for 반복문 — 리스트를 하나씩\n\n리스트의 값을 처음부터 끝까지 하나씩 꺼내 처리합니다.\n\n```python\nscores = [90, 85, 70]\nfor s in scores:\n    print(s)\n```\n\n`for 변수 in 리스트:` 형태입니다. `s`에 값이 하나씩 담기며 들여쓴 코드가 반복됩니다. 위 코드는 90, 85, 70을 차례로 출력합니다.\n\n## range() — 정해진 횟수만큼\n\n`range(n)`은 0부터 n-1까지의 숫자를 만들어, 정해진 횟수만큼 반복할 때 씁니다.\n\n```python\nfor i in range(3):\n    print(i)        # 0, 1, 2 출력\n```\n\n## 반복문으로 합계 구하기\n\n데이터 분석에서 자주 쓰는 패턴입니다. 변수를 하나 두고 반복하며 더해 나갑니다.\n\n```python\nscores = [90, 85, 70]\ntotal = 0\nfor s in scores:\n    total = total + s\nprint(total)        # 245\n```\n\n## while 반복문 — 조건이 참인 동안\n\n```python\ncount = 0\nwhile count < 3:\n    print(count)\n    count = count + 1    # 0, 1, 2 출력\n```\n\n주의: 조건이 계속 참이면 영원히 멈추지 않습니다(무한 루프). `count`를 늘려 언젠가 조건이 거짓이 되게 만들어야 합니다.\n\n## for vs while\n\n| | for | while |\n|---|---|---|\n| 언제 | 반복 횟수/대상이 정해짐 | 조건에 따라 반복 |\n| 예 | 리스트 하나씩, n번 | \"~할 때까지\" |\n\n데이터 분석에서는 대부분 `for`를 씁니다.",
   "fillBlanks": [
-    { "id": "fb1", "prompt": "리스트의 값을 하나씩 출력하세요.", "code": "nums = [1, 2, 3]\nfor n ______ nums:\n    print(n)", "answers": ["in"], "output": "1\n2\n3" },
-    { "id": "fb2", "prompt": "0부터 4까지 반복하도록 채우세요.", "code": "for i in ______(5):\n    print(i)", "answers": ["range"], "output": "0\n1\n2\n3\n4" },
-    { "id": "fb3", "prompt": "리스트의 합계를 구하도록 빈칸을 채우세요.", "code": "data = [10, 20, 30]\ntotal = 0\nfor d in data:\n    total = total ______ d\nprint(total)", "answers": ["+"], "output": "60" },
-    { "id": "fb4", "prompt": "조건이 참인 동안 반복하는 키워드를 채우세요.", "code": "n = 0\n______ n < 3:\n    print(n)\n    n = n + 1", "answers": ["while"], "output": "0\n1\n2" },
-    { "id": "fb5", "prompt": "다음 코드의 출력을 예측하세요.", "code": "count = 0\nfor i in range(4):\n    count = count + 1\nprint(count)", "answers": ["4"], "output": "4" }
+    {
+      "id": "fb1",
+      "prompt": "리스트의 값을 하나씩 출력하세요.",
+      "code": "nums = [1, 2, 3]\nfor n ______ nums:\n    print(n)",
+      "answers": [
+        "in"
+      ],
+      "output": "1\n2\n3",
+      "explain": "for 변수 in 리스트 형태로 리스트의 값을 하나씩 꺼내 반복합니다. n에 1, 2, 3이 차례로 들어가 각각 출력됩니다. 순서가 있는 데이터를 훑을 때 쓰는 기본 반복문입니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "0부터 4까지 반복하도록 채우세요.",
+      "code": "for i in ______(5):\n    print(i)",
+      "answers": [
+        "range"
+      ],
+      "output": "0\n1\n2\n3\n4",
+      "explain": "range(5)는 0부터 4까지의 숫자를 만들어냅니다. 끝 숫자 5는 포함되지 않아 0, 1, 2, 3, 4가 출력됩니다. 정해진 횟수만큼 반복할 때 씁니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "리스트의 합계를 구하도록 빈칸을 채우세요.",
+      "code": "data = [10, 20, 30]\ntotal = 0\nfor d in data:\n    total = total ______ d\nprint(total)",
+      "answers": [
+        "+"
+      ],
+      "output": "60",
+      "explain": "반복하며 total에 각 값을 누적해 더합니다. total = total + d를 세 번 반복해 10+20+30=60이 됩니다. 합계를 구하는 전형적인 반복 패턴입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "조건이 참인 동안 반복하는 키워드를 채우세요.",
+      "code": "n = 0\n______ n < 3:\n    print(n)\n    n = n + 1",
+      "answers": [
+        "while"
+      ],
+      "output": "0\n1\n2",
+      "explain": "while은 조건이 참인 동안 계속 반복합니다. n이 3보다 작은 동안 반복하며 0, 1, 2를 출력하고, n이 3이 되면 멈춥니다. 횟수가 정해지지 않은 반복에 씁니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "다음 코드의 출력을 예측하세요.",
+      "code": "count = 0\nfor i in range(4):\n    count = count + 1\nprint(count)",
+      "answers": [
+        "4"
+      ],
+      "output": "4",
+      "explain": "range(4)로 4번 반복하며 count를 1씩 증가시킵니다. 0에서 시작해 네 번 더해 최종 count는 4가 됩니다. 반복 횟수를 세는 기본 패턴입니다."
+    }
   ],
   "quiz": {
     "passThreshold": 0.8,
     "questions": [
-      { "id": "q1", "type": "mcq", "q": "다음 코드의 출력 횟수는?\n`for i in range(5):`\n`    print(\"안녕\")`", "options": ["4번", "5번", "6번", "무한 반복"], "answer": 1, "explain": "range(5)는 0~4, 총 5번 반복합니다." },
-      { "id": "q2", "type": "mcq", "q": "range(3)이 만드는 숫자는?", "options": ["1, 2, 3", "0, 1, 2, 3", "0, 1, 2", "1, 2"], "answer": 2, "explain": "0부터 3-1까지, 즉 0, 1, 2입니다." },
-      { "id": "q3", "type": "mcq", "q": "다음 코드의 최종 total 값은?\n`total = 0`\n`for x in [5, 10, 15]:`\n`    total = total + x`", "options": ["15", "30", "10", "25"], "answer": 1, "explain": "5+10+15 = 30입니다." },
-      { "id": "q4", "type": "mcq", "q": "다음 while문이 무한 반복되는 이유는?\n`n = 0`\n`while n < 3:`\n`    print(n)`", "options": ["조건이 틀려서", "n을 늘리지 않아서", "range가 없어서", "무한 반복 안 함"], "answer": 1, "explain": "n이 계속 0이라 조건이 항상 참이어서 멈추지 않습니다." },
-      { "id": "q5", "type": "mcq", "q": "리스트 [2, 4, 6]의 각 값을 하나씩 꺼내는 올바른 코드는?", "options": ["for i in range(3):", "for x in [2,4,6]:", "while [2,4,6]:", "for [2,4,6]:"], "answer": 1, "explain": "for 변수 in 리스트 형태가 값을 하나씩 꺼냅니다." }
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "다음 코드의 출력 횟수는?\n`for i in range(5):`\n`    print(\"안녕\")`",
+        "options": [
+          "4번",
+          "5번",
+          "6번",
+          "무한 반복"
+        ],
+        "answer": 1,
+        "explain": "range(5)는 0~4, 총 5번 반복합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "range(3)이 만드는 숫자는?",
+        "options": [
+          "1, 2, 3",
+          "0, 1, 2, 3",
+          "0, 1, 2",
+          "1, 2"
+        ],
+        "answer": 2,
+        "explain": "0부터 3-1까지, 즉 0, 1, 2입니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "다음 코드의 최종 total 값은?\n`total = 0`\n`for x in [5, 10, 15]:`\n`    total = total + x`",
+        "options": [
+          "15",
+          "30",
+          "10",
+          "25"
+        ],
+        "answer": 1,
+        "explain": "5+10+15 = 30입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "다음 while문이 무한 반복되는 이유는?\n`n = 0`\n`while n < 3:`\n`    print(n)`",
+        "options": [
+          "조건이 틀려서",
+          "n을 늘리지 않아서",
+          "range가 없어서",
+          "무한 반복 안 함"
+        ],
+        "answer": 1,
+        "explain": "n이 계속 0이라 조건이 항상 참이어서 멈추지 않습니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "리스트 [2, 4, 6]의 각 값을 하나씩 꺼내는 올바른 코드는?",
+        "options": [
+          "for i in range(3):",
+          "for x in [2,4,6]:",
+          "while [2,4,6]:",
+          "for [2,4,6]:"
+        ],
+        "answer": 1,
+        "explain": "for 변수 in 리스트 형태가 값을 하나씩 꺼냅니다."
+      }
     ]
   },
   "faq": [
-    { "q": "for s in scores에서 s는 어디서 온 이름인가요?", "a": "직접 정하는 이름이에요. s 대신 score, item 뭐든 됩니다. 반복할 때마다 리스트의 값이 그 이름에 하나씩 담깁니다." },
-    { "q": "range(5)는 왜 5가 아니라 4까지인가요?", "a": "0부터 시작해서 5개를 만들기 때문이에요(0,1,2,3,4). 슬라이싱의 \"끝 불포함\"과 같은 원리입니다." },
-    { "q": "for랑 while 중 뭘 써야 하나요?", "a": "반복할 대상이나 횟수가 정해져 있으면 for, \"어떤 조건이 될 때까지\"처럼 횟수를 모르면 while을 씁니다. 데이터 분석은 대부분 for로 해결돼요." },
-    { "q": "무한 루프에 빠지면 어떻게 하나요?", "a": "while 조건이 영원히 참이면 멈추지 않아요. 반복 안에서 조건에 쓰인 값을 바꿔(예: n = n + 1) 언젠가 거짓이 되게 해야 합니다." }
+    {
+      "q": "for s in scores에서 s는 어디서 온 이름인가요?",
+      "a": "직접 정하는 이름이에요. s 대신 score, item 뭐든 됩니다. 반복할 때마다 리스트의 값이 그 이름에 하나씩 담깁니다."
+    },
+    {
+      "q": "range(5)는 왜 5가 아니라 4까지인가요?",
+      "a": "0부터 시작해서 5개를 만들기 때문이에요(0,1,2,3,4). 슬라이싱의 \"끝 불포함\"과 같은 원리입니다."
+    },
+    {
+      "q": "for랑 while 중 뭘 써야 하나요?",
+      "a": "반복할 대상이나 횟수가 정해져 있으면 for, \"어떤 조건이 될 때까지\"처럼 횟수를 모르면 while을 씁니다. 데이터 분석은 대부분 for로 해결돼요."
+    },
+    {
+      "q": "무한 루프에 빠지면 어떻게 하나요?",
+      "a": "while 조건이 영원히 참이면 멈추지 않아요. 반복 안에서 조건에 쓰인 값을 바꿔(예: n = n + 1) 언젠가 거짓이 되게 해야 합니다."
+    }
   ]
 }

@@ -90,5 +90,54 @@ assert(xpRules.awards.quizPass === 20, "xpRules quizPass is 20");
 const badges = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, "badges.json"), "utf-8"));
 assert(badges.badges.length === 24, "Badges config has 24 badges");
 
+// Test describeBadgeCondition
+const trackTitles = {
+  track1: "파이썬 기초 다지기",
+  track2: "NumPy로 수치 다루기",
+  track3: "pandas 핵심 - 데이터 구조",
+  track4: "pandas 실전 - 데이터 가공",
+  track5: "그룹화와 집계",
+  track6: "데이터 시각화",
+  track7: "종합 분석 프로젝트",
+};
+
+function describeBadgeCondition(condition, titles) {
+  const gte = condition.gte ?? 1;
+  switch (condition.type) {
+    case "topic_count":
+      return `토픽 ${gte}개를 완료하면 획득`;
+    case "quiz_pass_count":
+      return `퀴즈 ${gte}개를 통과하면 획득`;
+    case "project_count":
+      return `미니 프로젝트 ${gte}개를 완료하면 획득`;
+    case "perfect_quiz_count":
+      return `퀴즈를 ${gte}번 만점 통과하면 획득`;
+    case "topic_percent":
+      return `전체 토픽의 ${gte}%를 완료하면 획득`;
+    case "streak":
+      return `${gte}일 연속 접속하면 획득`;
+    case "level":
+      return `레벨 ${gte}에 도달하면 획득`;
+    case "track_complete": {
+      const trackName = (condition.trackId && titles?.[condition.trackId]) || condition.trackId || "해당 트랙";
+      return `${trackName}의 모든 토픽을 완료하면 획득`;
+    }
+    case "all_tracks_complete":
+      return "모든 트랙을 완주하면 획득";
+    case "flawless_track":
+      return "한 트랙의 모든 퀴즈를 만점 통과하면 획득";
+    default:
+      return "조건 달성 시 획득";
+  }
+}
+
+badges.badges.forEach((b) => {
+  const desc = describeBadgeCondition(b.condition, trackTitles);
+  assert(!desc.includes("gte"), `Badge ${b.id} condition does not expose raw 'gte': "${desc}"`);
+  assert(!desc.includes("trackId"), `Badge ${b.id} condition does not expose raw 'trackId': "${desc}"`);
+  assert(desc.endsWith("획득"), `Badge ${b.id} condition ends with '획득': "${desc}"`);
+});
+
 console.log(`\nResults: ${passed} passed, ${failed} failed.`);
 if (failed > 0) process.exit(1);
+

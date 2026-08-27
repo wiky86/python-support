@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getAllTracks,
@@ -29,6 +30,20 @@ export function generateStaticParams() {
   }
 
   return paramsList;
+}
+
+export function generateMetadata({ params }: TopicPageProps): Metadata {
+  const topic = getTopic(params.trackId, params.topicId);
+  if (!topic) {
+    return {
+      title: "토픽 상세 · PyDataLab",
+    };
+  }
+
+  return {
+    title: `${topic.title} · PyDataLab`,
+    description: `파이썬 데이터 분석 ${topic.title} 개념 학습, 빈칸 채우기 실습, 퀴즈`,
+  };
 }
 
 export default function TopicPage({ params }: TopicPageProps) {

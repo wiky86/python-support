@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Track, Topic, BadgeDefinition } from "@/types/content";
+import { Track, Topic, BadgeDefinition, Project } from "@/types/content";
 import { useAuth } from "@/lib/auth-context";
 import { getTopicStatus, isProjectUnlocked } from "@/lib/progress";
 import { getLevelProgress } from "@/lib/gamification";
@@ -25,9 +25,10 @@ interface DashboardViewProps {
   tracks: Track[];
   topicsMap: Record<string, Topic>;
   badges: BadgeDefinition[];
+  projectsMap?: Record<string, Project>;
 }
 
-export function DashboardView({ tracks, topicsMap, badges }: DashboardViewProps) {
+export function DashboardView({ tracks, topicsMap, badges, projectsMap }: DashboardViewProps) {
   const { stats, progress, badges: userBadges } = useAuth();
   const { level, percent, xp, xpInCurrentLevel, xpRequiredForNext } = getLevelProgress(stats.xp);
 
@@ -276,83 +277,86 @@ export function DashboardView({ tracks, topicsMap, badges }: DashboardViewProps)
                 })}
 
                 {/* Track Mini-Project Card at the end of track */}
-                {track.projectFile && (
-                  <div className="h-full">
-                    {projectUnlocked ? (
-                      <Link
-                        href={`/tracks/${track.id}/project`}
-                        className="block h-full group"
-                      >
-                        <div
-                          className={`h-full p-5 rounded-2xl border transition-all flex flex-col justify-between ${
-                            projectCompleted
-                              ? "bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/30 border-teal-400 dark:border-teal-700 shadow-sm hover:shadow-md"
-                              : "bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-600/20 hover:scale-[1.02]"
-                          }`}
+                {track.projectFile && (() => {
+                  const projectTitle = projectsMap?.[track.id]?.title || "미니 프로젝트";
+                  return (
+                    <div className="h-full">
+                      {projectUnlocked ? (
+                        <Link
+                          href={`/tracks/${track.id}/project`}
+                          className="block h-full group"
                         >
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span
-                                className={`text-[11px] font-bold px-2 py-0.5 rounded ${
-                                  projectCompleted
-                                    ? "bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200"
-                                    : "bg-white/20 text-white"
-                                }`}
-                              >
-                                종합 미니 프로젝트
-                              </span>
-                              {projectCompleted ? (
-                                <span className="flex items-center gap-1 text-[11px] font-bold text-teal-600 dark:text-teal-400">
-                                  <CheckCircle2 className="w-4 h-4" /> 완주
-                                </span>
-                              ) : (
-                                <Sparkles className="w-4 h-4 text-yellow-300 animate-spin" />
-                              )}
-                            </div>
-
-                            <h4
-                              className={`text-sm font-bold leading-snug ${
-                                projectCompleted
-                                  ? "text-slate-900 dark:text-white"
-                                  : "text-white"
-                              }`}
-                            >
-                              실전 데이터 분석 프로젝트
-                            </h4>
-                          </div>
-
                           <div
-                            className={`pt-4 mt-3 border-t flex items-center justify-between text-xs ${
+                            className={`h-full p-5 rounded-2xl border transition-all flex flex-col justify-between ${
                               projectCompleted
-                                ? "border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300"
-                                : "border-white/20 text-emerald-100"
+                                ? "bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/30 border-teal-400 dark:border-teal-700 shadow-sm hover:shadow-md"
+                                : "bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-600/20 hover:scale-[1.02]"
                             }`}
                           >
-                            <span>결과 리포트 카드 생성</span>
-                            <ArrowRight className="w-4 h-4" />
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span
+                                  className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                                    projectCompleted
+                                      ? "bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200"
+                                      : "bg-white/20 text-white"
+                                  }`}
+                                >
+                                  종합 미니 프로젝트
+                                </span>
+                                {projectCompleted ? (
+                                  <span className="flex items-center gap-1 text-[11px] font-bold text-teal-600 dark:text-teal-400">
+                                    <CheckCircle2 className="w-4 h-4" /> 완주
+                                  </span>
+                                ) : (
+                                  <Sparkles className="w-4 h-4 text-yellow-300 animate-spin" />
+                                )}
+                              </div>
+
+                              <h4
+                                className={`text-sm font-bold leading-snug ${
+                                  projectCompleted
+                                    ? "text-slate-900 dark:text-white"
+                                    : "text-white"
+                                }`}
+                              >
+                                {projectTitle}
+                              </h4>
+                            </div>
+
+                            <div
+                              className={`pt-4 mt-3 border-t flex items-center justify-between text-xs ${
+                                projectCompleted
+                                  ? "border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300"
+                                  : "border-white/20 text-emerald-100"
+                              }`}
+                            >
+                              <span>결과 리포트 카드 생성</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div className="h-full p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 opacity-50 flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                미니 프로젝트
+                              </span>
+                              <Lock className="w-3.5 h-3.5 text-slate-400" />
+                            </div>
+                            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                              {projectTitle}
+                            </h4>
+                          </div>
+                          <div className="pt-4 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-400">
+                            모든 토픽 완료 시 잠금 해제
                           </div>
                         </div>
-                      </Link>
-                    ) : (
-                      <div className="h-full p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 opacity-50 flex flex-col justify-between">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                              미니 프로젝트
-                            </span>
-                            <Lock className="w-3.5 h-3.5 text-slate-400" />
-                          </div>
-                          <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                            실전 데이터 분석 프로젝트
-                          </h4>
-                        </div>
-                        <div className="pt-4 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-400">
-                          모든 토픽 완료 시 잠금 해제
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           );

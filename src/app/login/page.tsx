@@ -41,8 +41,9 @@ export default function LoginPage() {
     }
 
     if (!isConfigured) {
+      console.info("[Auth] Supabase credentials not set, continuing in guest mode.");
       setErrorMsg(
-        "Supabase 환경변수(.env.local)가 아직 설정되지 않았습니다. 게스트 모드로 바로 학습을 시작할 수 있습니다."
+        "현재는 게스트 모드로 동작 중입니다. 로그인 없이도 모든 학습 진도가 브라우저에 안전하게 저장됩니다."
       );
       return;
     }
@@ -90,21 +91,16 @@ export default function LoginPage() {
   return (
     <div className="flex-1 flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md space-y-6">
-        {/* Supabase Status Banner */}
-        {!isConfigured && (
-          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs space-y-2">
-            <div className="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-300">
-              <AlertCircle className="w-4 h-4 text-amber-600" />
-              Supabase 환경변수 안내
-            </div>
-            <p className="leading-relaxed">
-              현재 <code className="px-1 py-0.5 rounded bg-amber-200/50 dark:bg-amber-900/50 font-mono">.env.local</code>에 실제 Supabase 키가 설정되지 않아 <strong>게스트 모드</strong>(로컬 스토리지 자동 저장)로 동작합니다.
-            </p>
-            <p className="text-[11px] text-amber-700 dark:text-amber-400">
-              Supabase 대시보드의 URL과 anon key를 .env.local에 입력하시면 완전한 클라우드 동기화가 활성화됩니다.
-            </p>
+        {/* User-friendly Guest Mode Information */}
+        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs space-y-1.5">
+          <div className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            진도 자동 저장 안내
           </div>
-        )}
+          <p className="leading-relaxed text-emerald-700 dark:text-emerald-300/90">
+            로그인 없이도 모든 학습 진도와 획득 배지가 이 브라우저에 자동 저장됩니다. 로그인하면 여러 기기에서 학습 진도를 이어서 동기화할 수 있어요.
+          </p>
+        </div>
 
         <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
           {/* Header */}
