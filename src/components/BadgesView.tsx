@@ -35,6 +35,7 @@ export function BadgesView({ badgesConfig, trackTitles }: BadgesViewProps) {
         <div className="space-y-1">
           <Link
             href="/"
+            prefetch={false}
             className="text-xs font-semibold text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 flex items-center gap-1 mb-2 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> 학습 로드맵으로 돌아가기

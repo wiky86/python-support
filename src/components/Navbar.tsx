@@ -33,6 +33,7 @@ export function Navbar() {
           </span>
           <Link
             href="/login"
+            prefetch={false}
             className="ml-1 underline font-bold hover:text-white dark:hover:text-amber-100 transition-colors"
           >
             로그인하기 →
@@ -44,7 +45,7 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Left: Brand Logo */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5 font-bold text-lg text-slate-900 dark:text-white group">
+            <Link href="/" prefetch={false} className="flex items-center gap-2.5 font-bold text-lg text-slate-900 dark:text-white group">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-sm shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                 <BookOpen className="w-4 h-4" />
               </div>
@@ -56,12 +57,14 @@ export function Navbar() {
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 href="/"
+                prefetch={false}
                 className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 rounded-md transition-colors"
               >
                 학습 지도
               </Link>
               <Link
                 href="/badges"
+                prefetch={false}
                 className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 rounded-md transition-colors flex items-center gap-1"
               >
                 <Award className="w-4 h-4" />
@@ -75,7 +78,7 @@ export function Navbar() {
             {/* Streak Flame */}
             <div
               title={`연속 학습 ${stats.streak_count || 0}일`}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900 text-xs font-semibold cursor-default"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:orange-900 text-xs font-semibold cursor-default"
             >
               <span aria-hidden="true" className="text-sm leading-none">🔥</span>
               <span>{stats.streak_count || 0}일</span>
@@ -106,6 +109,7 @@ export function Navbar() {
             {/* Badges count shortcut */}
             <Link
               href="/badges"
+              prefetch={false}
               title={`획득한 배지: ${badges.length}개`}
               className="flex items-center gap-1 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-medium transition-colors"
             >
@@ -134,6 +138,7 @@ export function Navbar() {
             ) : (
               <Link
                 href="/login"
+                prefetch={false}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors"
               >
                 <LogIn className="w-3.5 h-3.5" />

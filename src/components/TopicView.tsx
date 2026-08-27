@@ -114,6 +114,7 @@ export function TopicView({
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <Link
             href="/"
+            prefetch={false}
             className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             학습 로드맵
@@ -296,6 +297,7 @@ export function TopicView({
         {prevTopicId ? (
           <Link
             href={`/tracks/${track.id}/${prevTopicId}`}
+            prefetch={false}
             className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors flex items-center gap-1"
           >
             <ChevronLeft className="w-4 h-4" /> 이전 토픽
@@ -303,6 +305,7 @@ export function TopicView({
         ) : (
           <Link
             href="/"
+            prefetch={false}
             className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
           >
             학습 지도로
@@ -328,6 +331,7 @@ export function TopicView({
         {!nextTopicId && track.projectFile && (
           <Link
             href={`/tracks/${track.id}/project`}
+            prefetch={false}
             className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
               isCompleted
                 ? "bg-teal-600 hover:bg-teal-700 text-white shadow-sm"

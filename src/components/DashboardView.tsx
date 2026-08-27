@@ -113,6 +113,7 @@ export function DashboardView({ tracks, topicsMap, badges, projectsMap }: Dashbo
             {/* Badges Card */}
             <Link
               href="/badges"
+              prefetch={false}
               className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-center transition-colors group"
             >
               <div className="text-[11px] text-slate-400 flex items-center justify-center gap-1">
@@ -269,6 +270,7 @@ export function DashboardView({ tracks, topicsMap, badges, projectsMap }: Dashbo
                     <Link
                       key={topic.id}
                       href={`/tracks/${track.id}/${topic.id}`}
+                      prefetch={false}
                       className="block group"
                     >
                       {cardContent}
@@ -284,6 +286,7 @@ export function DashboardView({ tracks, topicsMap, badges, projectsMap }: Dashbo
                       {projectUnlocked ? (
                         <Link
                           href={`/tracks/${track.id}/project`}
+                          prefetch={false}
                           className="block h-full group"
                         >
                           <div

@@ -139,6 +139,7 @@ export function ProjectView({
         <div className="flex items-center justify-center gap-4 pt-4">
           <Link
             href="/"
+            prefetch={false}
             className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors"
           >
             학습 지도로 돌아가기
@@ -155,6 +156,7 @@ export function ProjectView({
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <Link
             href="/"
+            prefetch={false}
             className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             학습 로드맵
@@ -276,6 +278,7 @@ export function ProjectView({
           <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <Link
               href="/"
+              prefetch={false}
               className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-md transition-all flex items-center gap-2"
             >
               <span>학습 대시보드로 돌아가기</span>

@@ -255,6 +255,7 @@ export default function LoginPage() {
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
             <Link
               href="/"
+              prefetch={false}
               className="text-xs font-semibold text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition-colors"
             >
               로그인 없이 둘러보기 (게스트 모드) →
