@@ -24,7 +24,7 @@ interface AuthContextType {
   recordStudyActivity: (xpGain: number) => Promise<void>;
 }
 
-const defaultStats: UserStatsRow = {
+const defaultGuestStats: UserStatsRow = {
   user_id: "guest-user",
   xp: 0,
   last_studied: null,
@@ -40,89 +40,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isConfigured = isSupabaseConfigured();
   const supabase = createClient();
 
-  const [stats, setStats] = useState<UserStatsRow>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("guest_user_stats");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore
-        }
-      }
-    }
-    return defaultStats;
-  });
+  const [stats, setStats] = useState<UserStatsRow>(defaultGuestStats);
+  const [progress, setProgress] = useState<Record<string, UserProgressRow>>({});
+  const [badges, setBadges] = useState<UserBadgeRow[]>([]);
 
-  const [progress, setProgress] = useState<Record<string, UserProgressRow>>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("guest_user_progress");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore
-        }
-      }
-    }
-    return {};
-  });
+  // Refresh and synchronize data from Supabase (if logged in) or LocalStorage (if guest)
+  const refreshData = useCallback(async (currentUser?: User | null) => {
+    const activeUser = currentUser !== undefined ? currentUser : user;
 
-  const [badges, setBadges] = useState<UserBadgeRow[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("guest_user_badges");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore
-        }
-      }
-    }
-    return [];
-  });
-
-  const refreshData = useCallback(async () => {
-    if (!isConfigured || !user) {
+    if (!isConfigured || !activeUser) {
+      // Guest Mode: load from local storage
       if (typeof window !== "undefined") {
-        const savedStats = localStorage.getItem("guest_user_stats");
-        const savedProgress = localStorage.getItem("guest_user_progress");
-        const savedBadges = localStorage.getItem("guest_user_badges");
-        if (savedStats) setStats(JSON.parse(savedStats));
-        if (savedProgress) setProgress(JSON.parse(savedProgress));
-        if (savedBadges) setBadges(JSON.parse(savedBadges));
+        try {
+          const savedStats = localStorage.getItem("guest_user_stats");
+          const savedProgress = localStorage.getItem("guest_user_progress");
+          const savedBadges = localStorage.getItem("guest_user_badges");
+          setStats(savedStats ? JSON.parse(savedStats) : defaultGuestStats);
+          setProgress(savedProgress ? JSON.parse(savedProgress) : {});
+          setBadges(savedBadges ? JSON.parse(savedBadges) : []);
+        } catch {
+          setStats(defaultGuestStats);
+          setProgress({});
+          setBadges([]);
+        }
       }
       return;
     }
 
     try {
-      // 1. Fetch user_stats
+      // 1. Fetch user_stats from Supabase
       const { data: statsData, error: statsError } = await supabase
         .from("user_stats")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", activeUser.id)
         .maybeSingle();
 
       if (statsData) {
         setStats(statsData as UserStatsRow);
       } else if (!statsError) {
-        // Initialize user_stats if not exists
-        const initial = {
-          user_id: user.id,
+        // If user_stats row doesn't exist yet, insert a default row
+        const initialStats: UserStatsRow = {
+          user_id: activeUser.id,
           xp: 0,
           last_studied: null,
           streak_count: 0,
           updated_at: new Date().toISOString(),
         };
-        await supabase.from("user_stats").insert(initial as any);
-        setStats(initial);
+        await supabase.from("user_stats").upsert(initialStats as any, { onConflict: "user_id" });
+        setStats(initialStats);
       }
 
-      // 2. Fetch user_progress
+      // 2. Fetch user_progress from Supabase
       const { data: progressData } = await supabase
         .from("user_progress")
         .select("*")
-        .eq("user_id", user.id);
+        .eq("user_id", activeUser.id);
 
       if (progressData) {
         const map: Record<string, UserProgressRow> = {};
@@ -130,56 +102,82 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           map[row.topic_id] = row;
         });
         setProgress(map);
+      } else {
+        setProgress({});
       }
 
-      // 3. Fetch user_badges
+      // 3. Fetch user_badges from Supabase
       const { data: badgeData } = await supabase
         .from("user_badges")
         .select("*")
-        .eq("user_id", user.id);
+        .eq("user_id", activeUser.id);
 
       if (badgeData) {
         setBadges(badgeData as UserBadgeRow[]);
+      } else {
+        setBadges([]);
       }
     } catch (err) {
-      console.error("Error refreshing Supabase data:", err);
+      console.error("Error refreshing data from Supabase:", err);
     }
   }, [isConfigured, user, supabase]);
 
+  // Listen to Supabase Auth State changes
   useEffect(() => {
     if (!isConfigured) {
       setLoading(false);
+      refreshData(null);
       return;
     }
 
+    let mounted = true;
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      if (!mounted) return;
+      const sessionUser = session?.user ?? null;
+      setUser(sessionUser);
       setLoading(false);
+      refreshData(sessionUser);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const sessionUser = session?.user ?? null;
+      setUser(sessionUser);
       setLoading(false);
+      refreshData(sessionUser);
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, [isConfigured, supabase]);
+  }, [isConfigured, supabase, refreshData]);
 
-  useEffect(() => {
-    refreshData();
-  }, [user, refreshData]);
-
+  // Sign out handler
   const signOut = async () => {
     if (isConfigured) {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.error("Sign out error:", err);
+      }
     }
     setUser(null);
+    setStats(defaultGuestStats);
+    setProgress({});
+    setBadges([]);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("guest_user_stats");
+      localStorage.removeItem("guest_user_progress");
+      localStorage.removeItem("guest_user_badges");
+    }
   };
 
+  // Update Topic or Project Progress
   const updateTopicProgress = async (
     topicId: string,
     status: "in_progress" | "completed",
@@ -212,15 +210,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const newProgress = { ...progress, [topicId]: updatedRow };
     setProgress(newProgress);
 
-    if (!user || !isConfigured) {
-      localStorage.setItem("guest_user_progress", JSON.stringify(newProgress));
-    } else {
+    if (user && isConfigured) {
       await supabase
         .from("user_progress")
         .upsert(updatedRow as any, { onConflict: "user_id,topic_id" });
+    } else if (typeof window !== "undefined") {
+      localStorage.setItem("guest_user_progress", JSON.stringify(newProgress));
     }
   };
 
+  // Save Earned Badges
   const saveEarnedBadges = async (badgeIds: string[]) => {
     if (!badgeIds || badgeIds.length === 0) return;
     const nowIso = new Date().toISOString();
@@ -239,13 +238,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setBadges(merged);
 
-    if (!user || !isConfigured) {
-      localStorage.setItem("guest_user_badges", JSON.stringify(merged));
-    } else {
+    if (user && isConfigured) {
       await supabase.from("user_badges").upsert(newBadgeRows as any, { onConflict: "user_id,badge_id" });
+    } else if (typeof window !== "undefined") {
+      localStorage.setItem("guest_user_badges", JSON.stringify(merged));
     }
   };
 
+  // Record Study Activity (XP and Streak Calculation)
   const recordStudyActivity = async (xpGain: number) => {
     const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
     let newStreak = stats.streak_count;
@@ -278,12 +278,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setStats(updatedStats);
 
-    if (!user || !isConfigured) {
-      localStorage.setItem("guest_user_stats", JSON.stringify(updatedStats));
-    } else {
+    if (user && isConfigured) {
       await supabase
         .from("user_stats")
         .upsert(updatedStats as any, { onConflict: "user_id" });
+    } else if (typeof window !== "undefined") {
+      localStorage.setItem("guest_user_stats", JSON.stringify(updatedStats));
     }
   };
 
@@ -296,7 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         stats,
         progress,
         badges,
-        refreshData,
+        refreshData: async () => refreshData(user),
         signOut,
         updateTopicProgress,
         saveEarnedBadges,

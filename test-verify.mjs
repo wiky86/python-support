@@ -138,6 +138,24 @@ badges.badges.forEach((b) => {
   assert(desc.endsWith("획득"), `Badge ${b.id} condition ends with '획득': "${desc}"`);
 });
 
+// Test ID <-> Email conversion helpers
+function idToEmail(id) {
+  const trimmed = id.trim().toLowerCase();
+  if (trimmed.includes("@")) return trimmed;
+  return `${trimmed}@ubion.kdt`;
+}
+function emailToId(email) {
+  if (!email) return "";
+  return email.split("@")[0].toUpperCase();
+}
+
+assert(idToEmail("DF08001") === "df08001@ubion.kdt", "idToEmail('DF08001') converts to 'df08001@ubion.kdt'");
+assert(idToEmail("df08001") === "df08001@ubion.kdt", "idToEmail('df08001') converts to 'df08001@ubion.kdt'");
+assert(idToEmail("  DF08001  ") === "df08001@ubion.kdt", "idToEmail with whitespaces converts correctly");
+assert(emailToId("df08001@ubion.kdt") === "DF08001", "emailToId('df08001@ubion.kdt') extracts 'DF08001'");
+assert(emailToId(null) === "", "emailToId(null) returns empty string");
+
 console.log(`\nResults: ${passed} passed, ${failed} failed.`);
 if (failed > 0) process.exit(1);
+
 
