@@ -70,9 +70,9 @@ export function FillInBlankList({
           const isWrong = results[item.id] === false;
           const value = userInputs[item.id] || "";
 
-          // Render code with the blank input box
-          // Replace `______` with an interactive input
-          const parts = item.code.split("______");
+          // Check if item has inline blank (______), otherwise render full code + separate input
+          const hasInlineBlank = item.code.includes("______");
+          const parts = hasInlineBlank ? item.code.split("______") : [];
 
           return (
             <div
@@ -108,41 +108,70 @@ export function FillInBlankList({
                 )}
               </div>
 
-              {/* Code Snippet Box with Blank Input */}
+              {/* Code Snippet Box */}
               <div className="p-4 rounded-lg bg-slate-950 text-slate-100 font-mono text-sm border border-slate-800 overflow-x-auto">
-                <div className="flex items-center flex-wrap gap-1 leading-relaxed">
-                  {parts.map((part, pIdx) => (
-                    <React.Fragment key={pIdx}>
-                      <span className="whitespace-pre">{part}</span>
-                      {pIdx < parts.length - 1 && (
-                        <input
-                          type="text"
-                          value={value}
-                          onChange={(e) =>
-                            handleInputChange(item.id, e.target.value)
-                          }
-                          onKeyDown={(e) => handleKeyDown(e, item)}
-                          placeholder="빈칸 입력"
-                          className={`inline-block px-2.5 py-1 text-sm font-mono rounded border transition-colors outline-none focus:ring-2 ${
-                            isCorrect
-                              ? "bg-emerald-950 text-emerald-300 border-emerald-500 focus:ring-emerald-500"
-                              : isWrong
-                              ? "bg-rose-950 text-rose-300 border-rose-500 focus:ring-rose-500"
-                              : "bg-slate-900 text-amber-300 border-amber-500/60 focus:border-amber-400 focus:ring-amber-400/30"
-                          } min-w-[120px] max-w-[200px]`}
-                        />
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
+                {hasInlineBlank ? (
+                  <div className="flex items-center flex-wrap gap-1 leading-relaxed">
+                    {parts.map((part, pIdx) => (
+                      <React.Fragment key={pIdx}>
+                        <span className="whitespace-pre">{part}</span>
+                        {pIdx < parts.length - 1 && (
+                          <input
+                            type="text"
+                            value={value}
+                            onChange={(e) =>
+                              handleInputChange(item.id, e.target.value)
+                            }
+                            onKeyDown={(e) => handleKeyDown(e, item)}
+                            placeholder="빈칸 입력"
+                            className={`inline-block px-2.5 py-1 text-sm font-mono rounded border transition-colors outline-none focus:ring-2 ${
+                              isCorrect
+                                ? "bg-emerald-950 text-emerald-300 border-emerald-500 focus:ring-emerald-500"
+                                : isWrong
+                                ? "bg-rose-950 text-rose-300 border-rose-500 focus:ring-rose-500"
+                                : "bg-slate-900 text-amber-300 border-amber-500/60 focus:border-amber-400 focus:ring-amber-400/30"
+                            } min-w-[120px] max-w-[240px]`}
+                          />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                ) : (
+                  <pre className="whitespace-pre overflow-x-auto leading-relaxed text-slate-200">
+                    {item.code}
+                  </pre>
+                )}
               </div>
+
+              {/* Dedicated Answer Input for output prediction questions without inline ______ */}
+              {!hasInlineBlank && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                    👉 예측값 / 답안 입력:
+                  </span>
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => handleInputChange(item.id, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(e, item)}
+                    placeholder="정답 또는 출력 결과 입력"
+                    className={`flex-1 px-3 py-1.5 text-sm font-mono rounded-lg border transition-colors outline-none focus:ring-2 ${
+                      isCorrect
+                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-emerald-500 focus:ring-emerald-500"
+                        : isWrong
+                        ? "bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border-rose-500 focus:ring-rose-500"
+                        : "bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 focus:border-emerald-500 focus:ring-emerald-500/20"
+                    }`}
+                  />
+                </div>
+              )}
 
               {/* Action & Output Area */}
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                 <button
                   onClick={() => handleCheck(item)}
                   disabled={!value.trim()}
-                  className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white disabled:opacity-50 transition-colors shadow-sm"
+                  className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
                 >
                   확인하기 (Enter)
                 </button>
