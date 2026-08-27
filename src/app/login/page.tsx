@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { idToEmail, ALLOW_SELF_SIGNUP } from "@/lib/config";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -21,7 +21,6 @@ import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
   const { user, refreshData } = useAuth();
-  const isConfigured = isSupabaseConfigured();
   const supabase = createClient();
 
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -47,11 +46,6 @@ export default function LoginPage() {
       return;
     }
 
-    if (!isConfigured) {
-      setErrorMsg("Supabase 연결 설정(NEXT_PUBLIC_SUPABASE_URL, ANON_KEY)을 확인해 주세요.");
-      return;
-    }
-
     const email = idToEmail(cleanUsername);
     setLoading(true);
 
@@ -62,8 +56,12 @@ export default function LoginPage() {
           password,
         });
         if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+          if (
+            error.message.includes("Invalid login credentials") ||
+            error.message.includes("invalid_grant") ||
+            error.status === 400
+          ) {
+            throw new Error("아이디 또는 비밀번호가 올바르지 않습니다. (계정이 등록되어 있는지 확인해 주세요)");
           }
           throw error;
         }
@@ -186,15 +184,15 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {errorMsg && (
-                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-start gap-2.5 leading-relaxed">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               {successMsg && (
-                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs flex items-start gap-2.5 leading-relaxed">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   <span>{successMsg}</span>
                 </div>
               )}
@@ -236,10 +234,10 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? (
-                  <span>로그인 중...</span>
+                  <span>로그인 확인 중...</span>
                 ) : mode === "signin" ? (
                   <>
                     <LogIn className="w-4 h-4" /> 로그인하기
