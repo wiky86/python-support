@@ -1,0 +1,23 @@
+{
+  "id": "track7",
+  "order": 7,
+  "title": "종합 분석 프로젝트",
+  "description": "지금까지 배운 모든 것을 하나의 흐름으로 엮어, 데이터 분석 전 과정을 실전처럼 경험합니다.",
+  "topicOrder": [
+    "track7.workflow",
+    "track7.exploration",
+    "track7.cleaning",
+    "track7.aggregation",
+    "track7.visualization",
+    "track7.interpretation"
+  ],
+  "topicFiles": [
+    "topics/t1-workflow.json",
+    "topics/t2-exploration.json",
+    "topics/t3-cleaning.json",
+    "topics/t4-aggregation.json",
+    "topics/t5-visualization.json",
+    "topics/t6-interpretation.json"
+  ],
+  "projectFile": "project.json"
+}
