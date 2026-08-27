@@ -5,7 +5,7 @@ import path from "path";
 const isGithubPages = process.env.GITHUB_ACTIONS || false;
 const repo = "python-support";
 
-// Load .env.local manually if present to ensure build-time inlining
+// Load .env.local if present
 const envLocal = {};
 const envPath = path.join(process.cwd(), ".env.local");
 if (fs.existsSync(envPath)) {
@@ -23,8 +23,19 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || envLocal.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envLocal.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const DEFAULT_SUPABASE_URL = "https://jcwyubqwbrprqumfikbo.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impjd3l1YnF3YnJwcnF1bWZpa2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3OTUxNjEsImV4cCI6MjEwMzM3MTE2MX0.20rdkFP03YFuAURc-5J4QbnrUDNG5H9Xu8Hm_TB4FPw";
+
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  envLocal.NEXT_PUBLIC_SUPABASE_URL ||
+  DEFAULT_SUPABASE_URL;
+
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  envLocal.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  DEFAULT_SUPABASE_ANON_KEY;
 
 const nextConfig = {
   output: "export",
