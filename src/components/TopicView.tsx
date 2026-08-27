@@ -103,6 +103,10 @@ export function TopicView({
     );
   }
 
+  // Unified Tab Card Wrapper CSS
+  const tabCardClassName =
+    "p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 w-full";
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* 1. Breadcrumbs and Header */}
@@ -148,7 +152,7 @@ export function TopicView({
       </div>
 
       {/* 2. Topic Learning Tabs */}
-      <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-900 p-1.5 gap-1 border border-slate-200 dark:border-slate-800">
+      <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-900 p-1.5 gap-1 border border-slate-200 dark:border-slate-800 w-full">
         <button
           type="button"
           onClick={() => changeTab("learn")}
@@ -202,16 +206,10 @@ export function TopicView({
         </button>
       </div>
 
-      {/* 3. Tab Contents (Always mounted in DOM to prevent React 18 AST unmount crashes) */}
-      <div className="space-y-10">
+      {/* 3. Tab Contents (Unified Container Width & Structure) */}
+      <div className="w-full">
         {/* Tab 1: Learn */}
-        <div
-          className={
-            activeTab === "learn"
-              ? "p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 block"
-              : "hidden"
-          }
-        >
+        <div className={activeTab === "learn" ? `${tabCardClassName} block` : "hidden"}>
           <MarkdownViewer content={topic.content} />
 
           <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -230,13 +228,7 @@ export function TopicView({
         </div>
 
         {/* Tab 2: Practice */}
-        <div
-          className={
-            activeTab === "practice"
-              ? "p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 block"
-              : "hidden"
-          }
-        >
+        <div className={activeTab === "practice" ? `${tabCardClassName} block` : "hidden"}>
           <FillInBlankList
             items={topic.fillBlanks}
             onAllCompleted={() => {}}
@@ -262,13 +254,7 @@ export function TopicView({
         </div>
 
         {/* Tab 3: Quiz */}
-        <div
-          className={
-            activeTab === "quiz"
-              ? "p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 block"
-              : "hidden"
-          }
-        >
+        <div className={activeTab === "quiz" ? `${tabCardClassName} block` : "hidden"}>
           <QuizRunner
             quiz={topic.quiz}
             topicId={topic.id}
@@ -289,14 +275,19 @@ export function TopicView({
         </div>
 
         {/* Tab 4: FAQ Bot */}
-        <div
-          className={
-            activeTab === "faq"
-              ? "max-w-2xl mx-auto block"
-              : "hidden"
-          }
-        >
-          <FaqChatbot faqList={topic.faq} topicTitle={topic.title} />
+        <div className={activeTab === "faq" ? `${tabCardClassName} block` : "hidden"}>
+          <div className="space-y-4">
+            <div className="pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Bot className="w-5 h-5 text-indigo-500" />
+                토픽 전용 학습 FAQ 봇
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                학습 중 자주 발생하는 질문과 개념을 대화형으로 빠르게 확인할 수 있습니다.
+              </p>
+            </div>
+            <FaqChatbot faqList={topic.faq} topicTitle={topic.title} />
+          </div>
         </div>
       </div>
 
