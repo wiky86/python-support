@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { createClient, isSupabaseConfigured } from "./supabase/client";
 import { UserProgressRow, UserStatsRow, UserBadgeRow } from "@/types/database";
@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [stats, setStats] = useState<UserStatsRow>(defaultGuestStats);
   const [progress, setProgress] = useState<Record<string, UserProgressRow>>({});
   const [badges, setBadges] = useState<UserBadgeRow[]>([]);
+  const isFetchingRef = useRef(false);
 
   // Refresh and synchronize data from Supabase (if logged in) or LocalStorage (if guest)
   const refreshData = useCallback(async (currentUser?: User | null) => {
@@ -67,18 +68,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    try {
-      // 1. Fetch user_stats from Supabase
-      const { data: statsData, error: statsError } = await supabase
-        .from("user_stats")
-        .select("*")
-        .eq("user_id", activeUser.id)
-        .maybeSingle();
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
 
-      if (statsData) {
-        setStats(statsData as UserStatsRow);
-      } else if (!statsError) {
-        // If user_stats row doesn't exist yet, insert a default row
+    try {
+      // Execute all 3 queries concurrently in parallel via Promise.all
+      const [statsRes, progressRes, badgeRes] = await Promise.all([
+        supabase.from("user_stats").select("*").eq("user_id", activeUser.id).maybeSingle(),
+        supabase.from("user_progress").select("*").eq("user_id", activeUser.id),
+        supabase.from("user_badges").select("*").eq("user_id", activeUser.id),
+      ]);
+
+      // 1. Handle user_stats
+      if (statsRes.data) {
+        setStats(statsRes.data as UserStatsRow);
+      } else if (!statsRes.error) {
         const initialStats: UserStatsRow = {
           user_id: activeUser.id,
           xp: 0,
@@ -86,19 +90,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           streak_count: 0,
           updated_at: new Date().toISOString(),
         };
-        await supabase.from("user_stats").upsert(initialStats as any, { onConflict: "user_id" });
+        supabase.from("user_stats").upsert(initialStats as any, { onConflict: "user_id" }).then();
         setStats(initialStats);
       }
 
-      // 2. Fetch user_progress from Supabase
-      const { data: progressData } = await supabase
-        .from("user_progress")
-        .select("*")
-        .eq("user_id", activeUser.id);
-
-      if (progressData) {
+      // 2. Handle user_progress
+      if (progressRes.data) {
         const map: Record<string, UserProgressRow> = {};
-        (progressData as UserProgressRow[]).forEach((row) => {
+        (progressRes.data as UserProgressRow[]).forEach((row) => {
           map[row.topic_id] = row;
         });
         setProgress(map);
@@ -106,19 +105,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProgress({});
       }
 
-      // 3. Fetch user_badges from Supabase
-      const { data: badgeData } = await supabase
-        .from("user_badges")
-        .select("*")
-        .eq("user_id", activeUser.id);
-
-      if (badgeData) {
-        setBadges(badgeData as UserBadgeRow[]);
+      // 3. Handle user_badges
+      if (badgeRes.data) {
+        setBadges(badgeRes.data as UserBadgeRow[]);
       } else {
         setBadges([]);
       }
     } catch (err) {
       console.error("Error refreshing data from Supabase:", err);
+    } finally {
+      isFetchingRef.current = false;
     }
   }, [isConfigured, user, supabase]);
 
@@ -185,7 +181,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     quizScore?: number
   ) => {
     const existing = progress[topicId];
-    // Retain initial score if already set
     const finalScore =
       existing?.quiz_score !== null && existing?.quiz_score !== undefined
         ? existing.quiz_score
@@ -253,7 +248,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!stats.last_studied) {
       newStreak = 1;
     } else if (stats.last_studied === today) {
-      // already studied today, maintain
       newStreak = stats.streak_count || 1;
     } else {
       const lastDate = new Date(stats.last_studied);
