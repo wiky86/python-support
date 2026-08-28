@@ -29,7 +29,7 @@ export function BadgesView({ badgesConfig, trackTitles }: BadgesViewProps) {
   const percent = totalBadges > 0 ? Math.round((earnedCount / totalBadges) * 100) : 0;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* 1. Header & Summary */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
         <div className="space-y-1">

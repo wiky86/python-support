@@ -168,7 +168,7 @@ export function QuizRunner({
   const isPassed = scoreRatio >= quiz.passThreshold;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full">
       <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <HelpCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />

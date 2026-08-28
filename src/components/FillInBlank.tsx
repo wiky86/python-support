@@ -56,7 +56,7 @@ export function FillInBlankList({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <Terminal className="w-5 h-5 text-teal-600 dark:text-teal-400" />
