@@ -8,6 +8,7 @@ import { UserProgressRow, UserStatsRow, UserBadgeRow } from "@/types/database";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isAdmin: boolean;
   isConfigured: boolean;
   stats: UserStatsRow;
   progress: Record<string, UserProgressRow>;
@@ -37,6 +38,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const isConfigured = isSupabaseConfigured();
   const supabase = createClient();
 
@@ -72,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserData = useCallback(
     async (userId: string | null) => {
       if (!isConfigured || !userId) {
+        setIsAdmin(false);
         // Guest Mode
         if (typeof window !== "undefined") {
           try {
@@ -97,11 +100,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isFetchingRef.current = true;
 
       try {
-        const [statsRes, progressRes, badgeRes] = await Promise.all([
+        const [statsRes, progressRes, badgeRes, adminRes] = await Promise.all([
           supabase.from("user_stats").select("*").eq("user_id", userId).maybeSingle(),
           supabase.from("user_progress").select("*").eq("user_id", userId),
           supabase.from("user_badges").select("*").eq("user_id", userId),
+          (supabase.from("admins") as any).select("user_id").eq("user_id", userId).maybeSingle(),
         ]);
+
+        // 0. Admin Status
+        setIsAdmin(!!(adminRes?.data as any)?.user_id);
 
         // 1. Stats
         if (statsRes.data) {
@@ -210,6 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setUser(null);
     userRef.current = null;
+    setIsAdmin(false);
     setStats(defaultGuestStats);
     setProgress({});
     setBadges([]);
@@ -355,6 +363,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
+        isAdmin,
         isConfigured,
         stats,
         progress,

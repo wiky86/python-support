@@ -15,10 +15,11 @@ import {
   BookOpen,
   User,
   ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 
 export function Navbar() {
-  const { user, stats, badges, isConfigured, signOut } = useAuth();
+  const { user, stats, badges, isConfigured, signOut, isAdmin } = useAuth();
   const { level, percent, xpInCurrentLevel, xpRequiredForNext, xp } = getLevelProgress(stats.xp);
   const studentId = emailToId(user?.email);
 
@@ -70,6 +71,16 @@ export function Navbar() {
                 <Award className="w-4 h-4" />
                 배지 도감
               </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  prefetch={false}
+                  className="px-3 py-1.5 text-sm font-semibold text-purple-700 hover:text-purple-800 dark:text-purple-300 dark:hover:text-purple-200 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 rounded-md transition-colors flex items-center gap-1.5 shadow-xs"
+                >
+                  <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  관리자
+                </Link>
+              )}
             </nav>
           </div>
 
@@ -123,9 +134,24 @@ export function Navbar() {
             {/* User Auth: ID Display & Logout or Login Button */}
             {user ? (
               <div className="flex items-center gap-2 pl-1">
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    prefetch={false}
+                    title="관리자 대시보드"
+                    className="md:hidden p-2 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                  </Link>
+                )}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-mono font-bold border border-slate-200 dark:border-slate-700">
                   <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>{studentId || user.email}</span>
+                  {isAdmin && (
+                    <span className="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-[10px] font-extrabold tracking-wider">
+                      ADMIN
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={signOut}
