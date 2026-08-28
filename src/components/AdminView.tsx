@@ -133,9 +133,30 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
         (supabase.from("user_badges") as any).select("*"),
       ]);
 
+      let userList: AdminUserListRow[] = [];
+
       if (userListRes.error) {
-        throw new Error(`수강생 목록 조회 실패: ${userListRes.error.message}`);
+        // If view permission error occurs, try fallback to user_stats table
+        console.warn("admin_user_list query warning:", userListRes.error.message);
+        const statsFallbackRes = await supabase.from("user_stats").select("*");
+        if (statsFallbackRes.data && statsFallbackRes.data.length > 0) {
+          userList = (statsFallbackRes.data as any[]).map((s) => ({
+            user_id: s.user_id,
+            login_id: s.user_id === user.id ? user.email?.split("@")[0] || "ADMIN" : `USER_${s.user_id.slice(0, 6)}`,
+            xp: s.xp,
+            streak_count: s.streak_count,
+            last_studied: s.last_studied,
+          }));
+          setError(
+            `Supabase 뷰(admin_user_list) 접근 권한 설정 필요: "${userListRes.error.message}". Supabase SQL Editor에서 'ALTER VIEW admin_user_list SET (security_invoker = false);' 를 실행하면 정상 연결됩니다.`
+          );
+        } else {
+          throw new Error(`수강생 목록 조회 실패: ${userListRes.error.message}`);
+        }
+      } else {
+        userList = (userListRes.data || []) as AdminUserListRow[];
       }
+
       if (progressRes.error) {
         throw new Error(`진도 데이터 조회 실패: ${progressRes.error.message}`);
       }
@@ -143,7 +164,6 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
         throw new Error(`배지 데이터 조회 실패: ${badgesRes.error.message}`);
       }
 
-      const userList = (userListRes.data || []) as AdminUserListRow[];
       const allProgress = (progressRes.data || []) as UserProgressRow[];
       const allBadges = (badgesRes.data || []) as UserBadgeRow[];
 
