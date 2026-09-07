@@ -3,7 +3,10 @@ import path from "path";
 
 /** @type {import('next').NextConfig} */
 const isGithubPages = process.env.GITHUB_ACTIONS || false;
-const repo = process.env.REPO_NAME || "kdt-support";
+const repo =
+  process.env.REPO_NAME ||
+  (process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split("/")[1] : null) ||
+  "python-support";
 
 // Load .env.local if present
 const envLocal = {};
