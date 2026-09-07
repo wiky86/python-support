@@ -53,11 +53,12 @@ export function QuizRunner({
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [hasPassedInSession, setHasPassedInSession] = useState(false);
   const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<string[]>([]);
   const [gainedXp, setGainedXp] = useState<number>(0);
 
   const existingProgress = progress[`${courseId}:${topicId}`] || progress[topicId];
-  const isAlreadyPassed = existingProgress?.quiz_passed;
+  const isAlreadyPassed = existingProgress?.quiz_passed || hasPassedInSession;
 
   const handleSelectOption = (questionId: string, optionIdx: number) => {
     if (submitted) return; // Locked after submit until retry
@@ -79,6 +80,8 @@ export function QuizRunner({
     setSubmitted(true);
 
     if (isPassed) {
+      setHasPassedInSession(true);
+
       // Fire confetti animation
       try {
         confetti({
@@ -93,7 +96,7 @@ export function QuizRunner({
       // Calculate XP gains according to rules:
       // topicComplete: 50 XP, quizPass: 30 XP, quizPerfectBonus: 20 XP
       let xpToAdd = 0;
-      const isFirstPass = !existingProgress?.quiz_passed;
+      const isFirstPass = !existingProgress?.quiz_passed && !hasPassedInSession;
 
       if (isFirstPass) {
         xpToAdd += 30; // quizPass
