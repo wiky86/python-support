@@ -1,0 +1,23 @@
+{
+  "id": "track8",
+  "order": 8,
+  "title": "외환시장 이해",
+  "description": "환율과 외환시장이 어떻게 작동하는지 깊이 있게 배웁니다. 외환시장의 기초와 기축통화, 환율의 표시·종류(스프레드·크로스레이트), 환율제도와 외환보유액, 환율 결정요인, 환위험 관리(선물환), 국제 자본이동과 캐리 트레이드까지 글로벌 금융의 흐름을 이해합니다.",
+  "topicOrder": [
+    "track8.forex-basics",
+    "track8.exchange-rate-quotes",
+    "track8.exchange-rate-system",
+    "track8.rate-determinants",
+    "track8.fx-risk",
+    "track8.carry-trade"
+  ],
+  "topicFiles": [
+    "topics/t1-forex-basics.json",
+    "topics/t2-exchange-rate-quotes.json",
+    "topics/t3-exchange-rate-system.json",
+    "topics/t4-rate-determinants.json",
+    "topics/t5-fx-risk.json",
+    "topics/t6-carry-trade.json"
+  ],
+  "projectFile": "project.json"
+}

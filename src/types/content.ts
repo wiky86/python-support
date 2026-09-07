@@ -1,3 +1,20 @@
+export interface Course {
+  id: string; // e.g. "python", "finance"
+  order: number;
+  title: string;
+  shortTitle: string;
+  description: string;
+  theme: "terminal" | "finance" | string;
+  accent: string;
+  icon: string;
+  contentPath: string;
+  trackCount: number;
+}
+
+export interface CoursesConfig {
+  courses: Course[];
+}
+
 export interface Question {
   id: string;
   type: "mcq";
@@ -29,6 +46,7 @@ export interface FAQItem {
 export interface Topic {
   id: string; // e.g. "track1.variables"
   trackId: string; // e.g. "track1"
+  courseId?: string; // e.g. "python" or "finance"
   order: number;
   title: string;
   content: string; // Markdown text
@@ -39,6 +57,7 @@ export interface Topic {
 
 export interface Track {
   id: string; // e.g. "track1"
+  courseId?: string; // e.g. "python" or "finance"
   order: number;
   title: string;
   description: string;
@@ -71,6 +90,7 @@ export interface ProjectReport {
 export interface Project {
   id: string; // e.g. "track1.project"
   trackId: string;
+  courseId?: string;
   title: string;
   intro: string;
   dataset: ProjectDataset;
@@ -78,24 +98,33 @@ export interface Project {
   report: ProjectReport;
 }
 
+export type BadgeConditionType =
+  | "topic_count"
+  | "topic_percent"
+  | "quiz_pass_count"
+  | "perfect_quiz_count"
+  | "project_count"
+  | "track_complete"
+  | "all_tracks_complete"
+  | "flawless_track"
+  | "streak"
+  | "level"
+  | "global_level"
+  | "global_xp"
+  | "courses_started"
+  | "courses_completed"
+  | "global_topic_count";
+
 export interface BadgeCondition {
-  type:
-    | "topic_count"
-    | "topic_percent"
-    | "quiz_pass_count"
-    | "perfect_quiz_count"
-    | "project_count"
-    | "track_complete"
-    | "all_tracks_complete"
-    | "flawless_track"
-    | "streak"
-    | "level";
+  type: BadgeConditionType;
   gte?: number;
   trackId?: string;
 }
 
 export interface BadgeDefinition {
   id: string;
+  scope?: "course" | "global";
+  course?: string;
   name: string;
   desc: string;
   icon: string;
@@ -103,6 +132,11 @@ export interface BadgeDefinition {
 }
 
 export interface BadgesConfig {
+  conditionTypes: Record<string, string>;
+  badges: BadgeDefinition[];
+}
+
+export interface GlobalBadgesConfig {
   conditionTypes: Record<string, string>;
   badges: BadgeDefinition[];
 }

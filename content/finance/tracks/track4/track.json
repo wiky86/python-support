@@ -1,0 +1,23 @@
+{
+  "id": "track4",
+  "order": 4,
+  "title": "증권분석·기업가치평가",
+  "description": "주식과 채권을 분석하고 기업 가치를 매기는 법을 배웁니다. 기본적·기술적 분석, 재무제표 읽기, PER·PBR 등 투자지표, 상대·절대 가치평가, 채권과 금리, 기술적 분석 기초까지 실전 증권분석의 뼈대를 세웁니다.",
+  "topicOrder": [
+    "track4.analysis-approaches",
+    "track4.financial-statements",
+    "track4.valuation-metrics",
+    "track4.valuation-methods",
+    "track4.bonds",
+    "track4.technical-analysis"
+  ],
+  "topicFiles": [
+    "topics/t1-analysis-approaches.json",
+    "topics/t2-financial-statements.json",
+    "topics/t3-valuation-metrics.json",
+    "topics/t4-valuation-methods.json",
+    "topics/t5-bonds.json",
+    "topics/t6-technical-analysis.json"
+  ],
+  "projectFile": "project.json"
+}

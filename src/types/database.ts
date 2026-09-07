@@ -29,6 +29,7 @@ export interface Database {
       user_progress: {
         Row: {
           user_id: string;
+          course: string; // 'python' | 'finance'
           topic_id: string;
           status: TopicStatus;
           quiz_passed: boolean;
@@ -38,6 +39,7 @@ export interface Database {
         };
         Insert: {
           user_id: string;
+          course: string;
           topic_id: string;
           status: TopicStatus;
           quiz_passed?: boolean;
@@ -47,6 +49,7 @@ export interface Database {
         };
         Update: {
           user_id?: string;
+          course?: string;
           topic_id?: string;
           status?: TopicStatus;
           quiz_passed?: boolean;
@@ -59,7 +62,7 @@ export interface Database {
       user_stats: {
         Row: {
           user_id: string;
-          xp: number;
+          xp: number; // Global cumulative XP
           last_studied: string | null; // YYYY-MM-DD
           streak_count: number;
           updated_at: string;
@@ -80,19 +83,43 @@ export interface Database {
         };
         Relationships: [];
       };
+      user_course_stats: {
+        Row: {
+          user_id: string;
+          course: string;
+          xp: number;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          course: string;
+          xp?: number;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          course?: string;
+          xp?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       user_badges: {
         Row: {
           user_id: string;
+          course: string; // 'python' | 'finance' | 'global'
           badge_id: string;
           earned_at: string;
         };
         Insert: {
           user_id: string;
+          course?: string;
           badge_id: string;
           earned_at?: string;
         };
         Update: {
           user_id?: string;
+          course?: string;
           badge_id?: string;
           earned_at?: string;
         };
@@ -123,15 +150,27 @@ export type UserStatsRow = Database["public"]["Tables"]["user_stats"]["Row"];
 export type UserBadgeRow = Database["public"]["Tables"]["user_badges"]["Row"];
 export type AdminUserListRow = Database["public"]["Views"]["admin_user_list"]["Row"];
 
+export interface StudentCourseProgress {
+  courseId: string;
+  completedTopicsCount: number;
+  totalTopicsCount: number;
+  progressPercent: number;
+  courseXp: number;
+  courseLevel: number;
+  courseBadgesCount: number;
+}
+
 export interface StudentSummary {
   userId: string;
   loginId: string;
   cohort: string;
   completedTopicsCount: number;
+  totalTopicsCount: number;
   progressPercent: number;
-  level: number;
-  xp: number;
-  badgesCount: number;
+  level: number; // Global level
+  xp: number; // Global XP
+  badgesCount: number; // Global + all course badges
   streakCount: number;
   lastStudied: string | null;
+  courseProgress?: Record<string, StudentCourseProgress>;
 }

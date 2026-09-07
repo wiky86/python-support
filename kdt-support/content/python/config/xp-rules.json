@@ -1,0 +1,31 @@
+{
+  "_comment": "파이썬 과목 XP·레벨 규칙. 레벨은 저장하지 않고 누적 XP에서 계산. 이 규칙은 과목별 XP 집계에 사용되며, 통합 XP는 전 과목 XP의 합으로 별도 계산한다.",
+  "levelFormula": {
+    "type": "incremental",
+    "baseCost": 250,
+    "increment": 50,
+    "description": "Lv(n)→Lv(n+1) 필요 XP = 200 + 50n. 누적(Lv n+1 도달) = 25n^2 + 175n - 200"
+  },
+  "awards": {
+    "dailyLogin": 10,
+    "streakMilestone": { "3": 20, "7": 50, "14": 80, "30": 150, "60": 250, "90": 350, "180": 700 },
+    "streakRepeating": { "everyDays": 30, "xp": 120 },
+    "topicComplete": 15,
+    "quizPass": 20,
+    "quizPerfectBonus": 10,
+    "trackComplete": 50,
+    "projectComplete": 60
+  },
+  "rules": {
+    "oneTimePerItem": ["topicComplete", "quizPass", "trackComplete", "projectComplete"],
+    "dailyOncePerDay": ["dailyLogin"],
+    "streakMilestoneOnce": true,
+    "streakRepeatingEvery": 30
+  },
+  "_notes": {
+    "levelCalc": "function getLevel(xp){ const n=(-175+Math.sqrt(175*175+4*25*(xp+200)))/(2*25); return Math.max(1, Math.floor(n)+1); }",
+    "streakScope": "스트릭은 계정 전체 기준 1개(과목 무관). streakMilestone/Repeating XP는 어느 과목 XP에 귀속시킬지 앱이 정책으로 정한다. 권장: 통합 XP에만 반영하고 과목별에는 학습 성취 XP만 귀속.",
+    "learnOnly": "전 과정(트랙7개) 완주만 약 2,660 XP -> 공식상 Lv8",
+    "learnPlus6MonthStreak": "완주 + 6개월 매일 출석 시 약 6,800 XP -> 공식상 Lv13~14"
+  }
+}

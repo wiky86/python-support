@@ -1,0 +1,30 @@
+{
+  "_comment": "금융 과목 XP·레벨 규칙. 레벨 공식·적립 규칙은 파이썬과 동일(과목 간 일관성). 트랙 9개라 완주 XP 총량이 파이썬(7트랙)보다 크다.",
+  "levelFormula": {
+    "type": "incremental",
+    "baseCost": 250,
+    "increment": 50,
+    "description": "Lv(n)→Lv(n+1) 필요 XP = 200 + 50n. 누적(Lv n+1 도달) = 25n^2 + 175n - 200"
+  },
+  "awards": {
+    "dailyLogin": 10,
+    "streakMilestone": { "3": 20, "7": 50, "14": 80, "30": 150, "60": 250, "90": 350, "180": 700 },
+    "streakRepeating": { "everyDays": 30, "xp": 120 },
+    "topicComplete": 15,
+    "quizPass": 20,
+    "quizPerfectBonus": 10,
+    "trackComplete": 50,
+    "projectComplete": 60
+  },
+  "rules": {
+    "oneTimePerItem": ["topicComplete", "quizPass", "trackComplete", "projectComplete"],
+    "dailyOncePerDay": ["dailyLogin"],
+    "streakMilestoneOnce": true,
+    "streakRepeatingEvery": 30
+  },
+  "_notes": {
+    "levelCalc": "function getLevel(xp){ const n=(-175+Math.sqrt(175*175+4*25*(xp+200)))/(2*25); return Math.max(1, Math.floor(n)+1); }",
+    "streakScope": "스트릭은 계정 전체 기준 1개(과목 무관). 파이썬 config와 동일 정책.",
+    "scale": "트랙 9개 x 토픽 6개 기준. 트랙당 약 380 XP -> 9트랙 학습만으로 약 3,420 XP -> 공식상 Lv10. 두 과목 모두 완주하면 통합 XP 약 6,080 -> 통합 Lv13."
+  }
+}

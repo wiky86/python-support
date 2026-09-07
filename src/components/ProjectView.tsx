@@ -18,6 +18,8 @@ import {
   Award,
   ArrowRight,
   TrendingUp,
+  ArrowLeft,
+  Layers,
 } from "lucide-react";
 
 interface ProjectViewProps {
@@ -41,6 +43,7 @@ export function ProjectView({
 }: ProjectViewProps) {
   const {
     progress,
+    courseProgressMap,
     stats,
     badges,
     user,
@@ -49,9 +52,11 @@ export function ProjectView({
     recordStudyActivity,
   } = useAuth();
 
+  const courseId = track.courseId || "python";
   const isUnlocked = isProjectUnlocked(track, progress);
   const projectId = `${track.id}.project`;
-  const isAlreadyCompleted = progress[projectId]?.status === "completed";
+  const existingProgress = progress[`${courseId}:${projectId}`] || progress[projectId];
+  const isAlreadyCompleted = existingProgress?.status === "completed";
 
   const [completedMissions, setCompletedMissions] = useState(isAlreadyCompleted);
   const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<string[]>([]);
@@ -71,33 +76,45 @@ export function ProjectView({
       // ignore
     }
 
-    // Award XP: projectComplete: 60 XP, trackComplete: 50 XP
+    // Award XP: projectComplete: 300 XP, trackComplete: 200 XP
     let xpToAdd = 0;
     if (!isAlreadyCompleted) {
-      xpToAdd += 60; // projectComplete
+      xpToAdd += 300; // projectComplete
       // Check if all topics in track complete => trackComplete bonus
-      xpToAdd += 50; // trackComplete
+      xpToAdd += 200; // trackComplete
     }
 
     setGainedXp(xpToAdd);
 
-    await updateTopicProgress(projectId, "completed", true, 1.0);
+    await updateTopicProgress(projectId, "completed", true, 1.0, courseId);
 
     if (xpToAdd > 0) {
       await recordStudyActivity(xpToAdd);
     }
 
     // Check newly unlocked badges
+    const simulatedRow = {
+      user_id: stats.user_id,
+      course: courseId,
+      topic_id: projectId,
+      status: "completed" as const,
+      quiz_passed: true,
+      quiz_score: 1.0,
+      completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
     const simulatedProgress = {
       ...progress,
-      [projectId]: {
-        user_id: stats.user_id,
-        topic_id: projectId,
-        status: "completed" as const,
-        quiz_passed: true,
-        quiz_score: 1.0,
-        completed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+      [projectId]: simulatedRow,
+      [`${courseId}:${projectId}`]: simulatedRow,
+    };
+
+    const simulatedCourseMap = {
+      ...courseProgressMap,
+      [courseId]: {
+        ...(courseProgressMap[courseId] || {}),
+        [projectId]: simulatedRow,
       },
     };
 
@@ -108,17 +125,19 @@ export function ProjectView({
 
     const newBadgeIds = evaluateBadges({
       stats: simulatedStats,
-      progress: simulatedProgress,
+      allProgress: simulatedProgress,
+      courseProgressMap: simulatedCourseMap,
       existingBadges: badges,
       allBadges,
-      allTrackTopicsCount,
-      totalTopicsCount,
-      totalTracksCount,
+      courseTrackTopicsCount: { [courseId]: allTrackTopicsCount },
+      courseTotalTopicsCount: { [courseId]: totalTopicsCount },
+      courseTotalTracksCount: { [courseId]: totalTracksCount },
+      currentCourseId: courseId,
     });
 
     if (newBadgeIds.length > 0) {
       setNewlyEarnedBadges(newBadgeIds);
-      await saveEarnedBadges(newBadgeIds);
+      await saveEarnedBadges(newBadgeIds, courseId);
     }
   };
 
@@ -138,11 +157,11 @@ export function ProjectView({
         </div>
         <div className="flex items-center justify-center gap-4 pt-4">
           <Link
-            href="/"
+            href={`/${courseId}`}
             prefetch={false}
             className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors"
           >
-            학습 지도로 돌아가기
+            과목 학습 지도로 돌아가기
           </Link>
         </div>
       </div>
@@ -150,143 +169,146 @@ export function ProjectView({
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       {/* 1. Breadcrumbs and Header */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <Link
             href="/"
             prefetch={false}
-            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1"
           >
-            학습 로드맵
+            <Layers className="w-3.5 h-3.5" />
+            과목 선택
           </Link>
           <span>/</span>
-          <span>{track.title}</span>
+          <Link
+            href={`/${courseId}`}
+            prefetch={false}
+            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+          >
+            {courseId === "python" ? "파이썬 데이터 분석" : "디지털 금융 이론"}
+          </Link>
           <span>/</span>
-          <span className="font-semibold text-slate-800 dark:text-slate-200">
-            {project.title}
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {track.title}
+          </span>
+          <span>/</span>
+          <span className="text-purple-600 dark:text-purple-400 font-bold">
+            미니 프로젝트
           </span>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 text-xs font-bold font-mono flex items-center gap-1">
-                <Rocket className="w-3.5 h-3.5" />
-                MINI PROJECT
+              <span className="px-2.5 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-xs font-bold font-mono">
+                TRACK {track.order} · MINI PROJECT
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-                {project.title}
-              </h1>
+              {completedMissions && (
+                <span className="flex items-center gap-1 text-xs font-semibold text-purple-600 dark:text-purple-400">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  프로젝트 완료
+                </span>
+              )}
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              {project.intro}
-            </p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              {project.title}
+            </h1>
           </div>
 
-          {(completedMissions || isAlreadyCompleted) && (
-            <div className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-300 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-bold">
-              <CheckCircle2 className="w-4 h-4 text-teal-600" />
-              프로젝트 완주 완료
+          <Link
+            href={`/${courseId}`}
+            prefetch={false}
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> 학습 로드맵
+          </Link>
+        </div>
+      </div>
+
+      {/* 2. Project Intro & Dataset Scenario Card */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold text-sm">
+            <Rocket className="w-4 h-4" />
+            <span>실전 종합 프로젝트 개요</span>
+          </div>
+          <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            {project.intro}
+          </p>
+        </div>
+
+        {/* Dataset / Scenario Code Block */}
+        {project.dataset && (
+          <div className="p-5 rounded-2xl bg-slate-900 text-slate-100 space-y-3 font-mono text-xs border border-slate-800">
+            <div className="flex items-center justify-between text-slate-400 text-[11px] pb-2 border-b border-slate-800">
+              <span className="flex items-center gap-1.5">
+                <Database className="w-3.5 h-3.5 text-teal-400" />
+                {project.dataset.description}
+              </span>
+              <span>데이터셋 / 가상 시나리오</span>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* 2. Dataset Section */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-          <Database className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">
-            제공 데이터셋 (Dataset)
-          </h3>
-        </div>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-          {project.dataset.description}
-        </p>
-        <div className="p-4 rounded-xl bg-slate-950 text-emerald-400 font-mono text-xs sm:text-sm overflow-x-auto border border-slate-800 leading-relaxed whitespace-pre">
-          {project.dataset.code}
-        </div>
-      </div>
-
-      {/* 3. Missions (Fill-in-the-blank) */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8">
-        <FillInBlankList
-          items={project.missions}
-          title="단계별 분석 미션 실습"
-          onAllCompleted={handleAllMissionsCompleted}
-        />
-
-        {!completedMissions && (
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-xs text-slate-500">
-              위의 모든 미션을 정답으로 완료하면 최종 분석 리포트 카드가 생성됩니다.
-            </span>
-            <button
-              onClick={handleAllMissionsCompleted}
-              className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5"
-            >
-              <Sparkles className="w-4 h-4" />
-              리포트 생성 및 완료하기
-            </button>
+            <pre className="overflow-x-auto whitespace-pre-wrap leading-relaxed text-teal-300">
+              {project.dataset.code}
+            </pre>
           </div>
         )}
       </div>
 
-      {/* 4. Completion & Newly Earned Badges Banner */}
-      {completedMissions && (
-        <div className="space-y-8 animate-fadeIn">
-          {newlyEarnedBadges.length > 0 && (
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-400 dark:border-amber-700">
-              <div className="text-sm font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2 mb-3">
-                <Award className="w-5 h-5 text-amber-500" />
-                축하합니다! 새로운 배지를 획득하셨습니다:
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                {newlyEarnedBadges.map((badgeId) => {
-                  const b = allBadges.find((x) => x.id === badgeId);
-                  return (
-                    <div
-                      key={badgeId}
-                      className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 shadow-sm"
-                    >
-                      <span className="text-amber-500">🏆</span>
-                      <span>{b?.name || badgeId}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+      {/* 3. Missions (Fill-in-the-Blank steps) */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8">
+        <FillInBlankList
+          items={project.missions}
+          title="단계별 미션 해결 (빈칸 채우기)"
+          onAllCompleted={handleAllMissionsCompleted}
+        />
 
-          {/* 5. Report Card */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                최종 결과 분석 리포트 카드
-              </h3>
-            </div>
-            <ReportCard
-              report={project.report}
-              projectTitle={project.title}
-              userName={user?.email?.split("@")[0] || "데이터 분석 학습자"}
-            />
-          </div>
+        {/* Completion Celebration & Report Card */}
+        {completedMissions && (
+          <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800 animate-fadeIn">
+            {/* XP and Badges notification */}
+            {gainedXp > 0 && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-transparent border border-purple-300 dark:border-purple-700 text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500 animate-spin" />
+                  <span>
+                    프로젝트 완료 보상: +{gainedXp} XP 획득! (프로젝트 300 XP + 트랙 완주 200 XP)
+                  </span>
+                </div>
+                {newlyEarnedBadges.length > 0 && (
+                  <span className="text-amber-600 dark:text-amber-400 font-extrabold">
+                    +신규 배지 {newlyEarnedBadges.length}개 획득!
+                  </span>
+                )}
+              </div>
+            )}
 
-          <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <Link
-              href="/"
-              prefetch={false}
-              className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-md transition-all flex items-center gap-2"
-            >
-              <span>학습 대시보드로 돌아가기</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {/* Generated Report Card */}
+            {project.report && (
+              <ReportCard
+                report={project.report}
+                trackTitle={track.title}
+                completedAt={new Date().toLocaleDateString("ko-KR")}
+              />
+            )}
+
+            <div className="flex items-center justify-between pt-4">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                축하합니다! 트랙의 모든 과정을 성공적으로 완주했습니다.
+              </span>
+              <Link
+                href={`/${courseId}`}
+                prefetch={false}
+                className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-2"
+              >
+                <span>학습 지도로 돌아가기</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

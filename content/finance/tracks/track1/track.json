@@ -1,0 +1,23 @@
+{
+  "id": "track1",
+  "order": 1,
+  "title": "디지털 뱅킹 & AI 리터러시",
+  "description": "전통 금융이 어떻게 디지털·데이터·AI 기반으로 바뀌고 있는지 큰 그림을 잡습니다. 디지털 뱅킹의 진화부터 핀테크, 마이데이터, 금융 AI, 리스크·규제, 디지털 자산까지 오늘날 금융의 지형을 이해합니다.",
+  "topicOrder": [
+    "track1.digital-banking-evolution",
+    "track1.fintech-innovation",
+    "track1.mydata",
+    "track1.financial-ai",
+    "track1.risk-regulation",
+    "track1.digital-assets"
+  ],
+  "topicFiles": [
+    "topics/t1-digital-banking-evolution.json",
+    "topics/t2-fintech-innovation.json",
+    "topics/t3-mydata.json",
+    "topics/t4-financial-ai.json",
+    "topics/t5-risk-regulation.json",
+    "topics/t6-digital-assets.json"
+  ],
+  "projectFile": "project.json"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "track6",
+  "order": 6,
+  "title": "리스크관리",
+  "description": "금융에서 발생하는 다양한 위험을 구분하고 측정·관리하는 법을 배웁니다. 리스크관리 프로세스, 시장·신용·유동성·운영 리스크, VaR, 위험 대응 전략(회피·감소·전가·수용)과 헤지, 시스템 리스크와 규제까지 위험과 현명하게 동행하는 법을 익힙니다.",
+  "topicOrder": [
+    "track6.risk-basics",
+    "track6.risk-types",
+    "track6.var",
+    "track6.risk-response",
+    "track6.derivatives-hedge",
+    "track6.systemic-regulation"
+  ],
+  "topicFiles": [
+    "topics/t1-risk-basics.json",
+    "topics/t2-risk-types.json",
+    "topics/t3-var.json",
+    "topics/t4-risk-response.json",
+    "topics/t5-derivatives-hedge.json",
+    "topics/t6-systemic-regulation.json"
+  ],
+  "projectFile": "project.json"
+}

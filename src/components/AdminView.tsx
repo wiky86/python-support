@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { getLevel } from "@/lib/gamification";
-import { StudentSummary, AdminUserListRow, UserProgressRow, UserBadgeRow } from "@/types/database";
+import { Course } from "@/types/content";
+import { StudentSummary, StudentCourseProgress, AdminUserListRow, UserProgressRow, UserBadgeRow } from "@/types/database";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -26,9 +27,14 @@ import {
   ArrowLeft,
   ChevronDown,
   Filter,
+  Layers,
+  Terminal,
+  Landmark,
 } from "lucide-react";
 
 interface AdminViewProps {
+  courses: Course[];
+  courseTopicCounts: Record<string, number>;
   totalTopicsCount: number;
 }
 
@@ -37,6 +43,8 @@ type SortField =
   | "cohort"
   | "progressPercent"
   | "completedTopicsCount"
+  | "pythonPercent"
+  | "financePercent"
   | "level"
   | "xp"
   | "badgesCount"
@@ -45,29 +53,19 @@ type SortField =
 
 type SortDirection = "asc" | "desc";
 
-/**
- * Extracts cohort code from login ID.
- * Examples:
- * - "DF08001" -> "DF08"
- * - "AI02015" -> "AI02"
- * - "DS1001" -> "DS1" or "DS10"
- */
 function extractCohort(loginId: string): string {
   if (!loginId) return "기타";
   const clean = loginId.trim().toUpperCase();
-  // Matches letters followed by 2 digits (e.g. DF08)
   const m2 = clean.match(/^([A-Z]+[0-9]{2})/);
   if (m2) return m2[1];
-  // Matches letters followed by 1 digit (e.g. DF8)
   const m1 = clean.match(/^([A-Z]+[0-9]{1})/);
   if (m1) return m1[1];
-  // Matches letters only
   const mLetters = clean.match(/^([A-Z]+)/);
   if (mLetters) return mLetters[1];
   return "기타";
 }
 
-export function AdminView({ totalTopicsCount }: AdminViewProps) {
+export function AdminView({ courses, courseTopicCounts, totalTopicsCount }: AdminViewProps) {
   const router = useRouter();
   const { user, loading: authLoading, isConfigured } = useAuth();
   const supabase = useMemo(() => createClient(), []);
@@ -80,7 +78,8 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
 
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [selectedCohort, setSelectedCohort] = useState<string>("ALL");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>("ALL");
+  const [searchQuery, setSearchQuery] = useState<string>("" );
 
   const [sortField, setSortField] = useState<SortField>("loginId");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -136,7 +135,6 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
       let userList: AdminUserListRow[] = [];
 
       if (userListRes.error) {
-        // If view permission error occurs, try fallback to user_stats table
         console.warn("admin_user_list query warning:", userListRes.error.message);
         const statsFallbackRes = await supabase.from("user_stats").select("*");
         if (statsFallbackRes.data && statsFallbackRes.data.length > 0) {
@@ -167,11 +165,20 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
       const allProgress = (progressRes.data || []) as UserProgressRow[];
       const allBadges = (badgesRes.data || []) as UserBadgeRow[];
 
-      // Index progress by user_id -> count of completed topics
+      // Index progress by user_id -> global completed count
       const completedCountByUser: Record<string, number> = {};
+      // Index progress by user_id -> course -> completed count
+      const courseCompletedCountByUser: Record<string, Record<string, number>> = {};
+
       allProgress.forEach((p) => {
         if (p.status === "completed" && !p.topic_id.endsWith(".project")) {
           completedCountByUser[p.user_id] = (completedCountByUser[p.user_id] || 0) + 1;
+
+          const c = p.course || "python";
+          if (!courseCompletedCountByUser[p.user_id]) {
+            courseCompletedCountByUser[p.user_id] = {};
+          }
+          courseCompletedCountByUser[p.user_id][c] = (courseCompletedCountByUser[p.user_id][c] || 0) + 1;
         }
       });
 
@@ -186,26 +193,45 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
         const rawLoginId = row.login_id || "UNKNOWN";
         const loginId = rawLoginId.toUpperCase();
         const cohort = extractCohort(loginId);
-        const completedCount = completedCountByUser[row.user_id] || 0;
-        const total = totalTopicsCount > 0 ? totalTopicsCount : 43;
-        const progressPercent = Math.min(100, Math.round((completedCount / total) * 100));
+        const globalCompleted = completedCountByUser[row.user_id] || 0;
+        const total = totalTopicsCount > 0 ? totalTopicsCount : 97;
+        const progressPercent = Math.min(100, Math.round((globalCompleted / total) * 100));
         const xp = row.xp || 0;
         const level = getLevel(xp);
         const badgesCount = badgesCountByUser[row.user_id] || 0;
         const streakCount = row.streak_count || 0;
         const lastStudied = row.last_studied || null;
 
+        // Build course progress breakdown
+        const courseProgress: Record<string, StudentCourseProgress> = {};
+        courses.forEach((c) => {
+          const cCompleted = (courseCompletedCountByUser[row.user_id] || {})[c.id] || 0;
+          const cTotal = courseTopicCounts[c.id] || (c.id === "python" ? 43 : 54);
+          const cPercent = cTotal > 0 ? Math.min(100, Math.round((cCompleted / cTotal) * 100)) : 0;
+          courseProgress[c.id] = {
+            courseId: c.id,
+            completedTopicsCount: cCompleted,
+            totalTopicsCount: cTotal,
+            progressPercent: cPercent,
+            courseXp: 0,
+            courseLevel: 1,
+            courseBadgesCount: 0,
+          };
+        });
+
         return {
           userId: row.user_id,
           loginId,
           cohort,
-          completedTopicsCount: completedCount,
+          completedTopicsCount: globalCompleted,
+          totalTopicsCount: total,
           progressPercent,
           level,
           xp,
           badgesCount,
           streakCount,
           lastStudied,
+          courseProgress,
         };
       });
 
@@ -216,179 +242,199 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
     } finally {
       setLoadingData(false);
     }
-  }, [user, isConfigured, supabase, totalTopicsCount]);
+  }, [user, isConfigured, supabase, courses, courseTopicCounts, totalTopicsCount]);
 
+  // Initial Auth Check
   useEffect(() => {
-    checkAdminAuth();
-  }, [checkAdminAuth]);
+    if (!authLoading) {
+      checkAdminAuth();
+    }
+  }, [authLoading, checkAdminAuth]);
 
+  // When authorized, load student data
   useEffect(() => {
     if (isAuthorizedAdmin) {
       loadAdminData();
     }
   }, [isAuthorizedAdmin, loadAdminData]);
 
-  // Extract distinct cohort list
+  // Unique cohorts list for filter tabs
   const cohorts = useMemo(() => {
     const set = new Set<string>();
-    students.forEach((s) => {
-      if (s.cohort) set.add(s.cohort);
-    });
+    students.forEach((s) => set.add(s.cohort));
     return Array.from(set).sort();
   }, [students]);
 
-  // Filtered list based on cohort and search query
+  // Filtered and Sorted Students
   const filteredStudents = useMemo(() => {
-    return students.filter((s) => {
-      const matchCohort = selectedCohort === "ALL" || s.cohort === selectedCohort;
-      const matchSearch =
-        !searchQuery.trim() ||
-        s.loginId.includes(searchQuery.trim().toUpperCase());
-      return matchCohort && matchSearch;
-    });
-  }, [students, selectedCohort, searchQuery]);
+    let result = [...students];
 
-  // Sorted list
-  const sortedStudents = useMemo(() => {
-    const list = [...filteredStudents];
-    list.sort((a, b) => {
-      let aVal: any = a[sortField];
-      let bVal: any = b[sortField];
+    // 1. Cohort Filter
+    if (selectedCohort !== "ALL") {
+      result = result.filter((s) => s.cohort === selectedCohort);
+    }
 
-      // Handle nulls for lastStudied
-      if (sortField === "lastStudied") {
-        aVal = aVal || "";
-        bVal = bVal || "";
+    // 2. Search Query (ID or User ID)
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter(
+        (s) => s.loginId.toLowerCase().includes(q) || s.userId.toLowerCase().includes(q)
+      );
+    }
+
+    // 3. Sorting
+    result.sort((a, b) => {
+      let aVal: any;
+      let bVal: any;
+
+      if (sortField === "pythonPercent") {
+        aVal = a.courseProgress?.["python"]?.progressPercent || 0;
+        bVal = b.courseProgress?.["python"]?.progressPercent || 0;
+      } else if (sortField === "financePercent") {
+        aVal = a.courseProgress?.["finance"]?.progressPercent || 0;
+        bVal = b.courseProgress?.["finance"]?.progressPercent || 0;
+      } else {
+        aVal = a[sortField];
+        bVal = b[sortField];
       }
 
-      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-    return list;
-  }, [filteredStudents, sortField, sortDirection]);
+      if (aVal === null || aVal === undefined) aVal = "";
+      if (bVal === null || bVal === undefined) bVal = "";
 
-  // Statistics calculation for summary cards
-  const statsSummary = useMemo(() => {
-    const totalCount = filteredStudents.length;
-    if (totalCount === 0) {
+      if (typeof aVal === "string") {
+        const cmp = aVal.localeCompare(bVal);
+        return sortDirection === "asc" ? cmp : -cmp;
+      } else {
+        const cmp = (aVal as number) - (bVal as number);
+        return sortDirection === "asc" ? cmp : -cmp;
+      }
+    });
+
+    return result;
+  }, [students, selectedCohort, searchQuery, sortField, sortDirection]);
+
+  // Summary Metrics for KPI Cards
+  const kpiMetrics = useMemo(() => {
+    const totalStudentsCount = students.length;
+    if (totalStudentsCount === 0) {
       return {
-        totalCount: 0,
-        avgProgress: 0,
-        avgXp: 0,
-        avgLevel: 0,
-        perfectProgressCount: 0,
-        activeCount: 0,
+        totalStudentsCount: 0,
+        avgGlobalProgress: 0,
+        avgPythonProgress: 0,
+        avgFinanceProgress: 0,
+        avgLevel: 1,
+        activeTodayCount: 0,
       };
     }
 
-    const sumProgress = filteredStudents.reduce((acc, s) => acc + s.progressPercent, 0);
-    const sumXp = filteredStudents.reduce((acc, s) => acc + s.xp, 0);
-    const sumLevel = filteredStudents.reduce((acc, s) => acc + s.level, 0);
-    const perfectProgressCount = filteredStudents.filter((s) => s.progressPercent >= 100).length;
-
-    // Active in last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const sevenDaysAgoStr = sevenDaysAgo.toISOString().slice(0, 10);
-    const activeCount = filteredStudents.filter(
-      (s) => s.lastStudied && s.lastStudied >= sevenDaysAgoStr
-    ).length;
+    const today = new Date().toISOString().split("T")[0];
+    const sumGlobalProgress = students.reduce((acc, s) => acc + s.progressPercent, 0);
+    const sumPythonProgress = students.reduce(
+      (acc, s) => acc + (s.courseProgress?.["python"]?.progressPercent || 0),
+      0
+    );
+    const sumFinanceProgress = students.reduce(
+      (acc, s) => acc + (s.courseProgress?.["finance"]?.progressPercent || 0),
+      0
+    );
+    const sumLevel = students.reduce((acc, s) => acc + s.level, 0);
+    const activeToday = students.filter((s) => s.lastStudied === today).length;
 
     return {
-      totalCount,
-      avgProgress: Math.round(sumProgress / totalCount),
-      avgXp: Math.round(sumXp / totalCount),
-      avgLevel: Number((sumLevel / totalCount).toFixed(1)),
-      perfectProgressCount,
-      activeCount,
+      totalStudentsCount,
+      avgGlobalProgress: Math.round(sumGlobalProgress / totalStudentsCount),
+      avgPythonProgress: Math.round(sumPythonProgress / totalStudentsCount),
+      avgFinanceProgress: Math.round(sumFinanceProgress / totalStudentsCount),
+      avgLevel: (sumLevel / totalStudentsCount).toFixed(1),
+      activeTodayCount: activeToday,
     };
-  }, [filteredStudents]);
+  }, [students]);
 
-  // Sort Toggle Handler
+  // Handle Sort Change
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
-      setSortDirection("desc"); // Default to desc for metrics, asc for strings
-      if (field === "loginId" || field === "cohort") {
-        setSortDirection("asc");
-      }
+      setSortDirection("desc");
     }
   };
 
-  // CSV Export Handler
-  const exportToCsv = () => {
-    if (sortedStudents.length === 0) return;
+  // Export to CSV
+  const handleExportCsv = () => {
+    if (filteredStudents.length === 0) return;
 
     const headers = [
       "아이디",
       "기수",
-      "완료토픽수",
-      "전체토픽수",
-      "진도율(%)",
-      "레벨",
-      "누적XP",
-      "획득배지수",
-      "연속학습일",
-      "마지막학습일",
+      "통합 진도율(%)",
+      "통합 완료 토픽",
+      "파이썬 진도율(%)",
+      "파이썬 완료",
+      "금융 진도율(%)",
+      "금융 완료",
+      "통합 레벨",
+      "통합 XP",
+      "배지 수",
+      "연속 학습일",
+      "최근 학습일",
+      "User ID",
     ];
 
-    const rows = sortedStudents.map((s) => [
+    const rows = filteredStudents.map((s) => [
       s.loginId,
       s.cohort,
-      s.completedTopicsCount,
-      totalTopicsCount,
       `${s.progressPercent}%`,
-      s.level,
+      `${s.completedTopicsCount}/${s.totalTopicsCount}`,
+      `${s.courseProgress?.["python"]?.progressPercent || 0}%`,
+      `${s.courseProgress?.["python"]?.completedTopicsCount || 0}/${s.courseProgress?.["python"]?.totalTopicsCount || 43}`,
+      `${s.courseProgress?.["finance"]?.progressPercent || 0}%`,
+      `${s.courseProgress?.["finance"]?.completedTopicsCount || 0}/${s.courseProgress?.["finance"]?.totalTopicsCount || 54}`,
+      `Lv.${s.level}`,
       s.xp,
       s.badgesCount,
-      s.streakCount,
-      s.lastStudied || "-",
+      `${s.streakCount}일`,
+      s.lastStudied || "학습 이력 없음",
+      s.userId,
     ]);
 
     const csvContent =
       "\uFEFF" +
-      [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join("\n");
+      [headers.join(","), ...rows.map((r) => r.map((cell) => `"${cell}"`).join(","))].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+    const today = new Date().toISOString().split("T")[0];
     link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `PyDataLab_수강생진도_${selectedCohort}_${new Date().toISOString().slice(0, 10)}.csv`
-    );
+    link.setAttribute("download", `kdt_students_progress_${today}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  // 1. Auth Loading State
+  // 1. Loading State
   if (authLoading || isAdminChecking) {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center animate-spin">
-          <RefreshCw className="w-6 h-6" />
-        </div>
-        <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-          관리자 권한을 확인하는 중입니다...
+      <div className="w-full max-w-7xl mx-auto px-4 py-20 text-center space-y-4">
+        <RefreshCw className="w-8 h-8 text-purple-600 animate-spin mx-auto" />
+        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          관리자 권한을 확인하고 있습니다...
         </p>
       </div>
     );
   }
 
-  // 2. Unauthenticated (Not Logged In)
+  // 2. Unauthenticated
   if (!user) {
     return (
       <div className="w-full max-w-md mx-auto px-4 py-20 text-center space-y-6">
-        <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200 dark:border-amber-800">
+        <div className="w-16 h-16 rounded-3xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center mx-auto border border-purple-200 dark:border-purple-800">
           <ShieldAlert className="w-8 h-8" />
         </div>
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            로그인이 필요합니다
+            관리자 로그인이 필요합니다
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             관리자 대시보드에 접근하려면 관리자 계정으로 로그인해 주세요.
@@ -407,7 +453,7 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
     );
   }
 
-  // 3. Unauthorized (Not in admins table)
+  // 3. Unauthorized
   if (!isAuthorizedAdmin) {
     return (
       <div className="w-full max-w-md mx-auto px-4 py-20 text-center space-y-6">
@@ -419,7 +465,7 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
             접근 권한이 없습니다
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            현재 계정(<strong>{user.email}</strong>)은 관리자 권한이 등록되어 있지 않습니다. 관리자 계정으로 다시 로그인해 주세요.
+            현재 계정(<strong>{user.email}</strong>)은 관리자 권한이 등록되어 있지 않습니다.
           </p>
         </div>
         <div className="flex items-center justify-center gap-3 pt-2">
@@ -447,11 +493,11 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
               ADMIN ONLY
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-              수강생 학습 현황 대시보드
+              수강생 통합 학습 현황 대시보드
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            수강생들의 실시간 토픽 진도율, 레벨, 배지 수집 현황 및 연속 학습일을 한눈에 조회합니다. (전체 {totalTopicsCount}개 토픽 기준)
+            수강생들의 파이썬·디지털 금융 실시간 토픽 진도율, 통합 레벨, 배지 수집 및 연속 학습일을 한눈에 조회합니다. (전체 {totalTopicsCount}개 토픽 기준)
           </p>
         </div>
 
@@ -468,398 +514,386 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
 
           <button
             type="button"
-            onClick={exportToCsv}
-            disabled={sortedStudents.length === 0}
+            onClick={handleExportCsv}
+            disabled={filteredStudents.length === 0}
             className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>CSV 다운로드</span>
+            <span>CSV 다운로드 ({filteredStudents.length}명)</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Summary KPI Metrics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        {/* Total Students */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>조회 수강생</span>
-            <Users className="w-4 h-4 text-purple-500" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">
-            {statsSummary.totalCount}
-            <span className="text-xs font-normal text-slate-500 ml-1">명</span>
-          </div>
-        </div>
-
-        {/* Average Progress */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>평균 진도율</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-            {statsSummary.avgProgress}%
-          </div>
-        </div>
-
-        {/* Average Level */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>평균 레벨</span>
-            <Sparkles className="w-4 h-4 text-teal-500" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-teal-600 dark:text-teal-400">
-            Lv.{statsSummary.avgLevel}
-          </div>
-        </div>
-
-        {/* Active Students (7 days) */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>최근 7일 학습</span>
-            <Flame className="w-4 h-4 text-orange-500" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-orange-600 dark:text-orange-400">
-            {statsSummary.activeCount}
-            <span className="text-xs font-normal text-slate-500 ml-1">명</span>
-          </div>
-        </div>
-
-        {/* 100% Completed */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1 col-span-2 sm:col-span-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>전체 완주자</span>
-            <Award className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">
-            {statsSummary.perfectProgressCount}
-            <span className="text-xs font-normal text-slate-500 ml-1">명</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Filters & Search Bar */}
-      <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          {/* Cohort Selector (Buttons on large screens, dropdown on small) */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5 text-purple-600" />
-              기수 선택:
-            </span>
-
-            <button
-              type="button"
-              onClick={() => setSelectedCohort("ALL")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                selectedCohort === "ALL"
-                  ? "bg-purple-600 text-white shadow-xs"
-                  : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"
-              }`}
-            >
-              전체 보기 ({students.length})
-            </button>
-
-            {cohorts.map((c) => {
-              const count = students.filter((s) => s.cohort === c).length;
-              const isSelected = selectedCohort === c;
-              return (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setSelectedCohort(c)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"
-                  }`}
-                >
-                  {c} ({count})
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search Input */}
-          <div className="relative min-w-[240px] max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="수강생 아이디 검색 (예: DF08001)"
-              className="w-full pl-9 pr-4 py-2 text-xs font-mono rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Error Notice */}
+      {/* Error / Fallback Notice */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between gap-3">
-          <span>{error}</span>
-          <button
-            type="button"
-            onClick={loadAdminData}
-            className="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold cursor-pointer"
-          >
-            다시 시도
-          </button>
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/80 text-xs text-amber-800 dark:text-amber-200 space-y-1.5">
+          <div className="flex items-center gap-2 font-bold">
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <span>데이터 조회 알림:</span>
+          </div>
+          <p className="pl-6 font-mono leading-relaxed">{error}</p>
         </div>
       )}
 
-      {/* 5. Main Student Progress Table */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden w-full">
+      {/* 2. KPI Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {/* Total Students */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+          <div className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+            <Users className="w-3.5 h-3.5 text-purple-600" />
+            <span>총 수강생</span>
+          </div>
+          <div className="text-2xl font-extrabold font-mono text-slate-900 dark:text-white">
+            {kpiMetrics.totalStudentsCount}명
+          </div>
+          <p className="text-[10px] text-slate-400">등록 계정 기준</p>
+        </div>
+
+        {/* Avg Global Progress */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+          <div className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
+            <span>통합 평균 진도율</span>
+          </div>
+          <div className="text-2xl font-extrabold font-mono text-teal-600 dark:text-teal-400">
+            {kpiMetrics.avgGlobalProgress}%
+          </div>
+          <p className="text-[10px] text-slate-400">전 과목 합산</p>
+        </div>
+
+        {/* Avg Python Progress */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+          <div className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+            <Terminal className="w-3.5 h-3.5 text-emerald-600" />
+            <span>파이썬 평균 진도</span>
+          </div>
+          <div className="text-2xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+            {kpiMetrics.avgPythonProgress}%
+          </div>
+          <p className="text-[10px] text-slate-400">파이썬 7개 트랙</p>
+        </div>
+
+        {/* Avg Finance Progress */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+          <div className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+            <Landmark className="w-3.5 h-3.5 text-amber-600" />
+            <span>금융 평균 진도</span>
+          </div>
+          <div className="text-2xl font-extrabold font-mono text-amber-600 dark:text-amber-400">
+            {kpiMetrics.avgFinanceProgress}%
+          </div>
+          <p className="text-[10px] text-slate-400">금융 9개 트랙</p>
+        </div>
+
+        {/* Avg Level */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+          <div className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>통합 평균 레벨</span>
+          </div>
+          <div className="text-2xl font-extrabold font-mono text-indigo-600 dark:text-indigo-400">
+            Lv.{kpiMetrics.avgLevel}
+          </div>
+          <p className="text-[10px] text-slate-400">전체 누적 XP 기준</p>
+        </div>
+
+        {/* Active Today */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+          <div className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+            <Flame className="w-3.5 h-3.5 text-orange-600" />
+            <span>오늘 학습 수강생</span>
+          </div>
+          <div className="text-2xl font-extrabold font-mono text-orange-600 dark:text-orange-400">
+            {kpiMetrics.activeTodayCount}명
+          </div>
+          <p className="text-[10px] text-slate-400">당일 학습 접속</p>
+        </div>
+      </div>
+
+      {/* 3. Filters and Search Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Cohort Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+          <button
+            type="button"
+            onClick={() => setSelectedCohort("ALL")}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              selectedCohort === "ALL"
+                ? "bg-purple-600 text-white shadow-xs"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+            }`}
+          >
+            전체 기수 ({students.length})
+          </button>
+
+          {cohorts.map((c) => {
+            const count = students.filter((s) => s.cohort === c).length;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setSelectedCohort(c)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  selectedCohort === c
+                    ? "bg-purple-600 text-white shadow-xs"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                }`}
+              >
+                {c} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search Input */}
+        <div className="relative w-full sm:w-64">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="아이디 검색 (예: DF08001)..."
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+      </div>
+
+      {/* 4. Student Data Table */}
+      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            {/* Table Header */}
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 text-slate-600 dark:text-slate-400 font-bold">
-                <th className="py-4 px-5 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("loginId")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
-                    <span>수강생 아이디</span>
-                    {sortField === "loginId" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300">
+            <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800">
+              <tr>
+                {/* ID */}
+                <th
+                  onClick={() => handleSort("loginId")}
+                  className="px-5 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span>수강생 ID</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
 
-                <th className="py-4 px-4 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("cohort")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
+                {/* Cohort */}
+                <th
+                  onClick={() => handleSort("cohort")}
+                  className="px-4 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
                     <span>기수</span>
-                    {sortField === "cohort" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
 
-                <th className="py-4 px-5 whitespace-nowrap min-w-[220px]">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("progressPercent")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
-                    <span>전체 진도율</span>
-                    {sortField === "progressPercent" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+                {/* Unified Progress */}
+                <th
+                  onClick={() => handleSort("progressPercent")}
+                  className="px-4 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span>통합 진도율</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
 
-                <th className="py-4 px-4 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("level")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
-                    <span>레벨 / 누적 XP</span>
-                    {sortField === "level" || sortField === "xp" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+                {/* Python Progress */}
+                <th
+                  onClick={() => handleSort("pythonPercent")}
+                  className="px-4 py-4 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Terminal className="w-3 h-3 text-emerald-500" />
+                    <span>파이썬 진도</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
 
-                <th className="py-4 px-4 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("badgesCount")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
-                    <span>획득 배지</span>
-                    {sortField === "badgesCount" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+                {/* Finance Progress */}
+                <th
+                  onClick={() => handleSort("financePercent")}
+                  className="px-4 py-4 cursor-pointer hover:text-amber-600 dark:hover:text-amber-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Landmark className="w-3 h-3 text-amber-500" />
+                    <span>금융 진도</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
 
-                <th className="py-4 px-4 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("streakCount")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
+                {/* Level / XP */}
+                <th
+                  onClick={() => handleSort("xp")}
+                  className="px-4 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span>통합 레벨 · XP</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
+                </th>
+
+                {/* Badges */}
+                <th
+                  onClick={() => handleSort("badgesCount")}
+                  className="px-4 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap text-center"
+                >
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span>배지</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
+                </th>
+
+                {/* Streak */}
+                <th
+                  onClick={() => handleSort("streakCount")}
+                  className="px-4 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap text-center"
+                >
+                  <div className="flex items-center justify-center gap-1.5">
                     <span>연속 학습</span>
-                    {sortField === "streakCount" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
 
-                <th className="py-4 px-5 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("lastStudied")}
-                    className="flex items-center gap-1.5 hover:text-purple-600 transition-colors cursor-pointer"
-                  >
-                    <span>마지막 학습일</span>
-                    {sortField === "lastStudied" ? (
-                      sortDirection === "asc" ? (
-                        <ArrowUp className="w-3.5 h-3.5 text-purple-600" />
-                      ) : (
-                        <ArrowDown className="w-3.5 h-3.5 text-purple-600" />
-                      )
-                    ) : (
-                      <ArrowUpDown className="w-3.5 h-3.5 opacity-40" />
-                    )}
-                  </button>
+                {/* Last Studied */}
+                <th
+                  onClick={() => handleSort("lastStudied")}
+                  className="px-5 py-4 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 select-none whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span>최근 학습일</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
+                  </div>
                 </th>
               </tr>
             </thead>
 
-            {/* Table Body */}
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-              {loadingData ? (
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+              {filteredStudents.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
-                      <span>수강생 데이터를 동기화하고 있습니다...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : sortedStudents.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-500 dark:text-slate-400">
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <Users className="w-8 h-8 text-slate-300 dark:text-slate-700" />
-                      <p className="text-sm font-semibold">표시할 수강생이 없습니다.</p>
-                      <p className="text-xs text-slate-400">
-                        {searchQuery ? "검색어를 확인해 주세요." : "등록된 수강생 계정이 없습니다."}
-                      </p>
-                    </div>
+                  <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
+                    {loadingData ? "데이터를 불러오는 중입니다..." : "조회된 수강생이 없습니다."}
                   </td>
                 </tr>
               ) : (
-                sortedStudents.map((s, idx) => {
-                  const isPerfect = s.progressPercent >= 100;
+                filteredStudents.map((student) => {
+                  const pyProg = student.courseProgress?.["python"] || { completedTopicsCount: 0, totalTopicsCount: 43, progressPercent: 0 };
+                  const fnProg = student.courseProgress?.["finance"] || { completedTopicsCount: 0, totalTopicsCount: 54, progressPercent: 0 };
+
                   return (
                     <tr
-                      key={s.userId}
-                      className="hover:bg-purple-50/30 dark:hover:bg-purple-950/20 transition-colors"
+                      key={student.userId}
+                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                     >
                       {/* ID */}
-                      <td className="py-3.5 px-5 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-mono text-slate-400 w-5">
-                            {idx + 1}
-                          </span>
-                          <span className="font-mono font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                            {s.loginId}
-                          </span>
-                        </div>
+                      <td className="px-5 py-4 font-mono font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                        {student.loginId}
                       </td>
 
                       {/* Cohort */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-xs font-semibold">
-                          {s.cohort}
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[11px] font-bold">
+                          {student.cohort}
                         </span>
                       </td>
 
-                      {/* Progress Bar & Info */}
-                      <td className="py-3.5 px-5 whitespace-nowrap">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold font-mono text-slate-900 dark:text-white flex items-center gap-1">
-                              {isPerfect && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 inline" />}
-                              {s.progressPercent}%
+                      {/* Unified Progress */}
+                      <td className="px-4 py-4 whitespace-nowrap min-w-[140px]">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-mono">
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {student.progressPercent}%
                             </span>
-                            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                              {s.completedTopicsCount} / {totalTopicsCount} 토픽
+                            <span className="text-slate-400">
+                              {student.completedTopicsCount}/{student.totalTopicsCount}
                             </span>
                           </div>
-                          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                isPerfect
-                                  ? "bg-gradient-to-r from-emerald-500 to-teal-400"
-                                  : "bg-emerald-500"
-                              }`}
-                              style={{ width: `${s.progressPercent}%` }}
+                              className="bg-gradient-to-r from-purple-500 to-indigo-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${student.progressPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Python Progress */}
+                      <td className="px-4 py-4 whitespace-nowrap min-w-[120px]">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-mono">
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                              {pyProg.progressPercent}%
+                            </span>
+                            <span className="text-slate-400">
+                              {pyProg.completedTopicsCount}/{pyProg.totalTopicsCount}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${pyProg.progressPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Finance Progress */}
+                      <td className="px-4 py-4 whitespace-nowrap min-w-[120px]">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-mono">
+                            <span className="font-bold text-amber-600 dark:text-amber-400">
+                              {fnProg.progressPercent}%
+                            </span>
+                            <span className="text-slate-400">
+                              {fnProg.completedTopicsCount}/{fnProg.totalTopicsCount}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${fnProg.progressPercent}%` }}
                             />
                           </div>
                         </div>
                       </td>
 
                       {/* Level & XP */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                            Lv.{s.level}
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold font-mono text-purple-600 dark:text-purple-400 text-xs">
+                            Lv.{student.level}
                           </span>
-                          <span className="font-mono text-xs text-slate-600 dark:text-slate-300">
-                            {s.xp.toLocaleString()} XP
+                          <span className="text-slate-400 font-mono text-[11px]">
+                            ({student.xp.toLocaleString()} XP)
                           </span>
                         </div>
                       </td>
 
                       {/* Badges */}
-                      <td className="py-3.5 px-4 whitespace-nowrap font-mono text-xs">
-                        <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
-                          <Award className="w-4 h-4 text-amber-500" />
-                          <span>{s.badgesCount}개</span>
-                        </div>
+                      <td className="px-4 py-4 whitespace-nowrap text-center">
+                        <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-600 dark:text-amber-400 text-xs">
+                          <Award className="w-3.5 h-3.5" />
+                          {student.badgesCount}
+                        </span>
                       </td>
 
                       {/* Streak */}
-                      <td className="py-3.5 px-4 whitespace-nowrap font-mono text-xs">
-                        <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 font-semibold">
-                          <Flame className="w-4 h-4 text-orange-500" />
-                          <span>{s.streakCount}일</span>
-                        </div>
+                      <td className="px-4 py-4 whitespace-nowrap text-center">
+                        <span className="inline-flex items-center gap-1 font-mono font-bold text-orange-600 dark:text-orange-400 text-xs">
+                          <Flame className="w-3.5 h-3.5" />
+                          {student.streakCount}일
+                        </span>
                       </td>
 
                       {/* Last Studied */}
-                      <td className="py-3.5 px-5 whitespace-nowrap font-mono text-xs text-slate-600 dark:text-slate-400">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{s.lastStudied || "-"}</span>
-                        </div>
+                      <td className="px-5 py-4 whitespace-nowrap font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                        {student.lastStudied ? (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-slate-400" />
+                            {student.lastStudied}
+                          </span>
+                        ) : (
+                          <span className="text-slate-300 dark:text-slate-600">-</span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -867,6 +901,16 @@ export function AdminView({ totalTopicsCount }: AdminViewProps) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Table Footer Stats */}
+        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <span>
+            총 <strong>{students.length}</strong>명의 수강생 중 <strong>{filteredStudents.length}</strong>명 표시 중
+          </span>
+          <span className="text-[11px]">
+            ※ 진도율 및 레벨은 수강생 활동 시 실시간 자동 반영됩니다.
+          </span>
         </div>
       </div>
     </div>

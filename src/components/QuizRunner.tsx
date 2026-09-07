@@ -20,6 +20,7 @@ interface QuizRunnerProps {
   quiz: Quiz;
   topicId: string;
   trackId: string;
+  courseId?: string;
   allBadges: BadgeDefinition[];
   allTrackTopicsCount: Record<string, number>;
   totalTopicsCount: number;
@@ -32,6 +33,7 @@ export function QuizRunner({
   quiz,
   topicId,
   trackId,
+  courseId = "python",
   allBadges,
   allTrackTopicsCount,
   totalTopicsCount,
@@ -41,6 +43,7 @@ export function QuizRunner({
 }: QuizRunnerProps) {
   const {
     progress,
+    courseProgressMap,
     stats,
     badges,
     updateTopicProgress,
@@ -53,7 +56,7 @@ export function QuizRunner({
   const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<string[]>([]);
   const [gainedXp, setGainedXp] = useState<number>(0);
 
-  const existingProgress = progress[topicId];
+  const existingProgress = progress[`${courseId}:${topicId}`] || progress[topicId];
   const isAlreadyPassed = existingProgress?.quiz_passed;
 
   const handleSelectOption = (questionId: string, optionIdx: number) => {
@@ -88,15 +91,15 @@ export function QuizRunner({
       }
 
       // Calculate XP gains according to rules:
-      // topicComplete: 15 XP, quizPass: 20 XP, quizPerfectBonus: 10 XP
+      // topicComplete: 50 XP, quizPass: 30 XP, quizPerfectBonus: 20 XP
       let xpToAdd = 0;
       const isFirstPass = !existingProgress?.quiz_passed;
 
       if (isFirstPass) {
-        xpToAdd += 20; // quizPass
-        xpToAdd += 15; // topicComplete
+        xpToAdd += 30; // quizPass
+        xpToAdd += 50; // topicComplete
         if (isPerfect) {
-          xpToAdd += 10; // quizPerfectBonus
+          xpToAdd += 20; // quizPerfectBonus
         }
       }
 
@@ -107,7 +110,8 @@ export function QuizRunner({
         topicId,
         "completed",
         true,
-        scoreRatio
+        scoreRatio,
+        courseId
       );
 
       if (xpToAdd > 0) {
@@ -115,16 +119,28 @@ export function QuizRunner({
       }
 
       // Check newly unlocked badges
+      const simulatedRow = {
+        user_id: stats.user_id,
+        course: courseId,
+        topic_id: topicId,
+        status: "completed" as const,
+        quiz_passed: true,
+        quiz_score: existingProgress?.quiz_score ?? scoreRatio,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
       const simulatedProgress = {
         ...progress,
-        [topicId]: {
-          user_id: stats.user_id,
-          topic_id: topicId,
-          status: "completed" as const,
-          quiz_passed: true,
-          quiz_score: existingProgress?.quiz_score ?? scoreRatio,
-          completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+        [topicId]: simulatedRow,
+        [`${courseId}:${topicId}`]: simulatedRow,
+      };
+
+      const simulatedCourseMap = {
+        ...courseProgressMap,
+        [courseId]: {
+          ...(courseProgressMap[courseId] || {}),
+          [topicId]: simulatedRow,
         },
       };
 
@@ -135,17 +151,19 @@ export function QuizRunner({
 
       const newBadgeIds = evaluateBadges({
         stats: simulatedStats,
-        progress: simulatedProgress,
+        allProgress: simulatedProgress,
+        courseProgressMap: simulatedCourseMap,
         existingBadges: badges,
         allBadges,
-        allTrackTopicsCount,
-        totalTopicsCount,
-        totalTracksCount,
+        courseTrackTopicsCount: { [courseId]: allTrackTopicsCount },
+        courseTotalTopicsCount: { [courseId]: totalTopicsCount },
+        courseTotalTracksCount: { [courseId]: totalTracksCount },
+        currentCourseId: courseId,
       });
 
       if (newBadgeIds.length > 0) {
         setNewlyEarnedBadges(newBadgeIds);
-        await saveEarnedBadges(newBadgeIds);
+        await saveEarnedBadges(newBadgeIds, courseId);
       }
     }
   };
@@ -177,61 +195,113 @@ export function QuizRunner({
           </h3>
         </div>
         <div className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-          통과 기준: {Math.round(quiz.passThreshold * 100)}% 이상
+          통과 기준: {Math.round(quiz.passThreshold * 100)}% 이상 ({Math.ceil(quiz.questions.length * quiz.passThreshold)}/{quiz.questions.length} 정답)
         </div>
       </div>
 
-      {/* Sequential Questions List (SPEC 3.3: In exact file order) */}
+      {/* Result Banner when submitted */}
+      {submitted && (
+        <div
+          className={`p-6 rounded-3xl border transition-all ${
+            isPassed
+              ? "bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 shadow-sm"
+              : "bg-rose-50/80 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 shadow-sm"
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md ${
+                  isPassed ? "bg-emerald-600 shadow-emerald-500/30" : "bg-rose-600 shadow-rose-500/30"
+                }`}
+              >
+                {isPassed ? (
+                  <Trophy className="w-6 h-6" />
+                ) : (
+                  <XCircle className="w-6 h-6" />
+                )}
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                  {isPassed
+                    ? correctCount === quiz.questions.length
+                      ? "🎉 축하합니다! 만점 통과입니다!"
+                      : "🎉 축하합니다! 퀴즈를 통과했습니다!"
+                    : "아쉽게도 통과 기준에 미달했습니다."}
+                </h4>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                  총 {quiz.questions.length}문제 중 {correctCount}문제 정답 ({Math.round(scoreRatio * 100)}%)
+                  {gainedXp > 0 && ` · +${gainedXp} XP 획득!`}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              {!isPassed ? (
+                <button
+                  onClick={handleRetry}
+                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>다시 풀기</span>
+                </button>
+              ) : onNextTopic ? (
+                <button
+                  onClick={onNextTopic}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
+                >
+                  <span>{nextTopicTitle ? `${nextTopicTitle}으로 이동` : "다음 학습 진행"}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Newly earned badge celebration banner */}
+          {newlyEarnedBadges.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-800/80 flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-200">
+              <Sparkles className="w-4 h-4 text-amber-500 animate-bounce" />
+              <span>새로운 배지({newlyEarnedBadges.length}개)를 획득했습니다! 배지 도감에서 확인하세요.</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Question List */}
       <div className="space-y-6">
-        {quiz.questions.map((q, idx) => {
-          const selected = selectedAnswers[q.id];
-          const isCorrect = selected === q.answer;
+        {quiz.questions.map((q, qIdx) => {
+          const selectedOption = selectedAnswers[q.id];
+          const isAnswerSelected = selectedOption !== undefined;
+          const isCorrect = submitted && selectedOption === q.answer;
+          const isWrong = submitted && selectedOption !== q.answer;
 
           return (
             <div
               key={q.id}
-              className={`p-5 sm:p-6 rounded-2xl border transition-all w-full ${
+              className={`p-6 rounded-2xl border transition-all ${
                 submitted
                   ? isCorrect
-                    ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800"
-                    : "bg-rose-50/40 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800"
-                  : "bg-slate-50/60 dark:bg-slate-950/40 border-slate-200/80 dark:border-slate-800/80 shadow-none"
+                    ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/80"
+                    : "bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/80"
+                  : "bg-slate-50/50 dark:bg-slate-950/30 border-slate-200 dark:border-slate-800"
               }`}
             >
-              {/* Question title */}
+              {/* Question Header */}
               <div className="flex items-start gap-3 mb-4">
-                <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">
-                  Q{idx + 1}
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex-shrink-0">
+                  {qIdx + 1}
                 </span>
-                <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white whitespace-pre-line leading-relaxed flex-1">
+                <p className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-relaxed">
                   {q.q}
-                </div>
+                </p>
               </div>
 
-              {/* 4-Choice Options (Full width) */}
-              <div className="space-y-2.5 w-full">
-                {q.options.map((option, optIdx) => {
-                  const isThisSelected = selected === optIdx;
-                  const isThisAnswer = q.answer === optIdx;
-
-                  let optionStyle =
-                    "border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/60";
-
-                  if (submitted) {
-                    if (isThisAnswer) {
-                      optionStyle =
-                        "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-medium";
-                    } else if (isThisSelected && !isCorrect) {
-                      optionStyle =
-                        "border-rose-500 bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200";
-                    } else {
-                      optionStyle =
-                        "border-slate-200 dark:border-slate-800 opacity-60";
-                    }
-                  } else if (isThisSelected) {
-                    optionStyle =
-                      "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 ring-2 ring-emerald-500/20";
-                  }
+              {/* Options */}
+              <div className="space-y-2.5 pl-9">
+                {q.options.map((opt, optIdx) => {
+                  const isThisSelected = selectedOption === optIdx;
+                  const isThisCorrectAnswer = submitted && optIdx === q.answer;
+                  const isThisWrongSelected = submitted && isThisSelected && optIdx !== q.answer;
 
                   return (
                     <button
@@ -239,35 +309,45 @@ export function QuizRunner({
                       type="button"
                       disabled={submitted}
                       onClick={() => handleSelectOption(q.id, optIdx)}
-                      className={`w-full text-left p-3.5 rounded-lg border text-xs sm:text-sm flex items-center justify-between transition-all ${optionStyle}`}
+                      className={`w-full text-left p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm font-medium border transition-all flex items-center justify-between ${
+                        submitted
+                          ? isThisCorrectAnswer
+                            ? "bg-emerald-100 dark:bg-emerald-950/80 border-emerald-400 text-emerald-900 dark:text-emerald-100 font-bold"
+                            : isThisWrongSelected
+                            ? "bg-rose-100 dark:bg-rose-950/80 border-rose-400 text-rose-900 dark:text-rose-100 font-semibold"
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 opacity-60"
+                          : isThisSelected
+                          ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-xs"
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700"
+                      }`}
                     >
                       <div className="flex items-center gap-3">
                         <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
                             isThisSelected
-                              ? "bg-emerald-600 border-emerald-600 text-white"
-                              : "border-slate-300 dark:border-slate-600 text-slate-500"
+                              ? "bg-emerald-600 text-white"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-500"
                           }`}
                         >
-                          {optIdx + 1}
+                          {String.fromCharCode(65 + optIdx)}
                         </span>
-                        <span className="font-mono">{option}</span>
+                        <span>{opt}</span>
                       </div>
 
-                      {submitted && isThisAnswer && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      {submitted && isThisCorrectAnswer && (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                       )}
-                      {submitted && isThisSelected && !isCorrect && (
-                        <XCircle className="w-4 h-4 text-rose-500" />
+                      {submitted && isThisWrongSelected && (
+                        <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
                       )}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Explanation after submission */}
-              {submitted && (
-                <div className="mt-4 ml-9 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300">
+              {/* Explanation (Shown only after submission) */}
+              {submitted && q.explain && (
+                <div className="mt-4 ml-9 p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   <span className="font-bold text-emerald-600 dark:text-emerald-400 mr-1.5">
                     💡 해설:
                   </span>
@@ -279,112 +359,24 @@ export function QuizRunner({
         })}
       </div>
 
-      {/* Quiz Submission Result Banner */}
-      {submitted && (
-        <div
-          className={`p-6 rounded-2xl border ${
-            isPassed
-              ? "bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-400 dark:border-emerald-700"
-              : "bg-gradient-to-br from-rose-500/10 to-amber-500/10 border-rose-400 dark:border-rose-700"
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  isPassed
-                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-                    : "bg-rose-500 text-white shadow-lg shadow-rose-500/30"
-                }`}
-              >
-                {isPassed ? (
-                  <Trophy className="w-6 h-6" />
-                ) : (
-                  <RotateCcw className="w-6 h-6" />
-                )}
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  {isPassed ? "퀴즈 통과 성공! 🎉" : "아쉽게 통과하지 못했어요"}
-                  {isPassed && correctCount === quiz.questions.length && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 font-extrabold flex items-center gap-0.5">
-                      <Sparkles className="w-3 h-3" /> 만점 달성!
-                    </span>
-                  )}
-                </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  점수: {correctCount} / {quiz.questions.length} 문항 (
-                  {Math.round(scoreRatio * 100)}%) —{" "}
-                  {isPassed
-                    ? "다음 토픽 잠금이 해제되었습니다!"
-                    : "해설을 확인하고 다시 도전해보세요."}
-                </p>
-                {gainedXp > 0 && (
-                  <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> +{gainedXp} XP 획득!
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              {!isPassed ? (
-                <button
-                  onClick={handleRetry}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" /> 다시 풀기
-                </button>
-              ) : (
-                onNextTopic && (
-                  <button
-                    onClick={onNextTopic}
-                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5 hover:translate-x-0.5"
-                  >
-                    <span>{nextTopicTitle ? `${nextTopicTitle}로 이동` : "다음 학습으로"}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                )
-              )}
-            </div>
-          </div>
-
-          {/* Newly earned badges banner */}
-          {newlyEarnedBadges.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-emerald-300 dark:border-emerald-800/60">
-              <div className="text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 mb-2">
-                <Award className="w-4 h-4 text-amber-500" />
-                새로운 배지를 획득했습니다!
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {newlyEarnedBadges.map((badgeId) => {
-                  const b = allBadges.find((x) => x.id === badgeId);
-                  return (
-                    <div
-                      key={badgeId}
-                      className="px-3 py-1.5 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-amber-300 dark:border-amber-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 shadow-sm"
-                    >
-                      <span className="text-amber-500">🏆</span>
-                      <span>{b?.name || badgeId}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Submit Action Button */}
+      {/* Submit Button */}
       {!submitted && (
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            {allAnswered
+              ? "모든 문제의 보기를 선택했습니다. 제출하여 채점하세요."
+              : "모든 문제에 답안을 선택해 주세요."}
+          </span>
           <button
-            type="button"
-            disabled={!allAnswered}
             onClick={handleGradeQuiz}
-            className="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:text-slate-400 text-white font-bold text-sm shadow-md shadow-emerald-600/20 disabled:shadow-none transition-all"
+            disabled={!allAnswered}
+            className={`px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition-all ${
+              allAnswered
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20 cursor-pointer"
+                : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+            }`}
           >
-            퀴즈 채점 및 제출
+            퀴즈 제출 및 채점
           </button>
         </div>
       )}

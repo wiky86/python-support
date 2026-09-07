@@ -5,7 +5,8 @@ import { FAQItem } from "@/types/content";
 import { Bot, User, MessageSquare, Sparkles } from "lucide-react";
 
 interface FaqChatbotProps {
-  faqList: FAQItem[];
+  faqList?: FAQItem[];
+  faqItems?: FAQItem[];
   topicTitle: string;
 }
 
@@ -14,7 +15,8 @@ interface ChatMessage {
   text: string;
 }
 
-export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
+export function FaqChatbot({ faqList, faqItems, topicTitle }: FaqChatbotProps) {
+  const items = faqList || faqItems || [];
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       sender: "bot",
@@ -40,92 +42,83 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
     let currentIndex = 0;
     setDisplayedTypingText("");
 
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       if (currentIndex < targetMsg.length) {
         setDisplayedTypingText((prev) => prev + targetMsg.charAt(currentIndex));
         currentIndex++;
       } else {
-        clearInterval(interval);
+        clearInterval(timer);
         setTypingIndex(null);
       }
-    }, 20);
+    }, 15);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, [typingIndex, messages]);
 
-  const handleSelectFaq = (faq: FAQItem) => {
-    if (typingIndex !== null) return; // Wait until current response finishes typing
+  const handleSelectQuestion = (item: FAQItem) => {
+    if (typingIndex !== null) return; // Prevent clicking while typing
 
-    const newMsgs: ChatMessage[] = [
-      ...messages,
-      { sender: "user", text: faq.q },
-      { sender: "bot", text: faq.a },
-    ];
+    const userMsg: ChatMessage = { sender: "user", text: item.q };
+    const botMsg: ChatMessage = { sender: "bot", text: item.a };
 
-    setMessages(newMsgs);
-    setTypingIndex(newMsgs.length - 1);
+    setMessages((prev) => {
+      const next = [...prev, userMsg, botMsg];
+      setTypingIndex(next.length - 1);
+      return next;
+    });
   };
 
   return (
-    <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 overflow-hidden flex flex-col h-[540px]">
-      {/* Chatbot Header */}
-      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-sm">
-            <Bot className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-              PyData 학습 FAQ 봇
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {topicTitle} 관련 자주 묻는 질문 챗봇
-            </p>
-          </div>
+    <div className="space-y-6 w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <Bot className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            FAQ 봇과 질의응답
+          </h3>
         </div>
-        <div className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold flex items-center gap-1">
-          <Sparkles className="w-3 h-3" />
-          상시 응답
-        </div>
+        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+          실시간 자동 응답
+        </span>
       </div>
 
-      {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+      {/* Chat Messages Box */}
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 min-h-[320px] max-h-[480px] overflow-y-auto space-y-4 font-sans text-xs sm:text-sm">
         {messages.map((msg, idx) => {
           const isBot = msg.sender === "bot";
-          const isCurrentlyTyping = typingIndex === idx;
-          const textToShow = isCurrentlyTyping ? displayedTypingText : msg.text;
+          const isCurrentlyTyping = idx === typingIndex;
+          const textToRender = isCurrentlyTyping ? displayedTypingText : msg.text;
 
           return (
             <div
               key={idx}
-              className={`flex items-start gap-2.5 w-full ${
+              className={`flex items-start gap-3 ${
                 isBot ? "justify-start" : "justify-end"
               }`}
             >
               {isBot && (
-                <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
-                  <Bot className="w-3.5 h-3.5" />
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs mt-0.5">
+                  <Bot className="w-4 h-4" />
                 </div>
               )}
 
               <div
-                className={`max-w-[85%] p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                className={`p-4 rounded-2xl max-w-[85%] sm:max-w-[75%] leading-relaxed whitespace-pre-wrap ${
                   isBot
-                    ? "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-200/80 dark:border-slate-700/80 shadow-xs"
-                    : "bg-emerald-600 text-white rounded-tr-none shadow-sm font-medium"
+                    ? "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 shadow-xs"
+                    : "bg-emerald-600 text-white shadow-xs font-medium rounded-br-xs"
                 }`}
               >
-                <div className="whitespace-pre-line">{textToShow}</div>
+                {textToRender}
                 {isCurrentlyTyping && (
-                  <span className="inline-block w-1.5 h-4 ml-1 bg-emerald-500 animate-pulse align-middle" />
+                  <span className="inline-block w-1.5 h-3.5 bg-emerald-500 ml-1 animate-pulse align-middle" />
                 )}
               </div>
 
               {!isBot && (
-                <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
-                  <User className="w-3.5 h-3.5" />
+                <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User className="w-4 h-4" />
                 </div>
               )}
             </div>
@@ -134,22 +127,26 @@ export function FaqChatbot({ faqList, topicTitle }: FaqChatbotProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Question Chips Panel */}
-      <div className="p-4 bg-white/90 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 w-full">
-        <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1">
-          <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
-          질문을 클릭하면 즉시 답변을 확인하실 수 있습니다:
+      {/* Suggested Questions Chips */}
+      <div className="space-y-2.5">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400">
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span>자주 묻는 질문 칩 (클릭 시 봇이 답변합니다)</span>
         </div>
-        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-          {faqList.map((faq, idx) => (
+
+        <div className="flex flex-wrap gap-2">
+          {items.map((item, idx) => (
             <button
               key={idx}
               type="button"
               disabled={typingIndex !== null}
-              onClick={() => handleSelectFaq(faq)}
-              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 hover:border-emerald-300 dark:hover:bg-emerald-950/40 dark:hover:border-emerald-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs text-left transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+              onClick={() => handleSelectQuestion(item)}
+              className="p-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700 text-slate-800 dark:text-slate-200 text-xs font-medium transition-all text-left flex items-center gap-2 shadow-2xs hover:shadow-xs disabled:opacity-50 cursor-pointer"
             >
-              💬 {faq.q}
+              <span className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                Q
+              </span>
+              <span>{item.q}</span>
             </button>
           ))}
         </div>

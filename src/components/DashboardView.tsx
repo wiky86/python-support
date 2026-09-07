@@ -2,10 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import { Track, Topic, BadgeDefinition, Project } from "@/types/content";
+import { Course, Track, Topic, BadgeDefinition, Project } from "@/types/content";
 import { useAuth } from "@/lib/auth-context";
 import { getTopicStatus, isProjectUnlocked } from "@/lib/progress";
-import { getLevelProgress } from "@/lib/gamification";
+import { getLevelProgress, getLevel, calculateXpFromProgress } from "@/lib/gamification";
 import { BadgeIcon } from "@/components/BadgeIcons";
 import {
   BookOpen,
@@ -19,68 +19,119 @@ import {
   ArrowRight,
   TrendingUp,
   Target,
+  ArrowLeft,
+  Terminal,
+  Landmark,
 } from "lucide-react";
 
 interface DashboardViewProps {
+  course: Course;
   tracks: Track[];
   topicsMap: Record<string, Topic>;
   badges: BadgeDefinition[];
   projectsMap?: Record<string, Project>;
 }
 
-export function DashboardView({ tracks, topicsMap, badges, projectsMap }: DashboardViewProps) {
-  const { stats, progress, badges: userBadges } = useAuth();
-  const { level, percent, xp, xpInCurrentLevel, xpRequiredForNext } = getLevelProgress(stats.xp);
+export function DashboardView({
+  course,
+  tracks,
+  topicsMap,
+  badges,
+  projectsMap = {},
+}: DashboardViewProps) {
+  const { stats, progress, courseProgressMap, badges: userBadges } = useAuth();
 
-  // Calculate overall metrics
-  const totalTopicsCount = Object.keys(topicsMap).length;
-  const completedTopicsCount = Object.values(progress).filter(
+  const isPython = course.id === "python";
+  const isFinance = course.id === "finance";
+
+  // Calculate course-specific progress
+  const courseProgMap = courseProgressMap[course.id] || {};
+  const courseRows = Object.values(courseProgMap);
+  const completedTopicsCount = courseRows.filter(
     (p) => p.status === "completed" && !p.topic_id.endsWith(".project")
   ).length;
+
+  const totalTopicsCount = Object.keys(topicsMap).length;
   const overallPercent = totalTopicsCount > 0
-    ? Math.round((completedTopicsCount / totalTopicsCount) * 100)
+    ? Math.min(100, Math.round((completedTopicsCount / totalTopicsCount) * 100))
     : 0;
 
+  const courseXp = calculateXpFromProgress(courseRows);
+  const { level: courseLevel, percent: levelPercent, xpInCurrentLevel, xpRequiredForNext } =
+    getLevelProgress(courseXp);
+
   const totalProjectsCount = tracks.filter((t) => t.projectFile).length;
-  const completedProjectsCount = Object.values(progress).filter(
+  const completedProjectsCount = courseRows.filter(
     (p) => p.status === "completed" && p.topic_id.endsWith(".project")
   ).length;
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      {/* 0. Back to Courses Navigation */}
+      <div>
+        <Link
+          href="/"
+          prefetch={false}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>전체 과목 선택으로 돌아가기</span>
+        </Link>
+      </div>
+
       {/* 1. Hero / Analytics Overview Banner */}
-      <div className="rounded-3xl bg-gradient-to-r from-emerald-900 via-slate-900 to-teal-950 text-white p-6 sm:p-8 border border-emerald-500/20 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div
+        className={`rounded-3xl p-6 sm:p-8 text-white border shadow-xl relative overflow-hidden ${
+          isPython
+            ? "bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-emerald-500/20"
+            : "bg-gradient-to-r from-amber-950 via-slate-900 to-yellow-950 border-amber-500/20"
+        }`}
+      >
+        <div
+          className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
+            isPython ? "bg-emerald-500/10" : "bg-amber-500/10"
+          }`}
+        />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
-                파이썬 데이터 분석 학습 공간
+              <span
+                className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
+                  isPython
+                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                    : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                }`}
+              >
+                {isPython ? <Terminal className="w-3.5 h-3.5" /> : <Landmark className="w-3.5 h-3.5" />}
+                {course.title}
               </span>
-              <span className="text-xs text-slate-400">데이터 과학자 로드맵</span>
+              <span className="text-xs text-slate-400 font-mono">총 {tracks.length}개 트랙</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              데이터 분석의 첫걸음, <br className="hidden sm:block" />
-              실습과 퀴즈로 탄탄하게 완성하세요.
+              {course.title} 학습 로드맵
             </h1>
-            <p className="text-sm text-slate-300">
-              코드 실행 엔진 없이도 정확한 빈칸 채우기와 실전 퀴즈, 미니 프로젝트로 분석 역량을 다집니다.
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              {course.description}
             </p>
           </div>
 
           {/* Quick Metrics Card Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
-            {/* Level Card */}
+            {/* Course Level Card */}
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
               <div className="text-[11px] text-slate-400 flex items-center justify-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-400" /> 레벨
+                <Sparkles className="w-3 h-3 text-amber-400" /> 과목 레벨
               </div>
-              <div className="text-xl font-bold font-mono mt-1 text-emerald-400">
-                Lv.{level}
+              <div
+                className={`text-xl font-bold font-mono mt-1 ${
+                  isPython ? "text-emerald-400" : "text-amber-400"
+                }`}
+              >
+                Lv.{courseLevel}
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5">
-                {xp} XP
+                {courseXp.toLocaleString()} XP
               </div>
             </div>
 
@@ -100,270 +151,236 @@ export function DashboardView({ tracks, topicsMap, badges, projectsMap }: Dashbo
             {/* Progress Card */}
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
               <div className="text-[11px] text-slate-400 flex items-center justify-center gap-1">
-                <Target className="w-3 h-3 text-teal-400" /> 토픽 완주율
+                <Target className="w-3 h-3 text-teal-400" /> 완주율
               </div>
               <div className="text-xl font-bold font-mono mt-1 text-teal-400">
                 {overallPercent}%
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5">
-                {completedTopicsCount}/{totalTopicsCount} 완료
+                {completedTopicsCount}/{totalTopicsCount} 토픽
               </div>
             </div>
 
-            {/* Badges Card */}
-            <Link
-              href="/badges"
-              prefetch={false}
-              className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-center transition-colors group"
-            >
+            {/* Project Card */}
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
               <div className="text-[11px] text-slate-400 flex items-center justify-center gap-1">
-                <Award className="w-3 h-3 text-yellow-400" /> 획득 배지
+                <FolderGit2 className="w-3 h-3 text-purple-400" /> 프로젝트
               </div>
-              <div className="text-xl font-bold font-mono mt-1 text-yellow-400 group-hover:scale-105 transition-transform">
-                {userBadges.length}개
+              <div className="text-xl font-bold font-mono mt-1 text-purple-400">
+                {completedProjectsCount}/{totalProjectsCount}
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5">
-                도감 보기 →
+                실전 종합 실습
               </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Level XP Progress Bar */}
-        <div className="mt-6 pt-4 border-t border-white/10">
-          <div className="flex items-center justify-between text-xs text-slate-300 mb-1.5 font-mono">
-            <span>
-              다음 레벨(Lv.{level + 1})까지: {xpInCurrentLevel} / {xpRequiredForNext} XP
-            </span>
-            <span className="font-bold text-emerald-400">{percent}%</span>
-          </div>
-          <div className="w-full h-2 rounded-full bg-slate-800/80 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
-              style={{ width: `${percent}%` }}
-            />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Tracks & Topics Learning Roadmap (Sequential Lock) */}
-      <div className="space-y-10">
-        <div className="flex items-center justify-between">
+      {/* 2. Track Roadmap Cards */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <BookOpen
+              className={`w-5 h-5 ${isPython ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}
+            />
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              커리큘럼 학습 지도
+              트랙별 학습 과정
             </h2>
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            총 {tracks.length}개 트랙 • {totalTopicsCount}개 토픽
-          </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            순차적으로 학습을 완료하여 다음 토픽을 잠금 해제하세요
+          </span>
         </div>
 
-        {tracks.map((track, trackIdx) => {
-          const trackTopics = track.topicOrder.map((tid) => topicsMap[tid]).filter(Boolean);
-          const trackCompletedTopics = trackTopics.filter(
-            (top) => progress[top.id]?.status === "completed" && progress[top.id]?.quiz_passed
-          ).length;
-          const trackPercent = trackTopics.length > 0
-            ? Math.round((trackCompletedTopics / trackTopics.length) * 100)
-            : 0;
+        <div className="space-y-6">
+          {tracks.map((track) => {
+            const project = projectsMap[track.id];
+            const projectUnlocked = isProjectUnlocked(track, progress);
+            const projectId = `${track.id}.project`;
+            const projectCompleted = progress[projectId]?.status === "completed";
 
-          const projectUnlocked = isProjectUnlocked(track, progress);
-          const projectCompleted =
-            progress[`${track.id}.project`]?.status === "completed";
+            // Calculate track completion
+            const trackCompletedTopicsCount = track.topicOrder.filter(
+              (tid) => progress[tid]?.status === "completed"
+            ).length;
+            const trackPercent = track.topicOrder.length > 0
+              ? Math.round((trackCompletedTopicsCount / track.topicOrder.length) * 100)
+              : 0;
 
-          return (
-            <div
-              key={track.id}
-              className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-sm space-y-6"
-            >
-              {/* Track Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold font-mono">
-                      TRACK {track.order}
-                    </span>
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
-                      {track.title}
-                    </h3>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                    {track.description}
-                  </p>
-                </div>
-
-                {/* Track Progress Pill */}
-                <div className="flex items-center gap-3 self-start sm:self-auto">
-                  <div className="text-right">
-                    <div className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">
-                      {trackCompletedTopics} / {trackTopics.length} 완료
+            return (
+              <div
+                key={track.id}
+                className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5"
+              >
+                {/* Track Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded-md ${
+                          isPython
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                            : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                        }`}
+                      >
+                        TRACK {track.order}
+                      </span>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                        {track.title}
+                      </h3>
                     </div>
-                    <div className="text-[10px] text-slate-400">진행률 {trackPercent}%</div>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                      {track.description}
+                    </p>
                   </div>
-                  <div className="w-12 h-12 rounded-full border-4 border-slate-100 dark:border-slate-800 flex items-center justify-center relative font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    {trackPercent}%
-                  </div>
-                </div>
-              </div>
 
-              {/* Topics Grid (Sequential Order) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trackTopics.map((topic, topicIdx) => {
-                  const status = getTopicStatus(track.id, topic.id, tracks, progress);
-                  const isLocked = status === "locked";
-                  const isCompleted = status === "completed";
-                  const isInProgress = status === "in_progress";
-
-                  const cardContent = (
-                    <div
-                      className={`h-full p-5 rounded-2xl border transition-all flex flex-col justify-between ${
-                        isCompleted
-                          ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/60 hover:shadow-md"
-                          : isInProgress
-                          ? "bg-white dark:bg-slate-900 border-emerald-500 dark:border-emerald-500 ring-2 ring-emerald-500/20 shadow-md hover:shadow-lg cursor-pointer"
-                          : "bg-slate-50/60 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800/80 opacity-60 cursor-not-allowed"
-                      }`}
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-mono font-bold text-slate-400">
-                            STEP {topic.order}
-                          </span>
-                          {isCompleted && (
-                            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                              <CheckCircle2 className="w-4 h-4" /> 완료
-                            </span>
-                          )}
-                          {isInProgress && (
-                            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 animate-pulse">
-                              <PlayCircle className="w-4 h-4" /> 학습 가능
-                            </span>
-                          )}
-                          {isLocked && (
-                            <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-                              <Lock className="w-3.5 h-3.5" /> 잠김
-                            </span>
-                          )}
-                        </div>
-
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
-                          {topic.title}
-                        </h4>
+                  {/* Track Progress Pill */}
+                  <div className="flex items-center gap-3 self-start sm:self-auto">
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-slate-700 dark:text-slate-300 font-mono">
+                        {trackCompletedTopicsCount} / {track.topicOrder.length} 완료
                       </div>
-
-                      <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                        <span>실습 {topic.fillBlanks.length}개 • 퀴즈 {topic.quiz.questions.length}제</span>
-                        {!isLocked && (
-                          <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        )}
+                      <div className="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isPython ? "bg-emerald-500" : "bg-amber-500"
+                          }`}
+                          style={{ width: `${trackPercent}%` }}
+                        />
                       </div>
                     </div>
-                  );
+                  </div>
+                </div>
 
-                  if (isLocked) {
-                    return <div key={topic.id}>{cardContent}</div>;
-                  }
+                {/* Topics Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {track.topicOrder.map((topicId, idx) => {
+                    const topic = topicsMap[topicId];
+                    if (!topic) return null;
 
-                  return (
-                    <Link
-                      key={topic.id}
-                      href={`/tracks/${track.id}/${topic.id}`}
-                      prefetch={false}
-                      className="block group"
-                    >
-                      {cardContent}
-                    </Link>
-                  );
-                })}
+                    const status = getTopicStatus(track.id, topicId, tracks, progress);
+                    const isLocked = status === "locked";
+                    const isCompleted = status === "completed";
+                    const isInProgress = status === "in_progress";
 
-                {/* Track Mini-Project Card at the end of track */}
-                {track.projectFile && (() => {
-                  const projectTitle = projectsMap?.[track.id]?.title || "미니 프로젝트";
-                  return (
-                    <div className="h-full">
-                      {projectUnlocked ? (
-                        <Link
-                          href={`/tracks/${track.id}/project`}
-                          prefetch={false}
-                          className="block h-full group"
-                        >
+                    return (
+                      <Link
+                        key={topicId}
+                        href={`/${course.id}/tracks/${track.id}/${topic.id}`}
+                        prefetch={false}
+                        className={`p-4 rounded-2xl border transition-all flex items-center justify-between group ${
+                          isCompleted
+                            ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60 hover:border-emerald-400"
+                            : isInProgress
+                            ? "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 hover:border-emerald-500 shadow-sm"
+                            : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800/80 opacity-60 cursor-not-allowed pointer-events-none"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
                           <div
-                            className={`h-full p-5 rounded-2xl border transition-all flex flex-col justify-between ${
-                              projectCompleted
-                                ? "bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/30 border-teal-400 dark:border-teal-700 shadow-sm hover:shadow-md"
-                                : "bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-600/20 hover:scale-[1.02]"
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                              isCompleted
+                                ? "bg-emerald-500 text-white shadow-xs"
+                                : isInProgress
+                                ? isPython ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300" : "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300"
+                                : "bg-slate-200 dark:bg-slate-800 text-slate-400"
                             }`}
                           >
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <span
-                                  className={`text-[11px] font-bold px-2 py-0.5 rounded ${
-                                    projectCompleted
-                                      ? "bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200"
-                                      : "bg-white/20 text-white"
-                                  }`}
-                                >
-                                  종합 미니 프로젝트
-                                </span>
-                                {projectCompleted ? (
-                                  <span className="flex items-center gap-1 text-[11px] font-bold text-teal-600 dark:text-teal-400">
-                                    <CheckCircle2 className="w-4 h-4" /> 완주
-                                  </span>
-                                ) : (
-                                  <Sparkles className="w-4 h-4 text-yellow-300 animate-spin" />
-                                )}
-                              </div>
-
-                              <h4
-                                className={`text-sm font-bold leading-snug ${
-                                  projectCompleted
-                                    ? "text-slate-900 dark:text-white"
-                                    : "text-white"
-                                }`}
-                              >
-                                {projectTitle}
-                              </h4>
-                            </div>
-
-                            <div
-                              className={`pt-4 mt-3 border-t flex items-center justify-between text-xs ${
-                                projectCompleted
-                                  ? "border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300"
-                                  : "border-white/20 text-emerald-100"
-                              }`}
-                            >
-                              <span>결과 리포트 카드 생성</span>
-                              <ArrowRight className="w-4 h-4" />
-                            </div>
+                            {isCompleted ? (
+                              <CheckCircle2 className="w-4 h-4" />
+                            ) : isLocked ? (
+                              <Lock className="w-3.5 h-3.5" />
+                            ) : (
+                              <span>{idx + 1}</span>
+                            )}
                           </div>
-                        </Link>
-                      ) : (
-                        <div className="h-full p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 opacity-50 flex flex-col justify-between">
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                                미니 프로젝트
-                              </span>
-                              <Lock className="w-3.5 h-3.5 text-slate-400" />
-                            </div>
-                            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                              {projectTitle}
+                          <div className="min-w-0">
+                            <h4 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                              {topic.title}
                             </h4>
-                          </div>
-                          <div className="pt-4 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-400">
-                            모든 토픽 완료 시 잠금 해제
+                            <span className="text-[11px] text-slate-400 font-mono">
+                              토픽 {idx + 1}
+                            </span>
                           </div>
                         </div>
-                      )}
+
+                        {!isLocked && (
+                          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {/* Track Mini Project Banner */}
+                {project && (
+                  <div
+                    className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                      projectCompleted
+                        ? "bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800/60"
+                        : projectUnlocked
+                        ? "bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-transparent border-purple-300 dark:border-purple-700"
+                        : "bg-slate-50/60 dark:bg-slate-950/30 border-slate-200 dark:border-slate-800/60 opacity-60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          projectCompleted
+                            ? "bg-purple-600 text-white"
+                            : projectUnlocked
+                            ? "bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300"
+                            : "bg-slate-200 dark:bg-slate-800 text-slate-400"
+                        }`}
+                      >
+                        {projectCompleted ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : projectUnlocked ? (
+                          <FolderGit2 className="w-5 h-5" />
+                        ) : (
+                          <Lock className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                            MINI PROJECT
+                          </span>
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                            {project.title}
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          {project.intro}
+                        </p>
+                      </div>
                     </div>
-                  );
-                })()}
+
+                    {projectUnlocked ? (
+                      <Link
+                        href={`/${course.id}/tracks/${track.id}/project`}
+                        prefetch={false}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 self-end sm:self-auto ${
+                          projectCompleted
+                            ? "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 hover:bg-purple-200"
+                            : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+                        }`}
+                      >
+                        <span>{projectCompleted ? "프로젝트 복습" : "프로젝트 시작"}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    ) : (
+                      <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1 self-end sm:self-auto">
+                        <Lock className="w-3.5 h-3.5" /> 트랙 완료 후 해제
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

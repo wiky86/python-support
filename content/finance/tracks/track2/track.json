@@ -1,0 +1,23 @@
+{
+  "id": "track2",
+  "order": 2,
+  "title": "Finance 입문",
+  "description": "금융의 가장 기초가 되는 개념을 다집니다. 돈과 금융의 의미부터 금리, 화폐의 시간가치, 금융시장 구조, 금융기관·상품, 위험과 수익까지 모든 금융 학습의 토대를 세웁니다.",
+  "topicOrder": [
+    "track2.money-basics",
+    "track2.interest-rate",
+    "track2.time-value",
+    "track2.financial-market",
+    "track2.institutions-products",
+    "track2.risk-return"
+  ],
+  "topicFiles": [
+    "topics/t1-money-basics.json",
+    "topics/t2-interest-rate.json",
+    "topics/t3-time-value.json",
+    "topics/t4-financial-market.json",
+    "topics/t5-institutions-products.json",
+    "topics/t6-risk-return.json"
+  ],
+  "projectFile": "project.json"
+}

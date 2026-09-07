@@ -21,6 +21,7 @@ import {
   Code2,
   ListOrdered,
   Bot,
+  Layers,
 } from "lucide-react";
 
 interface TopicViewProps {
@@ -45,6 +46,8 @@ export function TopicView({
   const router = useRouter();
   const { progress } = useAuth();
   const [activeTab, setActiveTab] = useState<"learn" | "practice" | "quiz" | "faq">("learn");
+
+  const courseId = track.courseId || topic.courseId || "python";
 
   const changeTab = (tab: "learn" | "practice" | "quiz" | "faq") => {
     setActiveTab(tab);
@@ -71,9 +74,9 @@ export function TopicView({
 
   const handleNextNavigation = () => {
     if (nextTopicId) {
-      router.push(`/tracks/${track.id}/${nextTopicId}`);
+      router.push(`/${courseId}/tracks/${track.id}/${nextTopicId}`);
     } else if (track.projectFile) {
-      router.push(`/tracks/${track.id}/project`);
+      router.push(`/${courseId}/tracks/${track.id}/project`);
     }
   };
 
@@ -93,10 +96,10 @@ export function TopicView({
         </div>
         <div className="flex items-center justify-center gap-4 pt-4">
           <Link
-            href="/"
+            href={`/${courseId}`}
             className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors"
           >
-            학습 지도로 돌아가기
+            과목 학습 지도로 돌아가기
           </Link>
         </div>
       </div>
@@ -108,21 +111,32 @@ export function TopicView({
     "p-6 sm:p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 w-full";
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       {/* 1. Breadcrumbs and Header */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           <Link
             href="/"
             prefetch={false}
-            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1"
           >
-            학습 로드맵
+            <Layers className="w-3.5 h-3.5" />
+            과목 선택
           </Link>
           <span>/</span>
-          <span>{track.title}</span>
+          <Link
+            href={`/${courseId}`}
+            prefetch={false}
+            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+          >
+            {courseId === "python" ? "파이썬 데이터 분석" : "디지털 금융 이론"}
+          </Link>
           <span>/</span>
-          <span className="font-semibold text-slate-800 dark:text-slate-200">
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {track.title}
+          </span>
+          <span>/</span>
+          <span className="text-slate-900 dark:text-white font-bold">
             {topic.title}
           </span>
         </div>
@@ -131,205 +145,196 @@ export function TopicView({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold font-mono">
-                TOPIC {topic.order}
+                TRACK {track.order} · TOPIC {topic.order}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-                {topic.title}
-              </h1>
+              {isCompleted && (
+                <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  학습 완료
+                </span>
+              )}
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              {track.title} • {topic.fillBlanks.length}개 실습 • {topic.quiz.questions.length}개 퀴즈
-            </p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              {topic.title}
+            </h1>
           </div>
 
-          {/* Completion Badge */}
-          {isCompleted && (
-            <div className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              학습 및 퀴즈 완료
-            </div>
-          )}
+          {/* Prev / Next Topic Navigation Buttons */}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {prevTopicId ? (
+              <Link
+                href={`/${courseId}/tracks/${track.id}/${prevTopicId}`}
+                prefetch={false}
+                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                title="이전 토픽"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Link>
+            ) : null}
+
+            {nextTopicId ? (
+              <button
+                onClick={handleNextNavigation}
+                disabled={!isNextUnlocked}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                  isNextUnlocked
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm cursor-pointer"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-60"
+                }`}
+              >
+                <span>다음 토픽</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            ) : track.projectFile ? (
+              <button
+                onClick={handleNextNavigation}
+                disabled={!isNextUnlocked}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                  isNextUnlocked
+                    ? "bg-purple-600 hover:bg-purple-700 text-white shadow-sm cursor-pointer"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-60"
+                }`}
+              >
+                <span>미니 프로젝트</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 
-      {/* 2. Topic Learning Tabs */}
-      <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-900 p-1.5 gap-1 border border-slate-200 dark:border-slate-800 w-full">
+      {/* 2. Unified 4-Step Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto pb-px">
         <button
-          type="button"
           onClick={() => changeTab("learn")}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${
             activeTab === "learn"
-              ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
-          <BookOpen className="w-4 h-4 text-emerald-600" />
-          <span>개념 학습</span>
+          <BookOpen className="w-4 h-4" />
+          <span>1. 개념 학습</span>
         </button>
 
         <button
-          type="button"
           onClick={() => changeTab("practice")}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${
             activeTab === "practice"
-              ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
-          <Code2 className="w-4 h-4 text-teal-600" />
-          <span>빈칸 실습 ({topic.fillBlanks.length})</span>
+          <Code2 className="w-4 h-4" />
+          <span>2. 빈칸 실습</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-300">
+            {topic.fillBlanks.length}
+          </span>
         </button>
 
         <button
-          type="button"
           onClick={() => changeTab("quiz")}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${
             activeTab === "quiz"
-              ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
-          <HelpCircle className="w-4 h-4 text-amber-500" />
-          <span>복습 퀴즈 ({topic.quiz.questions.length})</span>
+          <ListOrdered className="w-4 h-4" />
+          <span>3. 복습 퀴즈</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-300">
+            {topic.quiz.questions.length}
+          </span>
         </button>
 
         <button
-          type="button"
           onClick={() => changeTab("faq")}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${
             activeTab === "faq"
-              ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
-          <Bot className="w-4 h-4 text-indigo-500" />
-          <span>FAQ 봇</span>
+          <Bot className="w-4 h-4" />
+          <span>4. FAQ 봇</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-300">
+            {topic.faq?.length || 0}
+          </span>
         </button>
       </div>
 
-      {/* 3. Tab Contents (Unified Container Width & Structure) */}
-      <div className="w-full">
-        {/* Tab 1: Learn */}
-        <div className={activeTab === "learn" ? `${tabCardClassName} block` : "hidden"}>
-          <MarkdownViewer content={topic.content} />
+      {/* 3. Tab Content View Area */}
+      <div className="transition-all duration-200">
+        {/* TAB 1: Concepts Markdown */}
+        {activeTab === "learn" && (
+          <div className={tabCardClassName}>
+            <MarkdownViewer content={topic.content} />
 
-          <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-xs text-slate-500 dark:text-slate-400">
-              개념을 익혔다면 빈칸 채우기 실습을 진행해 보세요.
-            </span>
-            <button
-              type="button"
-              onClick={() => changeTab("practice")}
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
-            >
-              <span>빈칸 실습으로 이동</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                개념 확인을 마쳤다면 빈칸 실습으로 직접 코드를 완성해 보세요.
+              </span>
+              <button
+                onClick={() => changeTab("practice")}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                빈칸 실습으로 이동 →
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Tab 2: Practice */}
-        <div className={activeTab === "practice" ? `${tabCardClassName} block` : "hidden"}>
-          <FillInBlankList
-            items={topic.fillBlanks}
-            onAllCompleted={() => {}}
-          />
-
-          <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => changeTab("learn")}
-              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" /> 개념 다시보기
-            </button>
-            <button
-              type="button"
-              onClick={() => changeTab("quiz")}
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
-            >
-              <span>복습 퀴즈 풀기</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Tab 3: Quiz */}
-        <div className={activeTab === "quiz" ? `${tabCardClassName} block` : "hidden"}>
-          <QuizRunner
-            quiz={topic.quiz}
-            topicId={topic.id}
-            trackId={track.id}
-            allBadges={allBadges}
-            allTrackTopicsCount={allTrackTopicsCount}
-            totalTopicsCount={totalTopicsCount}
-            totalTracksCount={totalTracksCount}
-            onNextTopic={handleNextNavigation}
-            nextTopicTitle={
-              nextTopicId
-                ? `다음 토픽`
-                : track.projectFile
-                ? `미니 프로젝트`
-                : null
-            }
-          />
-        </div>
-
-        {/* Tab 4: FAQ Bot */}
-        <div className={activeTab === "faq" ? `${tabCardClassName} block` : "hidden"}>
-          <FaqChatbot faqList={topic.faq} topicTitle={topic.title} />
-        </div>
-      </div>
-
-      {/* 4. Bottom Topic Step Navigation */}
-      <div className="pt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        {prevTopicId ? (
-          <Link
-            href={`/tracks/${track.id}/${prevTopicId}`}
-            prefetch={false}
-            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors flex items-center gap-1"
-          >
-            <ChevronLeft className="w-4 h-4" /> 이전 토픽
-          </Link>
-        ) : (
-          <Link
-            href="/"
-            prefetch={false}
-            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
-          >
-            학습 지도로
-          </Link>
         )}
 
-        {nextTopicId && (
-          <button
-            type="button"
-            onClick={handleNextNavigation}
-            disabled={!isNextUnlocked}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
-              isNextUnlocked
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm cursor-pointer"
-                : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
-            }`}
-          >
-            <span>다음 토픽</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        {/* TAB 2: Fill in Blank Practice */}
+        {activeTab === "practice" && (
+          <div className={tabCardClassName}>
+            <FillInBlankList
+              items={topic.fillBlanks}
+              title="코드/개념 실습 (빈칸 채우기)"
+              onAllCompleted={() => {
+                // Optional prompt to jump to quiz
+              }}
+            />
+
+            <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <button
+                onClick={() => changeTab("learn")}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors"
+              >
+                ← 개념 다시 보기
+              </button>
+              <button
+                onClick={() => changeTab("quiz")}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                복습 퀴즈 풀기 →
+              </button>
+            </div>
+          </div>
         )}
 
-        {!nextTopicId && track.projectFile && (
-          <Link
-            href={`/tracks/${track.id}/project`}
-            prefetch={false}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
-              isCompleted
-                ? "bg-teal-600 hover:bg-teal-700 text-white shadow-sm"
-                : "bg-slate-200 dark:bg-slate-800 text-slate-400 pointer-events-none opacity-50"
-            }`}
-          >
-            <span>미니 프로젝트 도전</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+        {/* TAB 3: Quiz Runner */}
+        {activeTab === "quiz" && (
+          <div className={tabCardClassName}>
+            <QuizRunner
+              quiz={topic.quiz}
+              topicId={topic.id}
+              trackId={track.id}
+              courseId={courseId}
+              allBadges={allBadges}
+              allTrackTopicsCount={allTrackTopicsCount}
+              totalTopicsCount={totalTopicsCount}
+              totalTracksCount={totalTracksCount}
+              nextTopicTitle={nextTopicId ? `다음 토픽` : track.projectFile ? "미니 프로젝트" : null}
+              onNextTopic={handleNextNavigation}
+            />
+          </div>
+        )}
+
+        {/* TAB 4: FAQ Chatbot */}
+        {activeTab === "faq" && (
+          <div className={tabCardClassName}>
+            <FaqChatbot faqItems={topic.faq || []} topicTitle={topic.title} />
+          </div>
         )}
       </div>
     </div>

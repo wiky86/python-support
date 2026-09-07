@@ -1,0 +1,29 @@
+{
+  "_comment": "과목(course) 목록. 앱은 이 목록을 읽어 과목 선택 화면을 구성한다. 과목이 늘어나면 항목만 추가한다. 개수를 하드코딩하지 말 것.",
+  "courses": [
+    {
+      "id": "python",
+      "order": 1,
+      "title": "파이썬 데이터 분석",
+      "shortTitle": "파이썬",
+      "description": "파이썬을 활용한 데이터 분석 기초부터 실전까지. 변수·자료구조부터 pandas·시각화·종합 분석까지 단계별로 익힌다.",
+      "theme": "terminal",
+      "accent": "#14b8a6",
+      "icon": "terminal",
+      "contentPath": "content/python",
+      "trackCount": 7
+    },
+    {
+      "id": "finance",
+      "order": 2,
+      "title": "디지털 금융 이론",
+      "shortTitle": "금융",
+      "description": "금융시장·상품·기관의 구조와 디지털 금융 트렌드를 이론 중심으로 학습한다. 입문부터 퀀트·리스크관리까지 9개 트랙.",
+      "theme": "finance",
+      "accent": "#c9a227",
+      "icon": "landmark",
+      "contentPath": "content/finance",
+      "trackCount": 9
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "track3",
+  "order": 3,
+  "title": "거시경제 매커니즘 이해",
+  "description": "시장 전체를 움직이는 큰 그림을 읽습니다. GDP와 성장률, 물가와 인플레이션, 통화정책과 재정정책, 경기순환과 경제지표, 환율과 국제수지까지 거시경제가 어떻게 맞물려 돌아가는지 이해합니다.",
+  "topicOrder": [
+    "track3.gdp-basics",
+    "track3.inflation",
+    "track3.monetary-policy",
+    "track3.fiscal-policy",
+    "track3.business-cycle",
+    "track3.exchange-rate"
+  ],
+  "topicFiles": [
+    "topics/t1-gdp-basics.json",
+    "topics/t2-inflation.json",
+    "topics/t3-monetary-policy.json",
+    "topics/t4-fiscal-policy.json",
+    "topics/t5-business-cycle.json",
+    "topics/t6-exchange-rate.json"
+  ],
+  "projectFile": "project.json"
+}

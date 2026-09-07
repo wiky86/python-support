@@ -11,7 +11,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isConfigured: boolean;
   stats: UserStatsRow;
-  progress: Record<string, UserProgressRow>;
+  progress: Record<string, UserProgressRow>; // Keyed by topic_id and composite `${course}:${topic_id}`
+  courseProgressMap: Record<string, Record<string, UserProgressRow>>; // courseId -> topicId -> row
   badges: UserBadgeRow[];
   refreshData: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -19,9 +20,10 @@ interface AuthContextType {
     topicId: string,
     status: "in_progress" | "completed",
     quizPassed?: boolean,
-    quizScore?: number
+    quizScore?: number,
+    courseId?: string
   ) => Promise<void>;
-  saveEarnedBadges: (badgeIds: string[]) => Promise<void>;
+  saveEarnedBadges: (badgeIds: string[], courseId?: string) => Promise<void>;
   recordStudyActivity: (xpGain: number) => Promise<void>;
 }
 
@@ -44,12 +46,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [stats, setStats] = useState<UserStatsRow>(defaultGuestStats);
   const [progress, setProgress] = useState<Record<string, UserProgressRow>>({});
+  const [courseProgressMap, setCourseProgressMap] = useState<Record<string, Record<string, UserProgressRow>>>({});
   const [badges, setBadges] = useState<UserBadgeRow[]>([]);
 
   // Refs to avoid state closures and dependency cycle loops
   const userRef = useRef<User | null>(null);
   const statsRef = useRef<UserStatsRow>(defaultGuestStats);
   const progressRef = useRef<Record<string, UserProgressRow>>({});
+  const courseProgressMapRef = useRef<Record<string, Record<string, UserProgressRow>>>({});
   const badgesRef = useRef<UserBadgeRow[]>([]);
   const isFetchingRef = useRef(false);
 
@@ -67,8 +71,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [progress]);
 
   useEffect(() => {
+    courseProgressMapRef.current = courseProgressMap;
+  }, [courseProgressMap]);
+
+  useEffect(() => {
     badgesRef.current = badges;
   }, [badges]);
+
+  // Helper to build both flat map and nested course map from progress rows
+  const buildProgressMaps = (rows: UserProgressRow[]) => {
+    const flat: Record<string, UserProgressRow> = {};
+    const nested: Record<string, Record<string, UserProgressRow>> = {};
+
+    rows.forEach((row) => {
+      const c = row.course || "python";
+      flat[row.topic_id] = row;
+      flat[`${c}:${row.topic_id}`] = row;
+
+      if (!nested[c]) {
+        nested[c] = {};
+      }
+      nested[c][row.topic_id] = row;
+    });
+
+    return { flat, nested };
+  };
 
   // Core Data Fetcher: Loads data for a given userId (Supabase) or guest (LocalStorage)
   const fetchUserData = useCallback(
@@ -82,14 +109,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const savedProgress = localStorage.getItem("guest_user_progress");
             const savedBadges = localStorage.getItem("guest_user_badges");
             const parsedStats = savedStats ? JSON.parse(savedStats) : defaultGuestStats;
-            const parsedProgress = savedProgress ? JSON.parse(savedProgress) : {};
+            const parsedRows: UserProgressRow[] = savedProgress ? (Array.isArray(JSON.parse(savedProgress)) ? JSON.parse(savedProgress) : Object.values(JSON.parse(savedProgress))) : [];
             const parsedBadges = savedBadges ? JSON.parse(savedBadges) : [];
+
+            const { flat, nested } = buildProgressMaps(parsedRows);
             setStats(parsedStats);
-            setProgress(parsedProgress);
+            setProgress(flat);
+            setCourseProgressMap(nested);
             setBadges(parsedBadges);
           } catch {
             setStats(defaultGuestStats);
             setProgress({});
+            setCourseProgressMap({});
             setBadges([]);
           }
         }
@@ -127,13 +158,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // 2. Progress
         if (progressRes.data) {
-          const map: Record<string, UserProgressRow> = {};
-          (progressRes.data as UserProgressRow[]).forEach((row) => {
-            map[row.topic_id] = row;
-          });
-          setProgress(map);
+          const rows = progressRes.data as UserProgressRow[];
+          const { flat, nested } = buildProgressMaps(rows);
+          setProgress(flat);
+          setCourseProgressMap(nested);
         } else {
           setProgress({});
+          setCourseProgressMap({});
         }
 
         // 3. Badges
@@ -151,75 +182,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [isConfigured, supabase]
   );
 
-  // Manual refresh trigger
-  const refreshData = useCallback(async () => {
-    await fetchUserData(userRef.current?.id || null);
-  }, [fetchUserData]);
-
-  // Auth Lifecycle: Mounts ONCE, handles session init and onAuthStateChange
+  // Initial Auth & Session listener
   useEffect(() => {
+    let isMounted = true;
+
     if (!isConfigured) {
       setLoading(false);
       fetchUserData(null);
       return;
     }
 
-    let mounted = true;
-
-    // Initial session check
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
-        if (!mounted) return;
-        const sessionUser = session?.user ?? null;
-        setUser(sessionUser);
-        userRef.current = sessionUser;
-        setLoading(false);
-        fetchUserData(sessionUser?.id || null);
+        if (!isMounted) return;
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        fetchUserData(currentUser ? currentUser.id : null).finally(() => {
+          if (isMounted) setLoading(false);
+        });
       })
-      .catch(() => {
-        if (mounted) setLoading(false);
+      .catch((err) => {
+        console.error("Error getting session:", err);
+        if (isMounted) setLoading(false);
       });
 
-    // Auth state change subscription
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
-      const sessionUser = session?.user ?? null;
-      const prevUserId = userRef.current?.id;
-      const nextUserId = sessionUser?.id;
-
-      setUser(sessionUser);
-      userRef.current = sessionUser;
-      setLoading(false);
-
-      // Only re-fetch if user identity changed
-      if (prevUserId !== nextUserId) {
-        fetchUserData(nextUserId || null);
-      }
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return;
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      await fetchUserData(currentUser ? currentUser.id : null);
+      if (isMounted) setLoading(false);
     });
 
     return () => {
-      mounted = false;
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, [isConfigured, supabase, fetchUserData]);
 
-  // Sign out handler
+  // Refresh data explicitly without causing re-render loops
+  const refreshData = useCallback(async () => {
+    const currentUserId = userRef.current?.id || null;
+    await fetchUserData(currentUserId);
+  }, [fetchUserData]);
+
+  // Sign out
   const signOut = useCallback(async () => {
     if (isConfigured) {
-      try {
-        await supabase.auth.signOut();
-      } catch (err) {
-        console.error("Sign out error:", err);
-      }
+      await supabase.auth.signOut();
     }
     setUser(null);
-    userRef.current = null;
     setIsAdmin(false);
     setStats(defaultGuestStats);
     setProgress({});
+    setCourseProgressMap({});
     setBadges([]);
     if (typeof window !== "undefined") {
       localStorage.removeItem("guest_user_stats");
@@ -234,11 +253,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       topicId: string,
       status: "in_progress" | "completed",
       quizPassed = false,
-      quizScore?: number
+      quizScore?: number,
+      courseId: string = "python"
     ) => {
       const activeUser = userRef.current;
       const currentProgress = progressRef.current;
-      const existing = currentProgress[topicId];
+      const existing = currentProgress[`${courseId}:${topicId}`] || currentProgress[topicId];
 
       const finalScore =
         existing?.quiz_score !== null && existing?.quiz_score !== undefined
@@ -253,6 +273,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const updatedRow: UserProgressRow = {
         user_id: activeUser ? activeUser.id : "guest-user",
+        course: courseId,
         topic_id: topicId,
         status: finalStatus,
         quiz_passed: finalPassed,
@@ -262,17 +283,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       setProgress((prev) => {
-        const next = { ...prev, [topicId]: updatedRow };
-        if (!activeUser && typeof window !== "undefined") {
-          localStorage.setItem("guest_user_progress", JSON.stringify(next));
-        }
+        const next = {
+          ...prev,
+          [topicId]: updatedRow,
+          [`${courseId}:${topicId}`]: updatedRow,
+        };
         return next;
       });
+
+      setCourseProgressMap((prev) => {
+        const nextCourse = { ...(prev[courseId] || {}), [topicId]: updatedRow };
+        return { ...prev, [courseId]: nextCourse };
+      });
+
+      if (!activeUser && typeof window !== "undefined") {
+        try {
+          const savedProgress = localStorage.getItem("guest_user_progress");
+          const parsed: UserProgressRow[] = savedProgress ? (Array.isArray(JSON.parse(savedProgress)) ? JSON.parse(savedProgress) : Object.values(JSON.parse(savedProgress))) : [];
+          const filtered = parsed.filter((r) => !(r.course === courseId && r.topic_id === topicId));
+          filtered.push(updatedRow);
+          localStorage.setItem("guest_user_progress", JSON.stringify(filtered));
+        } catch (e) {
+          console.error("Localstorage progress save error:", e);
+        }
+      }
 
       if (activeUser && isConfigured) {
         await supabase
           .from("user_progress")
-          .upsert(updatedRow as any, { onConflict: "user_id,topic_id" });
+          .upsert(updatedRow as any, { onConflict: "user_id,course,topic_id" });
       }
     },
     [isConfigured, supabase]
@@ -280,12 +319,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Save Earned Badges
   const saveEarnedBadges = useCallback(
-    async (badgeIds: string[]) => {
+    async (badgeIds: string[], courseId: string = "global") => {
       if (!badgeIds || badgeIds.length === 0) return;
       const activeUser = userRef.current;
       const nowIso = new Date().toISOString();
       const newBadgeRows: UserBadgeRow[] = badgeIds.map((id) => ({
         user_id: activeUser ? activeUser.id : "guest-user",
+        course: courseId,
         badge_id: id,
         earned_at: nowIso,
       }));
@@ -293,7 +333,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setBadges((prev) => {
         const merged = [...prev];
         newBadgeRows.forEach((nb) => {
-          if (!merged.some((b) => b.badge_id === nb.badge_id)) {
+          if (!merged.some((b) => b.badge_id === nb.badge_id && b.course === nb.course)) {
             merged.push(nb);
           }
         });
@@ -306,7 +346,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (activeUser && isConfigured) {
         await supabase
           .from("user_badges")
-          .upsert(newBadgeRows as any, { onConflict: "user_id,badge_id" });
+          .upsert(newBadgeRows as any, { onConflict: "user_id,course,badge_id" });
       }
     },
     [isConfigured, supabase]
@@ -367,6 +407,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isConfigured,
         stats,
         progress,
+        courseProgressMap,
         badges,
         refreshData,
         signOut,

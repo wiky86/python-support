@@ -1,0 +1,23 @@
+{
+  "id": "track9",
+  "order": 9,
+  "title": "파생상품 이해",
+  "description": "선물·옵션·스왑 등 파생상품의 구조와 손익을 배웁니다. 파생상품의 기초와 레버리지, 선도·선물, 옵션의 기초와 손익구조, 스왑, 그리고 파생상품의 양면성과 규제까지 현대 금융의 정교한 도구를 이해하며 금융 학습의 대미를 장식합니다.",
+  "topicOrder": [
+    "track9.derivatives-basics",
+    "track9.forward-futures",
+    "track9.option-basics",
+    "track9.option-payoff",
+    "track9.swap",
+    "track9.two-faces"
+  ],
+  "topicFiles": [
+    "topics/t1-derivatives-basics.json",
+    "topics/t2-forward-futures.json",
+    "topics/t3-option-basics.json",
+    "topics/t4-option-payoff.json",
+    "topics/t5-swap.json",
+    "topics/t6-two-faces.json"
+  ],
+  "projectFile": "project.json"
+}

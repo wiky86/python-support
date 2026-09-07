@@ -1,0 +1,23 @@
+{
+  "id": "track5",
+  "order": 5,
+  "title": "퀀트투자·자산배분",
+  "description": "개별 종목을 넘어 여러 자산을 조합해 투자하는 법을 배웁니다. 포트폴리오와 분산, 기대수익률·위험 측정, 자산배분 원리와 대표 전략, 퀀트투자와 팩터·스마트베타까지 데이터 기반 투자의 뼈대를 세웁니다.",
+  "topicOrder": [
+    "track5.portfolio-basics",
+    "track5.return-risk-measure",
+    "track5.asset-allocation",
+    "track5.allocation-strategies",
+    "track5.quant-investing",
+    "track5.factors-smartbeta"
+  ],
+  "topicFiles": [
+    "topics/t1-portfolio-basics.json",
+    "topics/t2-return-risk-measure.json",
+    "topics/t3-asset-allocation.json",
+    "topics/t4-allocation-strategies.json",
+    "topics/t5-quant-investing.json",
+    "topics/t6-factors-smartbeta.json"
+  ],
+  "projectFile": "project.json"
+}

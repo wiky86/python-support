@@ -1,0 +1,46 @@
+{
+  "_comment": "파이썬 과목 배지. 모든 배지는 scope='course'(이 과목 진도로만 판정). 획득 기록은 Supabase user_badges에 (course='python', badge_id)로 저장. icon은 자리표시자 -> lucide-react 등에 매핑.",
+  "conditionTypes": {
+    "topic_count": "이 과목에서 완료한 토픽 수가 gte 이상",
+    "topic_percent": "이 과목 전체 토픽 대비 완료 비율(%)이 gte 이상",
+    "quiz_pass_count": "이 과목에서 통과한 퀴즈 수가 gte 이상",
+    "perfect_quiz_count": "이 과목에서 만점 통과한 퀴즈 수가 gte 이상",
+    "project_count": "이 과목에서 완료한 미니 프로젝트 수가 gte 이상",
+    "track_complete": "이 과목의 trackId 트랙 모든 토픽 완료",
+    "all_tracks_complete": "이 과목의 모든 트랙 완료",
+    "flawless_track": "이 과목 한 트랙의 모든 퀴즈를 만점 통과(최초 통과 점수 기준)",
+    "streak": "현재 연속 접속 일수(streak_count)가 gte 이상 (계정 전체 스트릭)",
+    "level": "이 과목 레벨이 gte 이상"
+  },
+  "badges": [
+    { "id": "py_first_topic",   "scope": "course", "name": "첫 발자국",     "desc": "첫 토픽을 완료했어요",             "icon": "footprints",  "condition": { "type": "topic_count", "gte": 1 } },
+    { "id": "py_first_quiz",    "scope": "course", "name": "첫 통과",       "desc": "첫 퀴즈를 통과했어요",             "icon": "check",       "condition": { "type": "quiz_pass_count", "gte": 1 } },
+    { "id": "py_first_project", "scope": "course", "name": "첫 프로젝트",   "desc": "첫 미니 프로젝트를 완료했어요",     "icon": "rocket",      "condition": { "type": "project_count", "gte": 1 } },
+
+    { "id": "py_track1_done",   "scope": "course", "name": "파이썬 입문자",  "desc": "트랙1을 완주했어요",              "icon": "python",      "condition": { "type": "track_complete", "trackId": "track1" } },
+    { "id": "py_track2_done",   "scope": "course", "name": "수치 계산자",   "desc": "트랙2를 완주했어요",              "icon": "calculator",  "condition": { "type": "track_complete", "trackId": "track2" } },
+    { "id": "py_track3_done",   "scope": "course", "name": "판다스 입문",   "desc": "트랙3을 완주했어요",              "icon": "table",       "condition": { "type": "track_complete", "trackId": "track3" } },
+    { "id": "py_track4_done",   "scope": "course", "name": "데이터 정제사", "desc": "트랙4를 완주했어요",              "icon": "filter",      "condition": { "type": "track_complete", "trackId": "track4" } },
+    { "id": "py_track5_done",   "scope": "course", "name": "집계 전문가",   "desc": "트랙5를 완주했어요",              "icon": "sigma",       "condition": { "type": "track_complete", "trackId": "track5" } },
+    { "id": "py_track6_done",   "scope": "course", "name": "시각화 아티스트","desc": "트랙6을 완주했어요",              "icon": "bar-chart",   "condition": { "type": "track_complete", "trackId": "track6" } },
+    { "id": "py_track7_done",   "scope": "course", "name": "데이터 분석가", "desc": "트랙7(종합)을 완주했어요",         "icon": "brain",       "condition": { "type": "track_complete", "trackId": "track7" } },
+
+    { "id": "py_half_way",      "scope": "course", "name": "절반의 여정",   "desc": "전체 토픽의 50%를 완료했어요",     "icon": "milestone",   "condition": { "type": "topic_percent", "gte": 50 } },
+    { "id": "py_all_tracks",    "scope": "course", "name": "완주자",       "desc": "파이썬 전 트랙을 완주했어요",       "icon": "trophy",      "condition": { "type": "all_tracks_complete" } },
+    { "id": "py_all_projects",  "scope": "course", "name": "프로젝트 마스터","desc": "미니 프로젝트 7개를 모두 완료했어요","icon": "award",       "condition": { "type": "project_count", "gte": 7 } },
+
+    { "id": "py_perfect_1",     "scope": "course", "name": "만점왕",       "desc": "퀴즈를 만점으로 통과했어요",       "icon": "star",        "condition": { "type": "perfect_quiz_count", "gte": 1 } },
+    { "id": "py_perfect_10",    "scope": "course", "name": "완벽주의자",   "desc": "퀴즈 10개를 만점 통과했어요",      "icon": "stars",       "condition": { "type": "perfect_quiz_count", "gte": 10 } },
+    { "id": "py_flawless_track","scope": "course", "name": "무결점",       "desc": "한 트랙의 모든 퀴즈를 만점 통과했어요","icon": "gem",       "condition": { "type": "flawless_track" } },
+
+    { "id": "py_streak_3",      "scope": "course", "name": "3일의 약속",   "desc": "3일 연속 접속했어요",             "icon": "flame",       "condition": { "type": "streak", "gte": 3 } },
+    { "id": "py_streak_7",      "scope": "course", "name": "일주일 개근",   "desc": "7일 연속 접속했어요",             "icon": "flame",       "condition": { "type": "streak", "gte": 7 } },
+    { "id": "py_streak_30",     "scope": "course", "name": "한 달의 꾸준함","desc": "30일 연속 접속했어요",            "icon": "flame",       "condition": { "type": "streak", "gte": 30 } },
+    { "id": "py_streak_90",     "scope": "course", "name": "계절을 넘어",   "desc": "90일 연속 접속했어요",            "icon": "flame",       "condition": { "type": "streak", "gte": 90 } },
+    { "id": "py_streak_180",    "scope": "course", "name": "반년의 여정",   "desc": "180일 연속 접속했어요",           "icon": "flame",       "condition": { "type": "streak", "gte": 180 } },
+
+    { "id": "py_level_5",       "scope": "course", "name": "레벨 5 달성",   "desc": "파이썬 레벨 5에 도달했어요",       "icon": "chevrons-up", "condition": { "type": "level", "gte": 5 } },
+    { "id": "py_level_10",      "scope": "course", "name": "레벨 10 달성",  "desc": "파이썬 레벨 10에 도달했어요",      "icon": "chevrons-up", "condition": { "type": "level", "gte": 10 } },
+    { "id": "py_level_12",      "scope": "course", "name": "최고 경지",     "desc": "파이썬 레벨 12에 도달했어요",      "icon": "crown",       "condition": { "type": "level", "gte": 12 } }
+  ]
+}

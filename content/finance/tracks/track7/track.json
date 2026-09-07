@@ -1,0 +1,23 @@
+{
+  "id": "track7",
+  "order": 7,
+  "title": "금융업종별 비교 분석",
+  "description": "은행·증권·보험·여신전문금융 등 금융 업종들이 각각 어떻게 돈을 벌고 어떤 특성과 규제를 갖는지 비교합니다. 금융 산업의 지형도, 은행·증권·보험·여전사의 수익 구조, 업종 종합 비교와 감독체계까지 금융 산업의 전체 그림을 완성합니다.",
+  "topicOrder": [
+    "track7.financial-industry-map",
+    "track7.banking",
+    "track7.securities",
+    "track7.insurance",
+    "track7.specialized-finance",
+    "track7.comparison-supervision"
+  ],
+  "topicFiles": [
+    "topics/t1-financial-industry-map.json",
+    "topics/t2-banking.json",
+    "topics/t3-securities.json",
+    "topics/t4-insurance.json",
+    "topics/t5-specialized-finance.json",
+    "topics/t6-comparison-supervision.json"
+  ],
+  "projectFile": "project.json"
+}
