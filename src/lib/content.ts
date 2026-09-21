@@ -10,6 +10,8 @@ import {
   BadgesConfig,
   GlobalBadgesConfig,
   XpRulesConfig,
+  DiagnosticData,
+  RoadmapData,
 } from "@/types/content";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -313,6 +315,46 @@ export function getProject(trackId: string, courseId: string = "python"): Projec
     };
   } catch (err) {
     console.error(`Error parsing project in ${courseId}/${trackId}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Returns the diagnostic test data for a given course
+ */
+export function getDiagnostic(courseId: string = "python"): DiagnosticData | null {
+  const diagnosticPath = path.join(CONTENT_DIR, courseId, "diagnostic.json");
+  if (!fs.existsSync(diagnosticPath)) return null;
+
+  try {
+    const content = fs.readFileSync(diagnosticPath, "utf-8");
+    const data = JSON.parse(content) as DiagnosticData;
+    return {
+      ...data,
+      course: courseId,
+    };
+  } catch (err) {
+    console.error(`Error parsing diagnostic.json in ${courseId}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Returns the roadmap and preview widgets data for a given course
+ */
+export function getRoadmap(courseId: string = "python"): RoadmapData | null {
+  const roadmapPath = path.join(CONTENT_DIR, courseId, "roadmap.json");
+  if (!fs.existsSync(roadmapPath)) return null;
+
+  try {
+    const content = fs.readFileSync(roadmapPath, "utf-8");
+    const data = JSON.parse(content) as RoadmapData;
+    return {
+      ...data,
+      course: courseId,
+    };
+  } catch (err) {
+    console.error(`Error parsing roadmap.json in ${courseId}:`, err);
     return null;
   }
 }

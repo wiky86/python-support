@@ -172,3 +172,55 @@ export interface XpRulesConfig {
     quizPerfectBonusBasis: string;
   };
 }
+
+export interface DiagnosticQuestion {
+  id: string;
+  trackId: string;
+  type: "mcq";
+  q: string;
+  options: string[];
+  answer: number; // 0-based index
+  explain: string;
+}
+
+export interface DiagnosticData {
+  course: string;
+  title: string;
+  description: string;
+  instruction: string;
+  allowDontKnow: boolean;
+  questions: DiagnosticQuestion[];
+}
+
+export interface RoadmapJourneyPreview {
+  type: "info" | "widget" | string;
+  note?: string;
+  widgetId?: string;
+}
+
+export interface RoadmapJourneyItem {
+  trackId: string;
+  order: number;
+  stationTitle: string;
+  whatYouLearn: string;
+  whyItMatters: string;
+  realWorld: string;
+  preview: RoadmapJourneyPreview | null;
+}
+
+export interface RoadmapWidget {
+  id: string;
+  title: string;
+  type: string;
+  widget: string;
+  note: string;
+}
+
+export interface RoadmapData {
+  course: string;
+  headline: string;
+  outcome: string;
+  note?: string;
+  journey: RoadmapJourneyItem[];
+  previewWidgets: RoadmapWidget[];
+}

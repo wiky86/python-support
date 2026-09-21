@@ -65,7 +65,7 @@ export function ReportCard({
   const handleShare = async () => {
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(
-        `📊 [${displayTitle} 완주 리포트]\n\n${renderedText}\n\n#KDT #DataLab #완주리포트`
+        `📊 [${displayTitle} 완주 리포트]\n\n${renderedText}\n\n#UBION #KDT #DataLab #완주리포트`
       );
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -99,7 +99,7 @@ export function ReportCard({
             </div>
             <div>
               <div className="text-[11px] font-bold text-indigo-400 tracking-wider uppercase">
-                KDT DataLab Project Certificate
+                UBION KDT DataLab Project Certificate
               </div>
               <h3 className="text-xl font-extrabold text-white">
                 {report.title}
@@ -161,8 +161,8 @@ export function ReportCard({
 
         {/* Card Footer Brand Watermark */}
         <div className="mt-8 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500">
-          <span>KDT DataLab · 실습 및 실무 프로젝트 인증서</span>
-          <span className="font-mono">kdt-support</span>
+          <span>UBION KDT DataLab · 실습 및 실무 프로젝트 인증서</span>
+          <span className="font-mono">ubion-kdt</span>
         </div>
       </div>
 

@@ -1,0 +1,105 @@
+{
+  "course": "finance",
+  "headline": "디지털 시대의 금융, 개념부터 응용까지",
+  "outcome": "이 과정을 마치면, 금융시장과 상품의 작동 원리를 이해하고, 거시경제 흐름을 읽고, 증권·리스크·파생상품 같은 전문 영역과 디지털 금융 트렌드를 하나의 큰 그림으로 연결해 설명할 수 있습니다.",
+  "note": "아래 지도는 전체 여정을 보여줄 뿐, 학습은 트랙1부터 순서대로 진행됩니다. 각 트랙은 앞 트랙을 마쳐야 열립니다. (트랙 순서는 교육 과정 편성 순서를 따릅니다.)",
+  "journey": [
+    {
+      "trackId": "track1",
+      "order": 1,
+      "stationTitle": "디지털 뱅킹 & AI 리터러시",
+      "whatYouLearn": "채널 진화, 인터넷전문은행, 오픈뱅킹, 핀테크, 마이데이터, 금융 AI.",
+      "whyItMatters": "지금 금융이 어디로 가고 있는지 큰 그림을 먼저 잡습니다. 과정 전체의 문제의식을 여는 트랙입니다.",
+      "realWorld": "하나의 앱에서 모든 은행 계좌를 관리하는 오픈뱅킹의 원리 이해.",
+      "preview": null
+    },
+    {
+      "trackId": "track2",
+      "order": 2,
+      "stationTitle": "Finance 입문",
+      "whatYouLearn": "돈의 기능, 금리(단리·복리), 화폐의 시간가치, 금융시장 구조, 위험과 수익.",
+      "whyItMatters": "모든 금융 개념의 토대입니다. 여기서 다지는 기초 위에 이후 모든 트랙이 쌓입니다.",
+      "realWorld": "'지금의 100만 원과 1년 뒤 100만 원의 가치가 왜 다른가'를 계산으로 이해.",
+      "preview": { "type": "widget", "widgetId": "compound-interest" }
+    },
+    {
+      "trackId": "track3",
+      "order": 3,
+      "stationTitle": "거시경제 매커니즘 이해",
+      "whatYouLearn": "GDP, 물가·인플레이션, 통화·재정정책, 경기순환, 환율·국제수지.",
+      "whyItMatters": "개별 상품을 넘어 시장 전체를 움직이는 큰 힘을 읽습니다. 금리·환율 뉴스가 왜 중요한지 알게 됩니다.",
+      "realWorld": "중앙은행의 금리 인상 뉴스가 내 대출·투자에 미치는 영향 해석.",
+      "preview": null
+    },
+    {
+      "trackId": "track4",
+      "order": 4,
+      "stationTitle": "증권분석 · 기업가치평가",
+      "whatYouLearn": "주식·채권 분석, PER·PBR 등 밸류에이션, 채권 가격과 금리의 관계.",
+      "whyItMatters": "여기서부터 본격적인 '분석'입니다. 기업과 자산의 가치를 숫자로 판단하는 법을 배웁니다.",
+      "realWorld": "한 기업의 주가가 이익 대비 비싼지 싼지 PER로 가늠하기.",
+      "preview": null
+    },
+    {
+      "trackId": "track5",
+      "order": 5,
+      "stationTitle": "퀀트투자 · 자산배분",
+      "whatYouLearn": "포트폴리오 이론, 분산투자, 상관관계, 샤프지수, 팩터 투자.",
+      "whyItMatters": "데이터와 규칙에 기반한 투자 방법론입니다. 파이썬 데이터 분석과도 자연스럽게 이어집니다.",
+      "realWorld": "여러 자산을 어떤 비중으로 섞어야 위험 대비 수익이 좋은지 설계.",
+      "preview": { "type": "widget", "widgetId": "portfolio-return" }
+    },
+    {
+      "trackId": "track6",
+      "order": 6,
+      "stationTitle": "리스크관리",
+      "whatYouLearn": "위험의 유형, VaR(최대예상손실), 헤지, 신용·시장·운영 리스크.",
+      "whyItMatters": "수익만큼 중요한 것이 위험 관리입니다. 앞서 배운 개념들을 '위험'이라는 렌즈로 종합합니다.",
+      "realWorld": "포트폴리오가 최악의 경우 얼마까지 잃을 수 있는지 숫자로 측정.",
+      "preview": null
+    },
+    {
+      "trackId": "track7",
+      "order": 7,
+      "stationTitle": "금융업종별 비교 분석",
+      "whatYouLearn": "은행·증권·보험·카드 등 업종별 구조와 수익 모델 비교.",
+      "whyItMatters": "금융 산업의 지형도를 그립니다. 각 업종이 어떻게 돈을 벌고 어떻게 다른지 이해합니다.",
+      "realWorld": "은행의 예대마진과 증권사의 수수료 수익 구조 비교.",
+      "preview": null
+    },
+    {
+      "trackId": "track8",
+      "order": 8,
+      "stationTitle": "외환시장 이해",
+      "whatYouLearn": "FX 시장 구조, 환율 결정 요인, 절상·절하, 환위험.",
+      "whyItMatters": "글로벌 자금 흐름과 무역·투자를 잇는 외환의 원리를 배웁니다.",
+      "realWorld": "환율 변동이 수출기업과 해외여행 비용에 미치는 영향 파악.",
+      "preview": null
+    },
+    {
+      "trackId": "track9",
+      "order": 9,
+      "stationTitle": "파생상품 이해",
+      "whatYouLearn": "선물·옵션·스왑의 개념과 구조, 콜/풋옵션의 권리.",
+      "whyItMatters": "가장 난도 높은 상품 영역으로, 앞선 모든 개념을 종합해야 이해됩니다. 과정의 정점입니다.",
+      "realWorld": "가격 하락 위험을 옵션으로 방어하는 헤지 전략의 원리.",
+      "preview": null
+    }
+  ],
+  "previewWidgets": [
+    {
+      "id": "compound-interest",
+      "title": "복리 계산기 (맛보기)",
+      "type": "calculator",
+      "widget": "compoundInterest",
+      "note": "원금·이율·기간을 넣어 복리의 힘을 숫자로 체감해 보세요. Track2에서 자세히 배웁니다."
+    },
+    {
+      "id": "portfolio-return",
+      "title": "포트폴리오 수익률 계산기 (맛보기)",
+      "type": "calculator",
+      "widget": "portfolioReturn",
+      "note": "자산별 비중과 기대수익률을 넣어 가중 평균 수익률을 계산해 보세요. Track5에서 자세히 배웁니다."
+    }
+  ]
+}

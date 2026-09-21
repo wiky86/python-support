@@ -45,7 +45,7 @@ export function generateMetadata({ params }: TopicPageProps): Metadata {
   }
 
   return {
-    title: `${topic.title} (${track.title}) — KDT DataLab`,
+    title: `${topic.title} (${track.title}) · UBION KDT DataLab`,
     description: `개념 학습, 빈칸 실습, 복습 퀴즈: ${topic.title}`,
   };
 }

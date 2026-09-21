@@ -62,7 +62,7 @@ export function Navbar() {
               </div>
               <div className="flex flex-col">
                 <span className="tracking-tight text-base font-extrabold leading-tight">
-                  <span className="text-emerald-600 dark:text-emerald-400">KDT</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">UBION KDT</span>
                   <span className="text-slate-800 dark:text-white"> DataLab</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-normal leading-none">

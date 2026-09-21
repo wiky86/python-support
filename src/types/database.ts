@@ -125,6 +125,57 @@ export interface Database {
         };
         Relationships: [];
       };
+      user_diagnostics: {
+        Row: {
+          user_id: string;
+          course: string; // 'python' | 'finance'
+          total_score: number;
+          track_scores: Record<string, number>;
+          answers: Json | null;
+          taken_at: string;
+        };
+        Insert: {
+          user_id: string;
+          course: string;
+          total_score: number;
+          track_scores: Record<string, number>;
+          answers?: Json | null;
+          taken_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          course?: string;
+          total_score?: number;
+          track_scores?: Record<string, number>;
+          answers?: Json | null;
+          taken_at?: string;
+        };
+        Relationships: [];
+      };
+      diagnostic_retake_grants: {
+        Row: {
+          user_id: string;
+          course: string;
+          granted_by: string;
+          granted_at: string;
+          consumed: boolean;
+        };
+        Insert: {
+          user_id: string;
+          course: string;
+          granted_by: string;
+          granted_at?: string;
+          consumed?: boolean;
+        };
+        Update: {
+          user_id?: string;
+          course?: string;
+          granted_by?: string;
+          granted_at?: string;
+          consumed?: boolean;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       admin_user_list: {
@@ -148,6 +199,8 @@ export type AdminRow = Database["public"]["Tables"]["admins"]["Row"];
 export type UserProgressRow = Database["public"]["Tables"]["user_progress"]["Row"];
 export type UserStatsRow = Database["public"]["Tables"]["user_stats"]["Row"];
 export type UserBadgeRow = Database["public"]["Tables"]["user_badges"]["Row"];
+export type UserDiagnosticRow = Database["public"]["Tables"]["user_diagnostics"]["Row"];
+export type DiagnosticRetakeGrantRow = Database["public"]["Tables"]["diagnostic_retake_grants"]["Row"];
 export type AdminUserListRow = Database["public"]["Views"]["admin_user_list"]["Row"];
 
 export interface StudentCourseProgress {
@@ -173,4 +226,6 @@ export interface StudentSummary {
   streakCount: number;
   lastStudied: string | null;
   courseProgress?: Record<string, StudentCourseProgress>;
+  diagnostics?: Record<string, UserDiagnosticRow | null>;
+  diagnosticGrants?: Record<string, DiagnosticRetakeGrantRow | null>;
 }

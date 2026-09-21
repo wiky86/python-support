@@ -22,6 +22,9 @@ import {
   ArrowLeft,
   Terminal,
   Landmark,
+  Compass,
+  HelpCircle,
+  Layers,
 } from "lucide-react";
 
 interface DashboardViewProps {
@@ -175,6 +178,67 @@ export function DashboardView({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 1.5 Pre-learning Diagnostic & Roadmap Action Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Diagnostic Test Card */}
+        <Link
+          href={`/${course.id}/diagnostic`}
+          prefetch={false}
+          className="p-5 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent dark:from-emerald-950/30 dark:via-teal-950/10 dark:to-transparent border border-emerald-500/30 hover:border-emerald-500/60 dark:hover:border-emerald-500/50 transition-all hover:shadow-lg flex items-center justify-between gap-4 group"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform flex-shrink-0">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">
+                  사전 점검
+                </span>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  {course.shortTitle} 사전 진단 테스트
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                트랙별 선수 이해도를 점검하고 나의 강약 지도를 확인해보세요.
+              </p>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0">
+            <ArrowRight className="w-4 h-4" />
+          </div>
+        </Link>
+
+        {/* Course Roadmap & Journey Card */}
+        <Link
+          href={`/${course.id}/roadmap`}
+          prefetch={false}
+          className="p-5 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-indigo-500/5 to-transparent dark:from-cyan-950/30 dark:via-indigo-950/10 dark:to-transparent border border-cyan-500/30 hover:border-cyan-500/60 dark:hover:border-cyan-500/50 transition-all hover:shadow-lg flex items-center justify-between gap-4 group"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center shadow-md shadow-cyan-600/20 group-hover:scale-105 transition-transform flex-shrink-0">
+              <Compass className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-300">
+                  실무 여정
+                </span>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  과정 전체 로드맵 &amp; 맛보기
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                트랙별 실무 가치를 한눈에 보고 인터랙티브 계산기를 체험하세요.
+              </p>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0">
+            <ArrowRight className="w-4 h-4" />
+          </div>
+        </Link>
       </div>
 
       {/* 2. Track Roadmap Cards */}

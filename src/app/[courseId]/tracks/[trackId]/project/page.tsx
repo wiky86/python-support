@@ -44,7 +44,7 @@ export function generateMetadata({ params }: ProjectPageProps): Metadata {
   }
 
   return {
-    title: `${project.title} (${track.title} 미니 프로젝트) — KDT DataLab`,
+    title: `${project.title} (${track.title} 미니 프로젝트) · UBION KDT DataLab`,
     description: project.intro,
   };
 }

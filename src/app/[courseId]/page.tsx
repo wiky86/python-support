@@ -30,7 +30,7 @@ export function generateMetadata({ params }: CoursePageProps): Metadata {
     return { title: "과목을 찾을 수 없습니다" };
   }
   return {
-    title: `${course.title} — KDT DataLab`,
+    title: `${course.title} · UBION KDT DataLab`,
     description: course.description,
   };
 }

@@ -110,3 +110,58 @@ export function isTrackCompleted(
 ): boolean {
   return isProjectUnlocked(track, progress);
 }
+
+/**
+ * Diagnostic Test Evaluation Thresholds
+ * - Strong (강함): >= 80%
+ * - Fair (보통): 40% ~ 79%
+ * - Weak (약함): < 40%
+ */
+export const DIAGNOSTIC_STRONG_THRESHOLD = 0.8;
+export const DIAGNOSTIC_FAIR_THRESHOLD = 0.4;
+
+export type DiagnosticGradeKey = "strong" | "fair" | "weak";
+
+export interface DiagnosticGrade {
+  key: DiagnosticGradeKey;
+  label: string; // '강함' | '보통' | '약함'
+  badgeClass: string;
+  barClass: string;
+  bgClass: string;
+  borderClass: string;
+  textClass: string;
+}
+
+export function getDiagnosticGrade(scoreRatio: number): DiagnosticGrade {
+  if (scoreRatio >= DIAGNOSTIC_STRONG_THRESHOLD) {
+    return {
+      key: "strong",
+      label: "강함",
+      badgeClass: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+      barClass: "bg-emerald-500",
+      bgClass: "bg-emerald-50/50 dark:bg-emerald-950/20",
+      borderClass: "border-emerald-200 dark:border-emerald-800/60",
+      textClass: "text-emerald-600 dark:text-emerald-400",
+    };
+  }
+  if (scoreRatio >= DIAGNOSTIC_FAIR_THRESHOLD) {
+    return {
+      key: "fair",
+      label: "보통",
+      badgeClass: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30",
+      barClass: "bg-amber-500",
+      bgClass: "bg-amber-50/50 dark:bg-amber-950/20",
+      borderClass: "border-amber-200 dark:border-amber-800/60",
+      textClass: "text-amber-600 dark:text-amber-400",
+    };
+  }
+  return {
+    key: "weak",
+    label: "약함",
+    badgeClass: "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30",
+    barClass: "bg-rose-500",
+    bgClass: "bg-rose-50/50 dark:bg-rose-950/20",
+    borderClass: "border-rose-200 dark:border-rose-800/60",
+    textClass: "text-rose-600 dark:text-rose-400",
+  };
+}

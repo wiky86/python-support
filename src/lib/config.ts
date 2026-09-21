@@ -1,5 +1,5 @@
 /**
- * PyDataLab Application Configuration
+ * UBION KDT DataLab Application Configuration
  */
 
 // Self sign-up policy: false = admin issue accounts only (default), true = self-service sign up allowed

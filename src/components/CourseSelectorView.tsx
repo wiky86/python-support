@@ -20,6 +20,7 @@ import {
   TrendingUp,
   BarChart3,
   ShieldCheck,
+  Compass,
 } from "lucide-react";
 
 interface CourseSelectorViewProps {
@@ -234,8 +235,8 @@ export function CourseSelectorView({
                   </div>
                 </div>
 
-                {/* Card Action Link */}
-                <div className="pt-6">
+                {/* Card Action Links */}
+                <div className="pt-6 space-y-2.5">
                   <Link
                     href={`/${course.id}`}
                     prefetch={false}
@@ -248,6 +249,26 @@ export function CourseSelectorView({
                     <span>{completedCount > 0 ? "이어서 학습하기" : "과목 학습 시작하기"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <Link
+                      href={`/${course.id}/diagnostic`}
+                      prefetch={false}
+                      className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
+                    >
+                      <Sparkles className="w-3 h-3 text-emerald-500" />
+                      <span>사전 진단</span>
+                    </Link>
+
+                    <Link
+                      href={`/${course.id}/roadmap`}
+                      prefetch={false}
+                      className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
+                    >
+                      <Compass className="w-3 h-3 text-cyan-500" />
+                      <span>여정 로드맵</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
             );
