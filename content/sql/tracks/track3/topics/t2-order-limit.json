@@ -1,0 +1,124 @@
+{
+  "id": "track3.order-limit",
+  "trackId": "track3",
+  "order": 2,
+  "title": "여러 기준 정렬과 상위 N개 — LIMIT",
+  "content": "## 여러 기준으로 정렬\n\n'부서 순으로 정렬하되, 같은 부서 안에서는 급여 높은 순'처럼 정렬 기준이 두 개일 수 있습니다. ORDER BY에 **콤마로 여러 열**을 나열합니다.\n\n```sql\nSELECT emp_name, dept_id, salary FROM employees\nORDER BY dept_id ASC, salary DESC;\n```\n\n먼저 dept_id로 오름차순 정렬하고, **같은 dept_id 안에서는** salary 내림차순으로 정렬합니다. 즉 부서 1 → 2 → 3 → 4 순으로 묶이고, 각 부서 안에서 급여 높은 사람이 위로 옵니다. 앞에 쓴 기준이 우선합니다.\n\n## 상위 N개만 — LIMIT\n\n'급여 상위 3명'처럼 결과의 일부만 보고 싶을 때 **LIMIT**을 씁니다.\n\n```sql\nSELECT emp_name, salary FROM employees\nORDER BY salary DESC\nLIMIT 3;\n```\n\n급여 높은 순으로 정렬한 뒤 **위에서 3개**만 가져옵니다. 결과: 김철수(6000), 박민수(5000), 임재현(4800). LIMIT은 보통 ORDER BY와 함께 써야 의미가 있습니다(정렬 후 상위 N개).\n\n## LIMIT의 위치\n\nLIMIT은 쿼리의 **맨 끝**에 옵니다. 순서는 SELECT → FROM → WHERE → ORDER BY → LIMIT.\n\n## 시작 위치 지정 (OFFSET)\n\n`LIMIT 시작, 개수` 형태로 특정 위치부터 가져올 수도 있습니다.\n\n```sql\nLIMIT 3, 2   -- 4번째부터 2개 (0부터 세므로 3은 4번째)\n```\n\n'2등부터 3등까지'처럼 중간 순위를 뽑을 때 씁니다. 페이지 나누기(페이지네이션)에 자주 활용됩니다.\n\n## 정리\n\nORDER BY에 콤마로 여러 정렬 기준을 줄 수 있고(앞 기준 우선), LIMIT N으로 상위 N개만 조회합니다. LIMIT은 쿼리 맨 끝에 오며, ORDER BY와 함께 써야 의미가 있습니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "부서 오름차순, 같은 부서 내 급여 내림차순으로 정렬하세요. 두 정렬 기준을 잇는 기호를 넣으세요.",
+      "code": "SELECT emp_name, dept_id, salary FROM employees ORDER BY dept_id ASC______ salary DESC;",
+      "answers": [","],
+      "ignoreCase": true,
+      "output": "부서 1→2→3→4 순, 각 부서 내 급여 높은 순으로 정렬",
+      "explain": "ORDER BY에 콤마로 여러 기준을 나열합니다. 앞의 dept_id가 우선이고, 같은 부서 안에서 salary로 다시 정렬됩니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "급여 상위 3명만 조회하세요. (개수 제한 키워드)",
+      "code": "SELECT emp_name, salary FROM employees ORDER BY salary DESC ______ 3;",
+      "answers": ["LIMIT"],
+      "ignoreCase": true,
+      "output": "(김철수,6000) (박민수,5000) (임재현,4800)",
+      "explain": "LIMIT 3은 위에서 3개만 가져옵니다. ORDER BY salary DESC로 정렬했으니 급여 상위 3명입니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "급여가 가장 낮은 1명만 조회하려 합니다. 빈칸에 개수를 넣으세요.",
+      "code": "SELECT emp_name, salary FROM employees ORDER BY salary ASC LIMIT ______;",
+      "answers": ["1"],
+      "ignoreCase": true,
+      "output": "(윤서연,3000)",
+      "explain": "ASC로 낮은 순 정렬 후 LIMIT 1로 1명만 가져오면, 급여가 가장 낮은 윤서연이 조회됩니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "LIMIT은 쿼리에서 어디에 위치하나요? 아래에서 ORDER BY 뒤에 오는 것을 확인하며 키워드를 넣으세요.",
+      "code": "SELECT emp_name FROM employees ORDER BY salary DESC ______ 5;",
+      "answers": ["LIMIT"],
+      "ignoreCase": true,
+      "output": "급여 상위 5명이 조회된다",
+      "explain": "LIMIT은 쿼리 맨 끝(ORDER BY 뒤)에 옵니다. 순서: SELECT→FROM→WHERE→ORDER BY→LIMIT."
+    },
+    {
+      "id": "fb5",
+      "prompt": "급여 순위에서 4번째부터 2명을 조회하세요. (LIMIT 시작위치, 개수 형태 — 시작위치를 넣으세요. 0부터 셉니다)",
+      "code": "SELECT emp_name, salary FROM employees ORDER BY salary DESC LIMIT ______, 2;",
+      "answers": ["3"],
+      "ignoreCase": true,
+      "output": "(강다연,4000) (최지훈,3800)  -- 4·5번째",
+      "explain": "LIMIT 3, 2 는 '4번째부터 2개'입니다. 0부터 세므로 3은 4번째를 뜻합니다. 급여 4·5위인 강다연·최지훈이 나옵니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "여러 열로 정렬할 때 `ORDER BY dept_id ASC, salary DESC` 의 동작은?",
+        "options": [
+          "salary로만 정렬",
+          "dept_id로 먼저 정렬하고, 같은 dept_id 안에서 salary로 정렬",
+          "두 열을 더해서 정렬",
+          "무작위 정렬"
+        ],
+        "answer": 1,
+        "explain": "앞의 기준(dept_id)이 우선이고, 같은 값 안에서 다음 기준(salary)으로 정렬합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "결과의 상위 N개만 가져오는 키워드는?",
+        "options": ["TOP", "LIMIT", "HEAD", "FIRST"],
+        "answer": 1,
+        "explain": "MySQL에서는 LIMIT N으로 상위 N개를 가져옵니다. (SQL Server는 TOP을 쓰지만 이 과정은 MySQL 기준입니다.)"
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`ORDER BY salary DESC LIMIT 3` 의 결과는?",
+        "options": [
+          "급여가 가장 낮은 3명",
+          "급여가 가장 높은 3명",
+          "무작위 3명",
+          "전체 직원"
+        ],
+        "answer": 1,
+        "explain": "DESC로 높은 순 정렬 후 상위 3개를 가져오므로 급여 상위 3명입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "LIMIT의 위치로 옳은 것은?",
+        "options": [
+          "SELECT 바로 뒤",
+          "WHERE 앞",
+          "쿼리 맨 끝(ORDER BY 뒤)",
+          "FROM 앞"
+        ],
+        "answer": 2,
+        "explain": "LIMIT은 쿼리 맨 끝에 옵니다. 순서: SELECT→FROM→WHERE→ORDER BY→LIMIT."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "LIMIT을 ORDER BY 없이 쓰면 생기는 문제는?",
+        "options": [
+          "반드시 오류가 난다",
+          "어떤 N개가 나올지 보장되지 않는다",
+          "항상 급여 순으로 나온다",
+          "전체가 다 나온다"
+        ],
+        "answer": 1,
+        "explain": "정렬 없이 LIMIT만 쓰면 '어떤' N개가 나올지 정해지지 않습니다. 의미 있는 상위 N개를 얻으려면 ORDER BY와 함께 써야 합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "정렬 기준을 3개 이상 줄 수도 있나요?", "a": "네, 콤마로 얼마든지 나열할 수 있습니다. 앞에 쓴 기준일수록 우선순위가 높습니다." },
+    { "q": "LIMIT은 모든 DBMS에서 쓰나요?", "a": "MySQL·PostgreSQL·SQLite는 LIMIT을 씁니다. SQL Server는 TOP, Oracle은 다른 문법을 쓰기도 합니다. 이 과정은 MySQL 기준이라 LIMIT을 씁니다." },
+    { "q": "LIMIT 3, 2 에서 숫자가 헷갈려요.", "a": "'LIMIT 시작위치, 개수' 순서입니다. 시작위치는 0부터 셉니다. LIMIT 3, 2는 '4번째부터 2개'를 뜻합니다. 페이지 나누기에서 자주 씁니다." }
+  ]
+}

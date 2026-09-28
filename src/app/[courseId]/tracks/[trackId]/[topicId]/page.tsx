@@ -7,6 +7,7 @@ import {
   getTrack,
   getTopic,
   getAllBadges,
+  getSampleDatabase,
 } from "@/lib/content";
 import { TopicView } from "@/components/TopicView";
 
@@ -73,6 +74,8 @@ export default function TopicPage({ params }: TopicPageProps) {
     0
   );
 
+  const sampleDb = getSampleDatabase(courseId);
+
   return (
     <TopicView
       track={track}
@@ -82,6 +85,7 @@ export default function TopicPage({ params }: TopicPageProps) {
       allTrackTopicsCount={allTrackTopicsCount}
       totalTopicsCount={totalTopicsCount}
       totalTracksCount={allTracks.length}
+      sampleDb={sampleDb}
     />
   );
 }

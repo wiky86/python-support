@@ -1,0 +1,119 @@
+{
+  "id": "track7.update",
+  "trackId": "track7",
+  "order": 2,
+  "title": "데이터 수정 — UPDATE",
+  "content": "## 기존 데이터 바꾸기\n\n**UPDATE**는 이미 있는 행의 값을 수정합니다. '윤서연의 급여를 올린다', '개발부 직원의 부서를 옮긴다' 같은 변경에 씁니다.\n\n## 기본 문법\n\n```sql\nUPDATE employees\nSET salary = 3500\nWHERE emp_id = 7;\n```\n\n- **UPDATE 테이블**: 수정할 테이블.\n- **SET 열 = 값**: 어떤 열을 무슨 값으로 바꿀지.\n- **WHERE 조건**: 어떤 행을 바꿀지.\n\n이 쿼리는 emp_id가 7인 직원(윤서연)의 급여를 3500으로 바꿉니다.\n\n## ⚠️ WHERE를 빠뜨리면 위험\n\n**가장 중요한 주의사항입니다.** WHERE를 빠뜨리면 **모든 행**이 수정됩니다.\n\n```sql\nUPDATE employees SET salary = 3500;   -- 위험! 전 직원 급여가 3500이 됨\n```\n\n이건 되돌리기 어려운 사고입니다. UPDATE를 쓸 때는 **항상 WHERE를 먼저 확인**하세요. 실무에서는 UPDATE 전에 같은 WHERE로 SELECT해서 대상 행을 먼저 확인하는 습관을 들입니다.\n\n## 여러 열 동시 수정\n\nSET에 콤마로 여러 열을 나열합니다.\n\n```sql\nUPDATE employees\nSET position = '대리', salary = 4000\nWHERE emp_id = 4;\n```\n\n정수진의 직급과 급여를 동시에 바꿉니다.\n\n## 기존 값을 이용한 수정\n\n현재 값을 기준으로 계산해 수정할 수 있습니다.\n\n```sql\nUPDATE employees\nSET salary = salary + 200\nWHERE position = '사원';\n```\n\n모든 사원의 급여를 현재보다 200 인상합니다. `salary = salary + 200` 은 '현재 급여에 200을 더한 값으로 바꾼다'는 뜻입니다. WHERE 조건에 맞는 여러 행이 한꺼번에 수정됩니다.\n\n## 정리\n\nUPDATE 테이블 SET 열=값 WHERE 조건 으로 기존 행을 수정합니다. WHERE를 빠뜨리면 전체 행이 바뀌므로 반드시 확인해야 합니다. 여러 열을 콤마로 동시에 바꾸거나, 기존 값을 이용해 계산 수정할 수 있습니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "emp_id 7번 직원의 급여를 3500으로 수정하세요. 데이터 수정 명령어를 넣으세요.",
+      "code": "______ employees SET salary = 3500 WHERE emp_id = 7;",
+      "answers": ["UPDATE"],
+      "ignoreCase": true,
+      "output": "윤서연(emp_id 7)의 급여가 3500으로 변경됨",
+      "explain": "UPDATE는 기존 행을 수정합니다. SET으로 바꿀 값을, WHERE로 대상 행을 지정합니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "수정할 열과 값을 지정하는 키워드를 넣으세요.",
+      "code": "UPDATE employees ______ salary = 3500 WHERE emp_id = 7;",
+      "answers": ["SET"],
+      "ignoreCase": true,
+      "output": "salary 열이 3500으로 설정됨",
+      "explain": "SET 뒤에 '열 = 새값'을 씁니다. 여러 열은 콤마로 나열합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "어떤 행을 수정할지 지정하는 절을 넣으세요. (빠뜨리면 전체가 수정되므로 필수!)",
+      "code": "UPDATE employees SET salary = 3500 ______ emp_id = 7;",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "emp_id 7인 행만 수정됨",
+      "explain": "WHERE로 수정 대상 행을 지정합니다. WHERE를 빠뜨리면 모든 행이 수정되므로 반드시 확인해야 합니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "모든 사원의 급여를 현재보다 200 인상하세요. 기존 급여에 200을 더하는 식을 완성하세요.",
+      "code": "UPDATE employees SET salary = ______ + 200 WHERE position = '사원';",
+      "answers": ["salary"],
+      "ignoreCase": true,
+      "output": "사원들의 급여가 각각 200씩 인상됨",
+      "explain": "salary = salary + 200 은 '현재 급여에 200을 더한 값'으로 수정합니다. 기존 값을 이용한 계산 수정입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "정수진(emp_id 4)의 직급과 급여를 동시에 수정하려 합니다. SET에서 두 열을 구분하는 기호를 넣으세요.",
+      "code": "UPDATE employees SET position = '대리'______ salary = 4000 WHERE emp_id = 4;",
+      "answers": [","],
+      "ignoreCase": true,
+      "output": "정수진의 직급과 급여가 함께 변경됨",
+      "explain": "SET에 콤마로 여러 열을 나열하면 한 번에 여러 열을 수정할 수 있습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "기존 데이터를 수정하는 명령은?",
+        "options": ["INSERT", "UPDATE", "SELECT", "MODIFY"],
+        "answer": 1,
+        "explain": "UPDATE가 기존 행의 값을 수정합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "UPDATE에서 WHERE를 빠뜨리면?",
+        "options": [
+          "아무 일도 안 일어난다",
+          "모든 행이 수정된다 (위험)",
+          "오류가 나서 실행 안 된다",
+          "첫 행만 수정된다"
+        ],
+        "answer": 1,
+        "explain": "WHERE가 없으면 테이블의 모든 행이 수정됩니다. 되돌리기 어려운 사고이므로 항상 WHERE를 확인해야 합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "수정할 열과 값을 지정하는 키워드는?",
+        "options": ["VALUES", "SET", "INTO", "WITH"],
+        "answer": 1,
+        "explain": "SET 뒤에 '열 = 새값'을 지정합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`SET salary = salary + 200` 의 의미는?",
+        "options": [
+          "급여를 200으로 바꾼다",
+          "현재 급여에 200을 더한 값으로 바꾼다",
+          "급여를 200% 올린다",
+          "오류가 난다"
+        ],
+        "answer": 1,
+        "explain": "오른쪽의 salary는 현재 값이므로, 현재 급여 + 200 으로 수정합니다. 기존 값 기반 계산 수정입니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "UPDATE 전에 권장되는 안전 습관은?",
+        "options": [
+          "그냥 실행한다",
+          "같은 WHERE 조건으로 먼저 SELECT해서 대상 행을 확인한다",
+          "WHERE를 뺀다",
+          "테이블을 삭제한다"
+        ],
+        "answer": 1,
+        "explain": "UPDATE 전에 같은 WHERE로 SELECT해서 '어떤 행이 바뀔지' 미리 확인하면 실수를 예방할 수 있습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "실수로 WHERE 없이 UPDATE했어요. 되돌릴 수 있나요?", "a": "트랜잭션(COMMIT 전)이면 ROLLBACK으로 되돌릴 수 있습니다. 하지만 이미 확정(COMMIT)됐거나 자동 커밋 환경이면 되돌리기 어렵습니다. 그래서 예방이 최선입니다." },
+    { "q": "UPDATE로 여러 행을 한 번에 바꿀 수 있나요?", "a": "네. WHERE 조건에 맞는 모든 행이 한꺼번에 수정됩니다. 예: 모든 사원 급여 인상." },
+    { "q": "바꿀 값이 기존 값과 같으면 어떻게 되나요?", "a": "그 행은 실질적으로 변화가 없습니다. 오류는 나지 않고, 값이 이미 같으면 그대로 유지됩니다." }
+  ]
+}

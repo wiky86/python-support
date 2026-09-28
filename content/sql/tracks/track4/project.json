@@ -1,0 +1,71 @@
+{
+  "id": "track4.project",
+  "trackId": "track4",
+  "title": "부서별 인력·급여 현황 분석",
+  "intro": "경영진이 부서별 인력과 급여 현황을 요청했습니다. 집계 함수와 GROUP BY, HAVING을 활용해 '부서별 인원', '부서별 평균 급여', '인원이 많은 부서' 등을 분석하는 리포트를 만듭니다. 트랙4의 핵심을 종합하는 실전 과제입니다.",
+  "dataset": {
+    "description": "회사 조직 데이터베이스의 employees 테이블(직원 8명). dept_id, position, salary 등.",
+    "code": "-- employees: emp_id, emp_name, dept_id, position, salary, hire_date, manager_id\n-- 부서: 1영업(2명) 2개발(3명) 3인사(2명) 4마케팅(1명)"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "전체 직원 수를 세세요. (개수 집계 함수)",
+      "code": "SELECT ______(*) FROM employees;",
+      "answers": ["COUNT"],
+      "ignoreCase": true,
+      "output": "8",
+      "explain": "COUNT(*)로 전체 행(직원) 수를 셉니다. 총 8명입니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "부서별 직원 수를 구하세요. 그룹으로 묶는 절을 완성하세요.",
+      "code": "SELECT dept_id, COUNT(*) FROM employees ______ dept_id;",
+      "answers": ["GROUP BY"],
+      "ignoreCase": true,
+      "output": "(1,2) (2,3) (3,2) (4,1)",
+      "explain": "GROUP BY dept_id로 부서별 인원을 셉니다. 개발부(2)가 3명으로 가장 많습니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "부서별 평균 급여를 높은 순으로 조회하세요. 평균 집계 함수를 넣으세요.",
+      "code": "SELECT dept_id, ROUND(______(salary)) AS avg_sal FROM employees GROUP BY dept_id ORDER BY avg_sal DESC;",
+      "answers": ["AVG"],
+      "ignoreCase": true,
+      "output": "(4,4800) (1,4600) (2,4100) (3,3500)",
+      "explain": "AVG(salary)를 부서별로 구하고 정렬합니다. 마케팅부(4800)가 평균 급여 1위입니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "인원이 2명 이상인 부서만 조회하세요. 집계 결과에 조건을 거는 절을 넣으세요.",
+      "code": "SELECT dept_id, COUNT(*) FROM employees GROUP BY dept_id ______ COUNT(*) >= 2;",
+      "answers": ["HAVING"],
+      "ignoreCase": true,
+      "output": "(1,2) (2,3) (3,2) — 마케팅부(1명) 제외",
+      "explain": "HAVING COUNT(*) >= 2 로 2명 이상 부서만 남깁니다. 마케팅부는 1명이라 제외됩니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "직급별 평균 급여를 구하세요. GROUP BY 기준 열을 넣으세요.",
+      "code": "SELECT position, ROUND(AVG(salary)) FROM employees GROUP BY ______;",
+      "answers": ["position"],
+      "ignoreCase": true,
+      "output": "(과장,4900) (대리,4000) (부장,6000) (사원,3375)",
+      "explain": "position으로 그룹화해 직급별 평균 급여를 구합니다. 부장이 6000으로 가장 높습니다."
+    }
+  ],
+  "report": {
+    "title": "부서별 인력·급여 현황 리포트",
+    "template": "전체 직원: {total}명\n부서별 인원: 영업 {d1}, 개발 {d2}, 인사 {d3}, 마케팅 {d4}\n평균 급여 1위 부서: {topDept} ({topAvg})\n인원 2명 이상 부서 수: {bigDepts}개\n직급별 평균 최고: {topPos} ({topPosAvg})",
+    "computedValues": {
+      "total": 8,
+      "d1": 2, "d2": 3, "d3": 2, "d4": 1,
+      "topDept": "마케팅부",
+      "topAvg": 4800,
+      "bigDepts": 3,
+      "topPos": "부장",
+      "topPosAvg": 6000
+    },
+    "conceptsUsed": ["COUNT", "SUM/AVG", "GROUP BY", "HAVING", "ORDER BY"]
+  }
+}

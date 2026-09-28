@@ -1,0 +1,70 @@
+{
+  "id": "track6.project",
+  "trackId": "track6",
+  "title": "고급 조건 분석 — 서브쿼리 활용",
+  "intro": "인사팀이 '평균보다 많이 받는 직원', '고액 연봉자가 있는 부서'처럼 한 번에 풀기 어려운 분석을 요청했습니다. 서브쿼리(WHERE·IN·FROM·EXISTS)를 활용해 단계적으로 문제를 해결합니다. 트랙6의 핵심을 종합하는 과제입니다.",
+  "dataset": {
+    "description": "회사 조직 데이터베이스. employees(직원 8명), departments(부서 4개). 평균 급여 약 4163, 최고 6000, 최저 3000.",
+    "code": "-- employees, departments (dept_id로 연결)"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "평균 급여보다 많이 받는 직원을 조회하세요. 서브쿼리로 평균을 구하는 집계 함수를 넣으세요.",
+      "code": "SELECT emp_name, salary FROM employees WHERE salary > (SELECT ______(salary) FROM employees);",
+      "answers": ["AVG"],
+      "ignoreCase": true,
+      "output": "김철수(6000), 박민수(5000), 임재현(4800)",
+      "explain": "서브쿼리 AVG(salary)가 평균(약 4163)을 구하고, 그보다 큰 직원 3명을 찾습니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "최고 급여를 받는 직원을 조회하세요. 서브쿼리로 최댓값을 구하세요.",
+      "code": "SELECT emp_name FROM employees WHERE salary = (SELECT ______(salary) FROM employees);",
+      "answers": ["MAX"],
+      "ignoreCase": true,
+      "output": "김철수 (6000)",
+      "explain": "서브쿼리 MAX(salary)가 최고 급여(6000)를 구하고, 그와 같은 급여의 직원을 찾습니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "서울에 있는 부서 소속 직원을 조회하세요. 여러 값 목록과 비교하는 연산자를 넣으세요.",
+      "code": "SELECT emp_name FROM employees WHERE dept_id ______ (SELECT dept_id FROM departments WHERE location = '서울');",
+      "answers": ["IN"],
+      "ignoreCase": true,
+      "output": "김철수, 이영희, 박민수, 정수진, 최지훈, 임재현 (서울 근무 6명)",
+      "explain": "서브쿼리가 서울 부서 번호 목록을 만들고, IN으로 그 부서 소속 직원을 찾습니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "부서별 평균 급여가 4500 이상인 부서를 조회하세요. FROM 서브쿼리 결과를 담는 절을 완성하세요.",
+      "code": "SELECT * ______ (SELECT dept_id, ROUND(AVG(salary)) AS a FROM employees GROUP BY dept_id) t WHERE t.a >= 4500;",
+      "answers": ["FROM"],
+      "ignoreCase": true,
+      "output": "(1,4600) (4,4800) — 영업부, 마케팅부",
+      "explain": "FROM 서브쿼리로 부서별 평균 표(t)를 만들고, WHERE로 평균 4500 이상 부서를 거릅니다. 영업부·마케팅부가 해당됩니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "급여 5000 이상인 직원이 있는 부서를 조회하세요. '존재 여부'를 확인하는 키워드를 넣으세요.",
+      "code": "SELECT d.dept_name FROM departments d WHERE ______ (SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id AND e.salary >= 5000);",
+      "answers": ["EXISTS"],
+      "ignoreCase": true,
+      "output": "영업부(김철수 6000), 개발부(박민수 5000)",
+      "explain": "EXISTS로 '급여 5000 이상 직원이 있는' 부서를 찾습니다. 영업부·개발부가 해당됩니다."
+    }
+  ],
+  "report": {
+    "title": "고급 조건 분석 리포트",
+    "template": "평균 초과 직원: {aboveAvg}명\n최고 급여자: {topPaid}\n서울 근무 직원: {seoul}명\n평균 급여 4500 이상 부서: {highDepts}\n고액연봉자(5000+) 보유 부서: {richDepts}\n사용 개념: {conceptsUsed}",
+    "computedValues": {
+      "aboveAvg": 3,
+      "topPaid": "김철수",
+      "seoul": 6,
+      "highDepts": "영업부, 마케팅부",
+      "richDepts": "영업부, 개발부",
+      "conceptsUsed": "WHERE 서브쿼리, IN 서브쿼리, FROM 서브쿼리, EXISTS"
+    },
+    "conceptsUsed": ["WHERE 서브쿼리", "IN 서브쿼리", "FROM 서브쿼리", "EXISTS"]
+  }
+}

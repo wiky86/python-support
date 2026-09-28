@@ -1,0 +1,124 @@
+{
+  "id": "track6.view",
+  "trackId": "track6",
+  "order": 6,
+  "title": "뷰(VIEW) — 쿼리에 이름 붙이기",
+  "content": "## 복잡한 쿼리를 재사용하기\n\n자주 쓰는 복잡한 쿼리를 매번 다시 쓰는 건 번거롭습니다. **뷰(VIEW)** 는 쿼리에 이름을 붙여 **가상의 테이블처럼** 저장해두는 것입니다. 이후로는 그 이름을 테이블처럼 조회할 수 있습니다.\n\n## 뷰 만들기 — CREATE VIEW\n\n```sql\nCREATE VIEW emp_dept AS\nSELECT e.emp_name, e.salary, d.dept_name, d.location\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id;\n```\n\n직원과 부서를 조인한 결과에 `emp_dept`라는 이름을 붙였습니다. 이제 이 조인을 매번 쓰지 않아도 됩니다.\n\n## 뷰 사용하기\n\n```sql\nSELECT * FROM emp_dept WHERE location = '서울';\n```\n\n`emp_dept`를 일반 테이블처럼 조회합니다. 실제로는 뷰에 저장된 조인 쿼리가 실행되어 결과를 돌려줍니다. 복잡한 조인을 몰라도 간단히 조회할 수 있습니다.\n\n## 뷰의 특징\n\n- **데이터를 복사하지 않는다**: 뷰는 쿼리 정의만 저장합니다. 조회할 때마다 원본 테이블에서 최신 데이터를 가져옵니다. 그래서 원본이 바뀌면 뷰 결과도 자동으로 반영됩니다.\n- **복잡함을 감춘다**: 복잡한 조인·집계를 뷰로 만들어두면, 사용자는 간단한 SELECT만 하면 됩니다.\n- **재사용**: 같은 쿼리를 여러 곳에서 반복하지 않아도 됩니다.\n\n## 뷰 삭제 — DROP VIEW\n\n```sql\nDROP VIEW emp_dept;\n```\n\n더 이상 필요 없으면 삭제합니다. 뷰를 삭제해도 원본 테이블(employees, departments)은 영향받지 않습니다. 뷰는 정의일 뿐 실제 데이터가 아니기 때문입니다.\n\n## 정리\n\n뷰(VIEW)는 쿼리에 이름을 붙여 가상 테이블처럼 저장·재사용하는 것입니다. CREATE VIEW로 만들고 테이블처럼 SELECT하며, 데이터를 복사하지 않아 원본의 최신 상태를 반영합니다. 복잡한 쿼리를 감추고 재사용할 때 유용합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "직원-부서 조인 결과에 emp_dept라는 이름을 붙여 뷰로 만드세요. (뷰 생성 키워드 두 단어 중 첫 단어)",
+      "code": "______ VIEW emp_dept AS SELECT e.emp_name, d.dept_name FROM employees e JOIN departments d ON e.dept_id = d.dept_id;",
+      "answers": ["CREATE"],
+      "ignoreCase": true,
+      "output": "emp_dept 뷰가 생성됨",
+      "explain": "CREATE VIEW 뷰이름 AS 쿼리 형태로 뷰를 만듭니다. 쿼리에 이름을 붙여 가상 테이블처럼 저장합니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "뷰 정의에서 실제 쿼리를 연결하는 키워드를 넣으세요.",
+      "code": "CREATE VIEW emp_dept ______ SELECT e.emp_name, d.dept_name FROM employees e JOIN departments d ON e.dept_id = d.dept_id;",
+      "answers": ["AS"],
+      "ignoreCase": true,
+      "output": "뷰 이름과 쿼리를 AS로 연결",
+      "explain": "CREATE VIEW 이름 AS 쿼리 에서 AS 뒤에 뷰가 나타낼 쿼리를 씁니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "만든 뷰 emp_dept를 일반 테이블처럼 조회하세요. FROM 뒤에 뷰 이름을 넣으세요.",
+      "code": "SELECT * FROM ______ WHERE location = '서울';",
+      "answers": ["emp_dept"],
+      "ignoreCase": true,
+      "output": "서울 근무 직원의 emp_dept 뷰 결과",
+      "explain": "뷰는 테이블처럼 FROM에 써서 조회합니다. 뒤에 WHERE 등도 붙일 수 있습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "필요 없어진 뷰 emp_dept를 삭제하세요. (삭제 키워드)",
+      "code": "______ VIEW emp_dept;",
+      "answers": ["DROP"],
+      "ignoreCase": true,
+      "output": "emp_dept 뷰가 삭제됨 (원본 테이블은 영향 없음)",
+      "explain": "DROP VIEW로 뷰를 삭제합니다. 뷰는 정의일 뿐이라, 삭제해도 원본 테이블(employees 등)은 그대로입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "뷰는 데이터를 복사하나요, 아니면 쿼리 정의만 저장하고 조회 시 원본에서 가져오나요? (복사 / 정의만)",
+      "code": "뷰는 데이터를 ______ 저장한다 (조회 시 원본에서 최신 데이터를 가져옴)",
+      "answers": ["정의만", "정의", "복사 안", "안"],
+      "ignoreCase": true,
+      "output": "정의만 저장 (원본 최신 데이터 반영)",
+      "explain": "뷰는 데이터를 복사하지 않고 쿼리 정의만 저장합니다. 조회할 때마다 원본에서 최신 데이터를 가져오므로, 원본이 바뀌면 뷰 결과도 자동 반영됩니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "뷰(VIEW)란?",
+        "options": [
+          "데이터를 복사해 만든 새 테이블",
+          "쿼리에 이름을 붙여 가상 테이블처럼 쓰는 것",
+          "테이블을 삭제하는 명령",
+          "인덱스의 한 종류"
+        ],
+        "answer": 1,
+        "explain": "뷰는 쿼리에 이름을 붙여 저장한 가상 테이블입니다. 데이터를 복사하지 않고 정의만 저장합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "뷰를 만드는 명령은?",
+        "options": ["MAKE VIEW", "CREATE VIEW", "NEW VIEW", "ADD VIEW"],
+        "answer": 1,
+        "explain": "CREATE VIEW 뷰이름 AS 쿼리 형태로 뷰를 만듭니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "뷰의 특징으로 옳은 것은?",
+        "options": [
+          "데이터를 복사해 저장한다",
+          "쿼리 정의만 저장하고 조회 시 원본에서 최신 데이터를 가져온다",
+          "원본이 바뀌어도 뷰는 안 바뀐다",
+          "한 번 만들면 조회할 수 없다"
+        ],
+        "answer": 1,
+        "explain": "뷰는 정의만 저장하므로 조회할 때마다 원본의 최신 데이터를 반영합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "뷰를 사용하는 주된 이점이 아닌 것은?",
+        "options": [
+          "복잡한 조인·집계를 감춰 간단히 조회",
+          "같은 쿼리를 재사용",
+          "원본 데이터를 물리적으로 복제해 백업",
+          "사용자에게 필요한 데이터만 보여주기"
+        ],
+        "answer": 2,
+        "explain": "뷰는 데이터를 복제하지 않습니다. 복잡함을 감추고 재사용하며 필요한 데이터만 보여주는 것이 장점입니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "`DROP VIEW emp_dept;` 를 실행하면?",
+        "options": [
+          "원본 employees 테이블도 삭제된다",
+          "뷰만 삭제되고 원본 테이블은 그대로다",
+          "데이터가 모두 사라진다",
+          "오류가 난다"
+        ],
+        "answer": 1,
+        "explain": "뷰는 정의일 뿐이라 삭제해도 원본 테이블은 영향받지 않습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "뷰에 데이터를 넣거나 수정할 수도 있나요?", "a": "단순한 뷰는 일부 수정이 가능하지만, 조인·집계가 포함된 복잡한 뷰는 대개 조회 전용입니다. 입문 단계에서는 '조회를 간편하게 하는 도구'로 이해하면 충분합니다." },
+    { "q": "뷰와 FROM 서브쿼리는 뭐가 다른가요?", "a": "둘 다 쿼리 결과를 테이블처럼 쓰지만, 뷰는 이름을 붙여 저장해 여러 번 재사용합니다. FROM 서브쿼리는 그 쿼리 한 번에서만 쓰는 일회성입니다." },
+    { "q": "뷰가 많아지면 관리가 어렵지 않나요?", "a": "네, 그래서 자주 쓰고 의미가 분명한 쿼리만 뷰로 만드는 것이 좋습니다. 이름을 명확히 지어 무엇을 담은 뷰인지 알 수 있게 합니다." }
+  ]
+}

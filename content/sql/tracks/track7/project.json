@@ -1,0 +1,70 @@
+{
+  "id": "track7.project",
+  "trackId": "track7",
+  "title": "프로젝트 관리 테이블 구축하기",
+  "intro": "회사에 새로운 '프로젝트 관리' 기능이 필요해졌습니다. 프로젝트 정보를 담을 테이블을 직접 만들고(CREATE), 제약조건을 걸고, 데이터를 추가·수정·삭제(INSERT/UPDATE/DELETE)하고, 필요에 따라 구조를 변경(ALTER)합니다. 트랙7의 데이터 조작·정의를 종합하는 실전 과제입니다.",
+  "dataset": {
+    "description": "새로 만들 projects 테이블. proj_id(기본키), proj_name(필수), budget(기본값 0). 기존 employees/departments와 별개.",
+    "code": "-- projects 테이블을 새로 설계·생성하는 과제"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "projects 테이블을 만드세요. proj_name은 필수(NOT NULL), budget은 기본값 0입니다. 테이블 생성 명령어를 넣으세요.",
+      "code": "______ TABLE projects (proj_id INT PRIMARY KEY, proj_name VARCHAR(100) NOT NULL, budget INT DEFAULT 0);",
+      "answers": ["CREATE"],
+      "ignoreCase": true,
+      "output": "projects 테이블 생성(proj_name 필수, budget 기본값 0)",
+      "explain": "CREATE TABLE로 새 테이블을 만들고, NOT NULL·DEFAULT 제약을 함께 정의합니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "첫 프로젝트(1, 신규앱개발, 예산 5000)를 추가하세요. 데이터 추가 명령어를 넣으세요.",
+      "code": "______ INTO projects (proj_id, proj_name, budget) VALUES (1, '신규앱개발', 5000);",
+      "answers": ["INSERT"],
+      "ignoreCase": true,
+      "output": "(1, 신규앱개발, 5000) 추가됨",
+      "explain": "INSERT INTO로 새 프로젝트를 추가합니다. 열 목록과 값이 순서대로 대응됩니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "budget을 생략하고 프로젝트(2, 마케팅캠페인)를 추가하세요. 그러면 기본값이 들어갑니다. 대상 테이블을 넣으세요.",
+      "code": "INSERT INTO ______ (proj_id, proj_name) VALUES (2, '마케팅캠페인');",
+      "answers": ["projects"],
+      "ignoreCase": true,
+      "output": "(2, 마케팅캠페인, 0) — budget이 기본값 0으로 들어감",
+      "explain": "budget을 생략하면 DEFAULT 0이 적용되어 0이 들어갑니다. 제약조건(DEFAULT)의 효과를 확인하는 미션입니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "2번 프로젝트의 budget을 3000으로 수정하세요. 데이터 수정 명령어를 넣으세요.",
+      "code": "______ projects SET budget = 3000 WHERE proj_id = 2;",
+      "answers": ["UPDATE"],
+      "ignoreCase": true,
+      "output": "(2, 마케팅캠페인, 3000)으로 수정됨",
+      "explain": "UPDATE ... SET ... WHERE로 특정 행을 수정합니다. WHERE로 2번만 정확히 지정합니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "projects에 담당자 열(lead_name)을 추가하세요. 구조 변경 명령어를 넣으세요.",
+      "code": "______ TABLE projects ADD lead_name VARCHAR(50);",
+      "answers": ["ALTER"],
+      "ignoreCase": true,
+      "output": "projects에 lead_name 열이 추가됨(기존 행은 NULL)",
+      "explain": "ALTER TABLE ... ADD로 기존 테이블에 새 열을 추가합니다. 기존 행의 lead_name은 NULL이 됩니다."
+    }
+  ],
+  "report": {
+    "title": "프로젝트 관리 테이블 구축 리포트",
+    "template": "생성한 테이블: {tableName}\n적용한 제약조건: {constraints}\n추가한 프로젝트: {projCount}개\nDEFAULT 확인: budget 생략 시 → {defaultVal}\n추가한 열: {addedColumn}\n사용 개념: {conceptsUsed}",
+    "computedValues": {
+      "tableName": "projects",
+      "constraints": "PRIMARY KEY, NOT NULL, DEFAULT",
+      "projCount": 2,
+      "defaultVal": 0,
+      "addedColumn": "lead_name",
+      "conceptsUsed": "CREATE, INSERT, UPDATE, ALTER, 제약조건"
+    },
+    "conceptsUsed": ["CREATE TABLE", "제약조건(NOT NULL/DEFAULT)", "INSERT", "UPDATE", "ALTER TABLE"]
+  }
+}

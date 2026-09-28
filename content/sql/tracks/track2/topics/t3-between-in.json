@@ -1,0 +1,129 @@
+{
+  "id": "track2.between-in",
+  "trackId": "track2",
+  "order": 3,
+  "title": "범위와 목록 — BETWEEN, IN",
+  "content": "## 범위로 검색 — BETWEEN\n\n'급여가 3500 이상 5000 이하'처럼 범위를 검색할 때, AND로 두 조건을 쓸 수도 있지만 **BETWEEN**을 쓰면 더 간결합니다.\n\n```sql\nSELECT emp_name, salary FROM employees\nWHERE salary BETWEEN 3500 AND 5000;\n```\n\n이것은 `salary >= 3500 AND salary <= 5000` 과 완전히 같습니다. **BETWEEN은 양 끝 값을 포함**한다는 점이 중요합니다(3500과 5000도 포함). 결과: 박민수(5000), 정수진(3500), 최지훈(3800), 강다연(4000), 임재현(4800).\n\n## 목록으로 검색 — IN\n\n'영업부(1) 또는 마케팅부(4)'처럼 여러 값 중 하나와 일치하는지 볼 때, OR를 반복하는 대신 **IN**을 씁니다.\n\n```sql\nSELECT emp_name, dept_id FROM employees\nWHERE dept_id IN (1, 4);\n```\n\n이것은 `dept_id = 1 OR dept_id = 4` 와 같습니다. 값이 많아질수록 IN이 훨씬 간결합니다. 결과: 김철수(1), 이영희(1), 임재현(4).\n\n## 문자열도 IN으로\n\n```sql\nSELECT emp_name, position FROM employees\nWHERE position IN ('부장', '과장');\n```\n\n직급이 부장 또는 과장인 직원을 조회합니다. 문자열이므로 각 값을 따옴표로 감쌉니다.\n\n## NOT과 결합\n\n`NOT BETWEEN`, `NOT IN` 으로 반대 조건도 만들 수 있습니다.\n\n```sql\nWHERE dept_id NOT IN (1, 4)  -- 영업부·마케팅부가 아닌 직원\n```\n\n## 정리\n\nBETWEEN A AND B는 A 이상 B 이하(양 끝 포함)의 범위 검색이고, IN (값 목록)은 여러 값 중 하나와 일치하는지 보는 목록 검색입니다. 둘 다 조건을 간결하게 만들어줍니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "급여가 3500 이상 5000 이하인 직원을 조회하세요. (범위 검색 키워드)",
+      "code": "SELECT emp_name, salary FROM employees WHERE salary ______ 3500 AND 5000;",
+      "answers": ["BETWEEN"],
+      "ignoreCase": true,
+      "output": "(박민수,5000) (정수진,3500) (최지훈,3800) (강다연,4000) (임재현,4800)",
+      "explain": "BETWEEN 3500 AND 5000 은 양 끝(3500, 5000)을 포함하는 범위입니다. salary >= 3500 AND salary <= 5000 과 같습니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "영업부(1) 또는 마케팅부(4) 소속 직원을 조회하세요. (목록 검색 키워드)",
+      "code": "SELECT emp_name, dept_id FROM employees WHERE dept_id ______ (1, 4);",
+      "answers": ["IN"],
+      "ignoreCase": true,
+      "output": "(김철수,1) (이영희,1) (임재현,4)",
+      "explain": "IN (1, 4) 는 dept_id가 1 또는 4인 행을 조회합니다. dept_id = 1 OR dept_id = 4 와 같지만 더 간결합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "직급이 '부장' 또는 '과장'인 직원을 조회하세요. IN 목록의 값을 넣으세요.",
+      "code": "SELECT emp_name, position FROM employees WHERE position IN ('부장', ______);",
+      "answers": ["'과장'"],
+      "ignoreCase": true,
+      "output": "(김철수,부장) (박민수,과장) (임재현,과장)",
+      "explain": "IN 목록의 문자열도 각각 따옴표로 감쌉니다. '부장', '과장' 처럼요."
+    },
+    {
+      "id": "fb4",
+      "prompt": "영업부(1)·마케팅부(4)가 '아닌' 직원을 조회하세요. (부정 목록 검색)",
+      "code": "SELECT emp_name, dept_id FROM employees WHERE dept_id ______ IN (1, 4);",
+      "answers": ["NOT"],
+      "ignoreCase": true,
+      "output": "박민수, 정수진, 최지훈(개발부), 강다연, 윤서연(인사부)",
+      "explain": "NOT IN (1, 4) 는 dept_id가 1도 4도 아닌 직원을 조회합니다. 개발부·인사부 직원이 나옵니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "BETWEEN을 쓸 때 최솟값과 최댓값을 잇는 키워드는?",
+      "code": "WHERE salary BETWEEN 3500 ______ 5000",
+      "answers": ["AND"],
+      "ignoreCase": true,
+      "output": "3500 이상 5000 이하 범위가 지정된다",
+      "explain": "BETWEEN 최솟값 AND 최댓값 형태로 씁니다. 사이를 AND로 잇습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "`salary BETWEEN 3500 AND 5000` 과 같은 의미의 조건은?",
+        "options": [
+          "salary > 3500 AND salary < 5000",
+          "salary >= 3500 AND salary <= 5000",
+          "salary = 3500 OR salary = 5000",
+          "salary IN (3500, 5000)"
+        ],
+        "answer": 1,
+        "explain": "BETWEEN은 양 끝 값을 포함합니다. 따라서 >= 3500 AND <= 5000 과 같습니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "BETWEEN에 대한 설명으로 옳은 것은?",
+        "options": [
+          "양 끝 값을 포함하지 않는다",
+          "양 끝 값을 포함한다",
+          "최솟값만 포함한다",
+          "최댓값만 포함한다"
+        ],
+        "answer": 1,
+        "explain": "BETWEEN A AND B는 A와 B를 모두 포함하는 범위입니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`dept_id IN (1, 4)` 와 같은 의미의 조건은?",
+        "options": [
+          "dept_id = 1 AND dept_id = 4",
+          "dept_id = 1 OR dept_id = 4",
+          "dept_id BETWEEN 1 AND 4",
+          "dept_id != 1 AND dept_id != 4"
+        ],
+        "answer": 1,
+        "explain": "IN (1, 4) 는 값이 1 또는 4인 행을 조회하므로 dept_id = 1 OR dept_id = 4 와 같습니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "IN을 사용하는 것이 OR 반복보다 나은 점은?",
+        "options": [
+          "결과가 다르게 나와서",
+          "값이 많을 때 조건을 간결하게 쓸 수 있어서",
+          "IN이 항상 더 빠르기만 해서",
+          "OR는 문자열을 못 써서"
+        ],
+        "answer": 1,
+        "explain": "IN은 여러 값을 목록으로 간결하게 표현합니다. OR를 여러 번 반복하는 것보다 읽기 쉽습니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "영업부(1)·마케팅부(4)가 아닌 직원을 조회하는 조건은?",
+        "options": [
+          "dept_id IN (1, 4)",
+          "dept_id NOT IN (1, 4)",
+          "dept_id BETWEEN 1 AND 4",
+          "NOT dept_id = 1"
+        ],
+        "answer": 1,
+        "explain": "NOT IN (1, 4) 는 값이 1도 4도 아닌 행을 조회합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "BETWEEN은 숫자에만 쓰나요?", "a": "날짜에도 자주 씁니다. 예: hire_date BETWEEN '2018-01-01' AND '2020-12-31'. 문자열 범위도 가능하지만 숫자·날짜에 주로 씁니다." },
+    { "q": "IN 목록에 값을 몇 개까지 넣을 수 있나요?", "a": "실무상 수백~수천 개도 가능합니다. 다만 너무 많으면 가독성과 성능이 떨어지니, 그런 경우 서브쿼리(뒤 트랙)를 쓰기도 합니다." },
+    { "q": "BETWEEN의 순서를 바꿔도 되나요?", "a": "아니요. BETWEEN 작은값 AND 큰값 순서로 써야 합니다. 큰값을 앞에 쓰면 결과가 비어버립니다." }
+  ]
+}

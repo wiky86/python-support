@@ -29,7 +29,7 @@ export function FillInBlankList({
 
   const handleCheck = (item: FillInBlankType) => {
     const input = userInputs[item.id] || "";
-    const isCorrect = checkFillInBlank(input, item.answers);
+    const isCorrect = checkFillInBlank(input, item.answers, item.ignoreCase);
 
     const nextResults = { ...results, [item.id]: isCorrect };
     setResults(nextResults);

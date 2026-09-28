@@ -1,0 +1,23 @@
+{
+  "id": "track2",
+  "order": 2,
+  "title": "데이터 조회 기초 — 조건 검색",
+  "description": "WHERE로 원하는 조건의 데이터만 골라내는 법을 배웁니다. 비교·논리 연산자, 범위(BETWEEN), 목록(IN), 패턴(LIKE), NULL 처리, 중복 제거(DISTINCT)까지 조회의 핵심을 익힙니다.",
+  "topicOrder": [
+    "track2.where-basic",
+    "track2.operators",
+    "track2.between-in",
+    "track2.like",
+    "track2.null",
+    "track2.distinct"
+  ],
+  "topicFiles": [
+    "topics/t1-where-basic.json",
+    "topics/t2-operators.json",
+    "topics/t3-between-in.json",
+    "topics/t4-like.json",
+    "topics/t5-null.json",
+    "topics/t6-distinct.json"
+  ],
+  "projectFile": "project.json"
+}

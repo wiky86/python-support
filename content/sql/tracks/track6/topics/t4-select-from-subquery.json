@@ -1,0 +1,119 @@
+{
+  "id": "track6.select-from-subquery",
+  "trackId": "track6",
+  "order": 4,
+  "title": "SELECT·FROM 절의 서브쿼리",
+  "content": "## SELECT 절 서브쿼리 — 결과에 값 더하기\n\n서브쿼리를 SELECT 절에 넣으면, 조회 결과에 **계산된 값 하나를 열로 추가**할 수 있습니다.\n\n```sql\nSELECT emp_name, salary,\n       (SELECT ROUND(AVG(salary)) FROM employees) AS 전체평균\nFROM employees;\n```\n\n각 직원 행 옆에 '전체 평균 급여'(약 4163)를 함께 표시합니다. 이러면 '이 직원이 평균과 얼마나 차이 나는지'를 눈으로 비교하기 좋습니다. SELECT 절 서브쿼리는 보통 값 하나(스칼라)를 반환해야 합니다.\n\n## FROM 절 서브쿼리 — 임시 테이블처럼\n\n서브쿼리를 FROM 절에 넣으면, 그 **결과를 하나의 임시 테이블처럼** 사용할 수 있습니다. '집계한 결과를 다시 조회'할 때 유용합니다.\n\n```sql\nSELECT *\nFROM (SELECT dept_id, ROUND(AVG(salary)) AS avg_sal\n      FROM employees\n      GROUP BY dept_id) AS dept_avg\nWHERE dept_avg.avg_sal >= 4000;\n```\n\n- 안쪽 서브쿼리가 '부서별 평균 급여' 표를 만듭니다.\n- 바깥 쿼리는 그 표를 `dept_avg`라는 임시 테이블로 보고, 평균이 4000 이상인 부서만 조회합니다.\n\n결과: 영업부(4600), 개발부(4100), 마케팅부(4800).\n\n## FROM 서브쿼리에는 별칭 필수\n\nFROM 절 서브쿼리는 **반드시 별칭**을 붙여야 합니다(위의 `AS dept_avg`). 임시 테이블에 이름을 줘야 바깥에서 참조할 수 있기 때문입니다.\n\n## HAVING 대신 FROM 서브쿼리?\n\n'부서별 평균이 4000 이상'은 HAVING으로도 됩니다(`GROUP BY dept_id HAVING AVG(salary) >= 4000`). FROM 서브쿼리는 집계 결과를 한 번 더 가공하거나, 여러 단계로 나눠 생각할 때 유용합니다. 상황에 맞게 고르면 됩니다.\n\n## 정리\n\nSELECT 절 서브쿼리는 결과에 계산 값 하나를 열로 추가하고, FROM 절 서브쿼리는 서브쿼리 결과를 임시 테이블처럼 사용합니다. FROM 서브쿼리에는 별칭이 반드시 필요합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "각 직원 옆에 전체 평균 급여를 함께 표시하세요. SELECT 절에 넣을 서브쿼리의 집계 함수를 넣으세요.",
+      "code": "SELECT emp_name, salary, (SELECT ROUND(______(salary)) FROM employees) AS 전체평균 FROM employees;",
+      "answers": ["AVG"],
+      "ignoreCase": true,
+      "output": "(김철수,6000,4163) (이영희,3200,4163) ... 모든 행에 전체평균 4163",
+      "explain": "SELECT 절 서브쿼리로 전체 평균(약 4163)을 계산해 각 행 옆에 열로 추가합니다. 개별 급여와 평균을 나란히 비교할 수 있습니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "부서별 평균 급여 표를 임시 테이블로 만들어 조회하려 합니다. 서브쿼리를 넣는 절을 완성하세요.",
+      "code": "SELECT * ______ (SELECT dept_id, ROUND(AVG(salary)) AS avg_sal FROM employees GROUP BY dept_id) AS dept_avg;",
+      "answers": ["FROM"],
+      "ignoreCase": true,
+      "output": "부서별 평균 급여 표 전체",
+      "explain": "FROM 절에 서브쿼리를 넣으면 그 결과를 임시 테이블(dept_avg)로 사용합니다. 집계 결과를 다시 조회할 때 유용합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "FROM 절 서브쿼리에 붙이는 임시 테이블 이름(별칭)을 넣으세요.",
+      "code": "SELECT * FROM (SELECT dept_id, ROUND(AVG(salary)) AS avg_sal FROM employees GROUP BY dept_id) AS ______ WHERE avg_sal >= 4000;",
+      "answers": ["dept_avg"],
+      "ignoreCase": true,
+      "output": "평균 4000 이상 부서: 영업(4600) 개발(4100) 마케팅(4800)",
+      "explain": "FROM 서브쿼리에는 별칭(dept_avg)이 반드시 필요합니다. 임시 테이블에 이름을 줘야 바깥에서 참조·필터할 수 있습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "FROM 절 서브쿼리에 '반드시' 붙여야 하는 것은?",
+      "code": "FROM (SELECT ...) 서브쿼리에 반드시 필요한 것 = ______",
+      "answers": ["별칭", "alias", "이름"],
+      "ignoreCase": true,
+      "output": "별칭 (임시 테이블 이름)",
+      "explain": "FROM 절 서브쿼리는 임시 테이블이므로 별칭(이름)이 반드시 필요합니다. 없으면 오류가 납니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "위 FROM 서브쿼리 결과에서 평균이 4000 이상인 부서만 남기는 조건을 완성하세요.",
+      "code": "SELECT * FROM (SELECT dept_id, ROUND(AVG(salary)) AS avg_sal FROM employees GROUP BY dept_id) AS t WHERE t.avg_sal >= ______;",
+      "answers": ["4000"],
+      "ignoreCase": true,
+      "output": "(1,4600) (2,4100) (4,4800)",
+      "explain": "임시 테이블 t에 대해 WHERE t.avg_sal >= 4000 으로 필터합니다. 인사부(3500)는 제외됩니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "SELECT 절에 서브쿼리를 넣으면?",
+        "options": [
+          "테이블이 삭제된다",
+          "조회 결과에 계산된 값을 열로 추가할 수 있다",
+          "정렬만 된다",
+          "행이 사라진다"
+        ],
+        "answer": 1,
+        "explain": "SELECT 절 서브쿼리로 전체 평균 같은 계산 값을 각 행 옆에 열로 추가할 수 있습니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "FROM 절 서브쿼리의 역할은?",
+        "options": [
+          "서브쿼리 결과를 임시 테이블처럼 사용",
+          "테이블을 영구 생성",
+          "행을 삭제",
+          "인덱스를 만든다"
+        ],
+        "answer": 0,
+        "explain": "FROM 절 서브쿼리는 그 결과를 임시 테이블처럼 다뤄, 다시 조회·필터할 수 있게 합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "FROM 절 서브쿼리에 반드시 필요한 것은?",
+        "options": ["GROUP BY", "별칭(임시 테이블 이름)", "ORDER BY", "DISTINCT"],
+        "answer": 1,
+        "explain": "FROM 서브쿼리는 임시 테이블이라 별칭이 반드시 필요합니다. 없으면 오류가 납니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "SELECT 절 서브쿼리는 보통 몇 개의 값을 반환해야 하나?",
+        "options": ["여러 개", "값 하나(스칼라)", "0개", "제한 없음"],
+        "answer": 1,
+        "explain": "SELECT 절에서 열로 쓰는 서브쿼리는 보통 값 하나(스칼라)를 반환해야 합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "'부서별 평균이 4000 이상'을 구하는 방법으로 옳지 않은 것은?",
+        "options": [
+          "GROUP BY dept_id HAVING AVG(salary) >= 4000",
+          "FROM 서브쿼리로 부서별 평균 표를 만든 뒤 WHERE로 필터",
+          "WHERE AVG(salary) >= 4000 을 그냥 쓴다",
+          "둘 다(HAVING, FROM 서브쿼리) 가능"
+        ],
+        "answer": 2,
+        "explain": "WHERE에는 집계 함수를 직접 못 씁니다. HAVING을 쓰거나 FROM 서브쿼리로 집계 결과를 만든 뒤 WHERE로 걸러야 합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "FROM 서브쿼리는 언제 쓰면 좋나요?", "a": "집계한 결과를 한 번 더 가공·필터하거나, 복잡한 로직을 여러 단계로 나눠 생각할 때 유용합니다. 단순한 그룹 조건이면 HAVING이 더 간단합니다." },
+    { "q": "SELECT 절 서브쿼리가 각 행마다 실행되면 느리지 않나요?", "a": "바깥 행과 무관한 서브쿼리(전체 평균 등)는 대부분 한 번만 계산됩니다. 바깥 행마다 달라지는 상관 서브쿼리는 행마다 평가될 수 있어 주의가 필요합니다." },
+    { "q": "FROM 서브쿼리를 여러 개 조인할 수도 있나요?", "a": "네. 각각에 별칭을 주면 임시 테이블처럼 서로 조인할 수 있습니다. 복잡해지면 뒤에 배울 CTE(WITH)로 정리하면 읽기 좋습니다." }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "_comment": "SQL 과목 전체가 공유하는 예제 데이터베이스(회사 조직). 모든 트랙의 빈칸·퀴즈·프로젝트는 이 스키마와 데이터를 전제로 한다. MySQL 기준.",
+  "database": "company",
+  "tables": {
+    "departments": {
+      "description": "부서 정보",
+      "columns": [
+        { "name": "dept_id", "type": "INT", "key": "PK", "desc": "부서 번호" },
+        { "name": "dept_name", "type": "VARCHAR(50)", "desc": "부서 이름" },
+        { "name": "location", "type": "VARCHAR(50)", "desc": "근무지" }
+      ],
+      "rows": [
+        [1, "영업부", "서울"],
+        [2, "개발부", "서울"],
+        [3, "인사부", "부산"],
+        [4, "마케팅부", "서울"]
+      ]
+    },
+    "employees": {
+      "description": "직원 정보",
+      "columns": [
+        { "name": "emp_id", "type": "INT", "key": "PK", "desc": "사원 번호" },
+        { "name": "emp_name", "type": "VARCHAR(50)", "desc": "이름" },
+        { "name": "dept_id", "type": "INT", "key": "FK", "desc": "소속 부서(departments.dept_id)" },
+        { "name": "position", "type": "VARCHAR(30)", "desc": "직급" },
+        { "name": "salary", "type": "INT", "desc": "월급(만원 단위 아님, 실제 급여 숫자)" },
+        { "name": "hire_date", "type": "DATE", "desc": "입사일" },
+        { "name": "manager_id", "type": "INT", "desc": "직속 상사(employees.emp_id), 없으면 NULL" }
+      ],
+      "rows": [
+        [1, "김철수", 1, "부장", 6000, "2015-03-01", null],
+        [2, "이영희", 1, "사원", 3200, "2020-06-15", 1],
+        [3, "박민수", 2, "과장", 5000, "2017-09-01", null],
+        [4, "정수진", 2, "사원", 3500, "2021-01-10", 3],
+        [5, "최지훈", 2, "사원", 3800, "2019-11-20", 3],
+        [6, "강다연", 3, "대리", 4000, "2018-07-05", null],
+        [7, "윤서연", 3, "사원", 3000, "2022-02-28", 6],
+        [8, "임재현", 4, "과장", 4800, "2016-05-12", null]
+      ]
+    }
+  },
+  "ddl": "CREATE TABLE departments (\n  dept_id INT PRIMARY KEY,\n  dept_name VARCHAR(50),\n  location VARCHAR(50)\n);\n\nCREATE TABLE employees (\n  emp_id INT PRIMARY KEY,\n  emp_name VARCHAR(50),\n  dept_id INT,\n  position VARCHAR(30),\n  salary INT,\n  hire_date DATE,\n  manager_id INT,\n  FOREIGN KEY (dept_id) REFERENCES departments(dept_id)\n);"
+}

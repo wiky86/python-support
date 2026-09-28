@@ -1,0 +1,124 @@
+{
+  "id": "track4.count-null",
+  "trackId": "track4",
+  "order": 2,
+  "title": "COUNT의 세 가지 형태와 NULL",
+  "content": "## COUNT는 세는 대상에 따라 다르다\n\nCOUNT는 무엇을 세느냐에 따라 세 가지 형태가 있고, **NULL을 다루는 방식이 다릅니다**. 이 차이를 아는 것이 이 토픽의 핵심입니다.\n\n## COUNT(*) — 모든 행\n\n```sql\nSELECT COUNT(*) FROM employees;\n```\n\n`COUNT(*)` 는 **NULL 여부와 상관없이 모든 행**을 셉니다. 결과: 8. 단순히 '몇 행인가'를 셀 때 씁니다.\n\n## COUNT(열) — NULL 제외\n\n```sql\nSELECT COUNT(manager_id) FROM employees;\n```\n\n`COUNT(열)` 은 그 **열이 NULL이 아닌 행만** 셉니다. manager_id가 NULL인 직원(김철수·박민수·강다연·임재현 4명)은 제외되어 결과는 4입니다. '상사가 있는 직원 수'를 세는 셈입니다.\n\n이 차이가 중요합니다. `COUNT(*)`는 8, `COUNT(manager_id)`는 4 — 같은 테이블인데 NULL 때문에 결과가 다릅니다.\n\n## COUNT(DISTINCT 열) — 중복 제외\n\n```sql\nSELECT COUNT(DISTINCT dept_id) FROM employees;\n```\n\n`COUNT(DISTINCT 열)` 은 그 열의 **고유한 값의 개수**를 셉니다. 직원들이 속한 부서 종류의 수(1,2,3,4 → 4개)를 셉니다. '몇 개의 서로 다른 부서에 직원이 있는가'를 알 때 씁니다.\n\n## 다른 집계 함수와 NULL\n\nSUM·AVG·MAX·MIN도 **NULL은 무시**하고 계산합니다. 예를 들어 AVG는 NULL이 아닌 값들의 평균이라, NULL을 0으로 치지 않습니다. 이 점이 계산 결과에 영향을 주니 알아둬야 합니다.\n\n## 정리\n\nCOUNT(*)는 모든 행, COUNT(열)은 NULL이 아닌 행, COUNT(DISTINCT 열)은 고유 값의 개수를 셉니다. 집계 함수는 대체로 NULL을 무시하고 계산합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "NULL 여부와 상관없이 전체 행 수를 세세요. (모든 행을 세는 형태)",
+      "code": "SELECT COUNT(______) FROM employees;",
+      "answers": ["*"],
+      "ignoreCase": true,
+      "output": "8",
+      "explain": "COUNT(*)는 NULL을 포함해 모든 행을 셉니다. 전체 8명입니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "manager_id가 NULL이 아닌 행(상사가 있는 직원)만 세세요. COUNT에 열 이름을 넣으세요.",
+      "code": "SELECT COUNT(______) FROM employees;",
+      "answers": ["manager_id"],
+      "ignoreCase": true,
+      "output": "4",
+      "explain": "COUNT(manager_id)는 그 열이 NULL이 아닌 행만 셉니다. 상사가 있는 4명이 세어집니다(NULL인 4명 제외)."
+    },
+    {
+      "id": "fb3",
+      "prompt": "직원들이 속한 '서로 다른 부서의 수'를 세세요. 중복을 제외하는 키워드를 넣으세요.",
+      "code": "SELECT COUNT(______ dept_id) FROM employees;",
+      "answers": ["DISTINCT"],
+      "ignoreCase": true,
+      "output": "4",
+      "explain": "COUNT(DISTINCT dept_id)는 고유한 부서 번호의 개수를 셉니다. 1,2,3,4 → 4개입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "서로 다른 직급의 종류가 몇 개인지 세세요. (position 열)",
+      "code": "SELECT COUNT(DISTINCT ______) FROM employees;",
+      "answers": ["position"],
+      "ignoreCase": true,
+      "output": "4 (부장, 과장, 대리, 사원)",
+      "explain": "COUNT(DISTINCT position)은 고유한 직급 수를 셉니다. 부장·과장·대리·사원 → 4개입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "COUNT(*)와 결과가 다를 수 있는 이유가 되는, '값이 없음'을 나타내는 것은?",
+      "code": "COUNT(열)은 이것이 아닌 행만 센다: ______",
+      "answers": ["NULL"],
+      "ignoreCase": true,
+      "output": "NULL (COUNT(열)은 NULL이 아닌 행만 센다)",
+      "explain": "COUNT(열)은 NULL이 아닌 행만 셉니다. 그래서 NULL이 있는 열은 COUNT(*)보다 결과가 작을 수 있습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "COUNT(*)와 COUNT(manager_id)의 결과가 다른 이유는?",
+        "options": [
+          "COUNT(*)가 더 느려서",
+          "COUNT(manager_id)는 manager_id가 NULL인 행을 세지 않아서",
+          "둘은 원래 항상 같아서",
+          "manager_id가 문자열이라서"
+        ],
+        "answer": 1,
+        "explain": "COUNT(*)는 모든 행, COUNT(열)은 그 열이 NULL이 아닌 행만 셉니다. NULL이 있으면 결과가 달라집니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "고유한 값의 개수를 세는 형태는?",
+        "options": [
+          "COUNT(*)",
+          "COUNT(열)",
+          "COUNT(DISTINCT 열)",
+          "COUNT(NULL)"
+        ],
+        "answer": 2,
+        "explain": "COUNT(DISTINCT 열)이 중복을 제외한 고유 값의 개수를 셉니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "manager_id가 NULL인 직원이 4명일 때, `COUNT(manager_id)` 의 결과는? (전체 8명)",
+        "options": ["8", "4", "0", "12"],
+        "answer": 1,
+        "explain": "COUNT(manager_id)는 NULL이 아닌 행만 세므로, 상사가 있는 4명만 세어집니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "AVG(salary)가 NULL을 다루는 방식으로 옳은 것은?",
+        "options": [
+          "NULL을 0으로 쳐서 평균을 낮춘다",
+          "NULL은 무시하고 값이 있는 행들로만 평균을 낸다",
+          "NULL이 하나라도 있으면 결과가 NULL이 된다",
+          "NULL을 최댓값으로 친다"
+        ],
+        "answer": 1,
+        "explain": "집계 함수는 대체로 NULL을 무시합니다. AVG는 NULL이 아닌 값들의 평균을 냅니다(NULL을 0으로 치지 않음)."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "'몇 개의 서로 다른 부서에 직원이 있는가'를 구하는 쿼리는?",
+        "options": [
+          "SELECT COUNT(*) FROM employees;",
+          "SELECT COUNT(dept_id) FROM employees;",
+          "SELECT COUNT(DISTINCT dept_id) FROM employees;",
+          "SELECT dept_id FROM employees;"
+        ],
+        "answer": 2,
+        "explain": "COUNT(DISTINCT dept_id)가 고유한 부서 수를 셉니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "COUNT(*)와 COUNT(1)은 같나요?", "a": "실질적으로 같은 결과(모든 행 수)를 냅니다. 성능도 현대 DBMS에서는 거의 차이가 없습니다. 관례적으로 COUNT(*)를 많이 씁니다." },
+    { "q": "COUNT(열)에서 열에 NULL이 하나도 없으면?", "a": "그러면 COUNT(*)와 결과가 같습니다. NULL이 있을 때만 차이가 납니다." },
+    { "q": "SUM에 NULL이 섞이면 합계가 NULL이 되나요?", "a": "아닙니다. SUM은 NULL을 무시하고 나머지 값만 더합니다. 단, 모든 값이 NULL이면 SUM 결과가 NULL이 됩니다." }
+  ]
+}

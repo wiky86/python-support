@@ -1,0 +1,124 @@
+{
+  "id": "track5.outer-join",
+  "trackId": "track5",
+  "order": 4,
+  "title": "LEFT JOIN — 짝이 없어도 포함하기",
+  "content": "## INNER JOIN의 한계\n\nINNER JOIN은 양쪽에 모두 짝이 있는 행만 보여줍니다. 그런데 '상사가 없는 직원도 포함해서 상사 이름을 보고 싶다'거나 '직원이 한 명도 없는 부서까지 보고 싶다'면, 짝이 없는 행도 남겨야 합니다. 이때 **LEFT JOIN**을 씁니다.\n\n## LEFT JOIN\n\n```sql\nSELECT e.emp_name, m.emp_name AS manager\nFROM employees e\nLEFT JOIN employees m\nON e.manager_id = m.emp_id;\n```\n\n**LEFT JOIN**은 왼쪽 테이블(FROM에 쓴 e)의 **모든 행을 유지**하고, 오른쪽에 짝이 있으면 붙이고 없으면 **NULL로 채웁니다**.\n\n위 쿼리는 각 직원의 상사 이름을 붙이는데, 상사가 없는 직원(manager_id가 NULL)도 결과에 남고 manager 자리는 NULL이 됩니다. 김철수는 상사가 없어 manager가 NULL, 이영희는 상사가 김철수로 나옵니다.\n\n만약 INNER JOIN이었다면 상사가 없는 직원 4명이 아예 빠졌을 것입니다. LEFT JOIN은 이들을 유지합니다.\n\n## LEFT / RIGHT\n\n- **LEFT JOIN**: 왼쪽(FROM) 테이블의 모든 행을 유지.\n- **RIGHT JOIN**: 오른쪽(JOIN) 테이블의 모든 행을 유지.\n\n실무에서는 LEFT JOIN을 훨씬 많이 씁니다. RIGHT JOIN이 필요하면 테이블 순서를 바꿔 LEFT JOIN으로 바꿔 쓸 수 있기 때문입니다.\n\n## 짝 없는 행 찾기\n\nLEFT JOIN 후 오른쪽이 NULL인 행을 찾으면 '짝이 없는 행'만 골라낼 수 있습니다.\n\n```sql\nSELECT e.emp_name\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.emp_id\nWHERE m.emp_id IS NULL;\n```\n\n상사가 없는 직원(김철수·박민수·강다연·임재현)만 조회됩니다.\n\n## 정리\n\nLEFT JOIN은 왼쪽 테이블의 모든 행을 유지하고, 오른쪽에 짝이 없으면 NULL로 채웁니다. INNER JOIN이 짝 있는 행만 남기는 것과 대비됩니다. 짝 없는 행을 찾을 때는 LEFT JOIN 후 IS NULL 조건을 씁니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "왼쪽 테이블의 모든 행을 유지하는 조인을 넣으세요. (짝 없으면 NULL)",
+      "code": "SELECT e.emp_name, m.emp_name AS manager FROM employees e ______ JOIN employees m ON e.manager_id = m.emp_id;",
+      "answers": ["LEFT"],
+      "ignoreCase": true,
+      "output": "모든 직원이 나오고, 상사 없는 직원은 manager가 NULL",
+      "explain": "LEFT JOIN은 왼쪽(employees e)의 모든 행을 유지합니다. 상사가 없는 직원도 남고 manager 자리는 NULL이 됩니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "INNER JOIN과 달리 LEFT JOIN에서 오른쪽에 짝이 없으면 그 자리는 무엇으로 채워지나요?",
+      "code": "LEFT JOIN에서 오른쪽 짝이 없으면 그 값은 ______",
+      "answers": ["NULL"],
+      "ignoreCase": true,
+      "output": "NULL로 채워진다",
+      "explain": "LEFT JOIN은 왼쪽 행을 유지하되, 오른쪽에 대응이 없으면 그 열을 NULL로 채웁니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "상사가 없는 직원만 골라내려 합니다. LEFT JOIN 후 오른쪽이 NULL인 행을 찾는 조건을 완성하세요.",
+      "code": "SELECT e.emp_name FROM employees e LEFT JOIN employees m ON e.manager_id = m.emp_id WHERE m.emp_id ______ NULL;",
+      "answers": ["IS"],
+      "ignoreCase": true,
+      "output": "김철수, 박민수, 강다연, 임재현 (상사 없는 직원)",
+      "explain": "LEFT JOIN 후 오른쪽(m) 열이 NULL이면 짝이 없다는 뜻입니다. WHERE m.emp_id IS NULL로 상사 없는 직원만 골라냅니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "오른쪽 테이블의 모든 행을 유지하는 조인의 이름은?",
+      "code": "오른쪽 테이블 모든 행 유지 = ______ JOIN",
+      "answers": ["RIGHT"],
+      "ignoreCase": true,
+      "output": "RIGHT JOIN (오른쪽 테이블 기준)",
+      "explain": "RIGHT JOIN은 오른쪽(JOIN에 쓴) 테이블의 모든 행을 유지합니다. 실무에서는 테이블 순서를 바꿔 LEFT JOIN을 더 자주 씁니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "양쪽에 짝이 있는 행만 남기는(짝 없으면 제외) 조인의 이름은?",
+      "code": "양쪽 짝 있는 행만 = ______ JOIN",
+      "answers": ["INNER"],
+      "ignoreCase": true,
+      "output": "INNER JOIN (교집합)",
+      "explain": "INNER JOIN은 양쪽에 모두 짝이 있는 행만 남깁니다. LEFT JOIN(왼쪽 전부 유지)과 대비됩니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "LEFT JOIN의 특징으로 옳은 것은?",
+        "options": [
+          "양쪽에 짝이 있는 행만 남긴다",
+          "왼쪽 테이블의 모든 행을 유지하고 오른쪽 짝이 없으면 NULL",
+          "오른쪽 테이블만 남긴다",
+          "두 테이블을 삭제한다"
+        ],
+        "answer": 1,
+        "explain": "LEFT JOIN은 왼쪽(FROM) 테이블의 모든 행을 유지하고, 오른쪽에 짝이 없으면 NULL로 채웁니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "INNER JOIN과 LEFT JOIN의 가장 큰 차이는?",
+        "options": [
+          "속도만 다르다",
+          "INNER는 짝 있는 행만, LEFT는 왼쪽 행을 짝이 없어도 유지",
+          "결과가 항상 같다",
+          "LEFT는 조건을 못 건다"
+        ],
+        "answer": 1,
+        "explain": "INNER JOIN은 양쪽 짝이 있는 행만, LEFT JOIN은 왼쪽 행을 모두 유지(오른쪽 없으면 NULL)합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "LEFT JOIN에서 오른쪽에 짝이 없는 자리는 무엇으로 채워지나?",
+        "options": ["0", "빈 문자열", "NULL", "오류"],
+        "answer": 2,
+        "explain": "짝이 없으면 오른쪽 열은 NULL로 채워집니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "'짝이 없는 행'만 골라내려면 LEFT JOIN 후 어떤 조건을 쓰나?",
+        "options": [
+          "WHERE 오른쪽열 = 0",
+          "WHERE 오른쪽열 IS NULL",
+          "WHERE 오른쪽열 IS NOT NULL",
+          "WHERE 오른쪽열 = ''"
+        ],
+        "answer": 1,
+        "explain": "LEFT JOIN 후 오른쪽 열이 NULL이면 짝이 없다는 뜻이므로, WHERE ... IS NULL로 골라냅니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "실무에서 RIGHT JOIN보다 LEFT JOIN을 더 많이 쓰는 이유로 적절한 것은?",
+        "options": [
+          "RIGHT JOIN은 오류가 나서",
+          "테이블 순서를 바꾸면 RIGHT를 LEFT로 표현할 수 있어서",
+          "RIGHT JOIN은 느려서만",
+          "둘은 완전히 다른 결과라서"
+        ],
+        "answer": 1,
+        "explain": "RIGHT JOIN이 필요한 경우도 테이블 순서를 바꾸면 LEFT JOIN으로 표현할 수 있어, 관례적으로 LEFT JOIN을 주로 씁니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "OUTER JOIN이라는 말도 들었는데요?", "a": "LEFT JOIN은 정식으로는 LEFT OUTER JOIN입니다. OUTER는 생략 가능해서 보통 LEFT JOIN이라고 씁니다. RIGHT도 마찬가지입니다." },
+    { "q": "FULL OUTER JOIN도 있나요?", "a": "양쪽 모두의 짝 없는 행까지 다 포함하는 FULL OUTER JOIN도 있지만, MySQL은 직접 지원하지 않아 우회 기법을 씁니다. 입문 단계에서는 INNER와 LEFT를 확실히 익히면 충분합니다." },
+    { "q": "언제 INNER, 언제 LEFT를 쓰나요?", "a": "양쪽에 다 있는 데이터만 필요하면 INNER, 한쪽(주로 왼쪽) 데이터를 빠짐없이 보되 짝이 없어도 유지하고 싶으면 LEFT를 씁니다." }
+  ]
+}

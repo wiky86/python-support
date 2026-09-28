@@ -2,12 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Track, Project, BadgeDefinition } from "@/types/content";
+import { Track, Project, BadgeDefinition, SampleDatabase } from "@/types/content";
 import { useAuth } from "@/lib/auth-context";
 import { isProjectUnlocked } from "@/lib/progress";
 import { evaluateBadges } from "@/lib/gamification";
 import { FillInBlankList } from "@/components/FillInBlank";
 import { ReportCard } from "@/components/ReportCard";
+import { SampleDbViewer } from "@/components/SampleDbViewer";
 import confetti from "canvas-confetti";
 import {
   Rocket,
@@ -30,6 +31,7 @@ interface ProjectViewProps {
   allTrackTopicsCount: Record<string, number>;
   totalTopicsCount: number;
   totalTracksCount: number;
+  sampleDb?: SampleDatabase | null;
 }
 
 export function ProjectView({
@@ -40,6 +42,7 @@ export function ProjectView({
   allTrackTopicsCount,
   totalTopicsCount,
   totalTracksCount,
+  sampleDb,
 }: ProjectViewProps) {
   const {
     progress,
@@ -187,7 +190,11 @@ export function ProjectView({
             prefetch={false}
             className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
-            {courseId === "python" ? "파이썬 데이터 분석" : "디지털 금융 이론"}
+            {courseId === "python"
+              ? "파이썬 데이터 분석"
+              : courseId === "finance"
+              ? "디지털 금융 이론"
+              : "데이터베이스 활용을 위한 SQL"}
           </Link>
           <span>/</span>
           <span className="font-semibold text-slate-700 dark:text-slate-300">
@@ -226,6 +233,11 @@ export function ProjectView({
           </Link>
         </div>
       </div>
+
+      {/* Optional Sample Database Viewer (SQL course) */}
+      {sampleDb && (
+        <SampleDbViewer sampleDb={sampleDb} defaultOpen={false} />
+      )}
 
       {/* 2. Project Intro & Dataset Scenario Card */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">

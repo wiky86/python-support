@@ -1,0 +1,114 @@
+{
+  "id": "track3.func-combine",
+  "trackId": "track3",
+  "order": 6,
+  "title": "문자열 결합(CONCAT)과 함수 종합 활용",
+  "content": "## 문자열 합치기 — CONCAT\n\n여러 값을 이어 붙여 하나의 문자열로 만들 때 **CONCAT**을 씁니다. (MySQL 기준)\n\n```sql\nSELECT CONCAT(emp_name, ' (', position, ')') FROM employees;\n```\n\n이름과 직급을 '김철수 (부장)' 형태로 합칩니다. `CONCAT(값1, 값2, ...)` 에 나열한 값들이 순서대로 이어 붙습니다. 문자열 상수(' (', ')')도 함께 넣을 수 있습니다.\n\n주의: MySQL은 문자열 결합에 `+`를 쓰지 않고 **CONCAT**을 씁니다. (`+`를 쓰면 숫자로 계산하려 합니다.)\n\n## 함수 중첩\n\n함수 안에 함수를 넣을 수 있습니다.\n\n```sql\nSELECT UPPER(SUBSTRING('sql', 1, 1));   -- 결과 S\n```\n\n먼저 SUBSTRING으로 첫 글자('s')를 뽑고, 그것을 UPPER로 대문자('S')로 바꿉니다. 안쪽 함수가 먼저 실행되고 그 결과가 바깥 함수로 전달됩니다.\n\n## 함수와 별칭 함께 쓰기\n\n함수 결과 열은 이름이 복잡하므로 별칭(AS)을 붙이면 보기 좋습니다.\n\n```sql\nSELECT CONCAT(emp_name, '님') AS 호칭 FROM employees;\n```\n\n결과 열 제목이 '호칭'으로 표시됩니다.\n\n## 함수와 계산 종합 예\n\n```sql\nSELECT emp_name,\n       CONCAT(ROUND(salary * 1.1), '만원') AS 인상후급여\nFROM employees;\n```\n\n급여를 10% 인상해 반올림하고, 뒤에 '만원'을 붙여 표시합니다. 여러 함수를 조합해 원하는 형태의 결과를 만드는 것이 이 토픽의 핵심입니다.\n\n## 정리\n\nCONCAT으로 여러 값을 이어 붙이고(MySQL은 +가 아니라 CONCAT), 함수를 중첩하거나 별칭과 조합해 원하는 형태의 결과를 만듭니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "이름과 직급을 '김철수 (부장)' 형태로 합쳐 조회하세요. (문자열 결합 함수)",
+      "code": "SELECT ______(emp_name, ' (', position, ')') FROM employees;",
+      "answers": ["CONCAT"],
+      "ignoreCase": true,
+      "output": "김철수 (부장), 이영희 (사원), ...",
+      "explain": "CONCAT은 나열한 값들을 순서대로 이어 붙입니다. 문자열 상수 ' (' 와 ')' 도 함께 넣어 원하는 형태를 만듭니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "이름 뒤에 '님'을 붙여 호칭을 만드세요. CONCAT에 넣을 문자열을 완성하세요.",
+      "code": "SELECT CONCAT(emp_name, ______) AS 호칭 FROM employees;",
+      "answers": ["'님'"],
+      "ignoreCase": true,
+      "output": "김철수님, 이영희님, ...",
+      "explain": "CONCAT(emp_name, '님')은 이름 뒤에 '님'을 붙입니다. 문자열 상수는 따옴표로 감쌉니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "'sql'의 첫 글자를 뽑아 대문자로 바꾸세요. (바깥쪽 함수를 넣으세요)",
+      "code": "SELECT ______(SUBSTRING('sql', 1, 1));",
+      "answers": ["UPPER"],
+      "ignoreCase": true,
+      "output": "S",
+      "explain": "함수 중첩입니다. 안쪽 SUBSTRING이 첫 글자 's'를 뽑고, 바깥 UPPER가 이를 'S'로 바꿉니다. 안쪽이 먼저 실행됩니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "함수 결과 열에 '호칭'이라는 별칭을 붙이세요. (별칭 키워드)",
+      "code": "SELECT CONCAT(emp_name, '님') ______ 호칭 FROM employees;",
+      "answers": ["AS"],
+      "ignoreCase": true,
+      "output": "열 제목이 '호칭'으로 표시됨",
+      "explain": "함수 결과 열은 이름이 복잡하므로 AS로 별칭을 붙이면 보기 좋습니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "10% 인상해 반올림한 급여 뒤에 '만원'을 붙이세요. 반올림 함수를 넣으세요.",
+      "code": "SELECT emp_name, CONCAT(______(salary * 1.1), '만원') AS 인상후급여 FROM employees;",
+      "answers": ["ROUND"],
+      "ignoreCase": true,
+      "output": "김철수 6600만원, 이영희 3520만원, ...",
+      "explain": "여러 함수를 조합한 예입니다. salary*1.1로 인상 → ROUND로 반올림 → CONCAT으로 '만원'을 붙입니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "MySQL에서 여러 문자열을 이어 붙이는 함수는?",
+        "options": ["JOIN", "CONCAT", "MERGE", "ADD"],
+        "answer": 1,
+        "explain": "CONCAT이 문자열 결합 함수입니다. MySQL은 +로 문자열을 합치지 않습니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "MySQL에서 `SELECT 'a' + 'b'` 처럼 +로 문자열을 합치려 하면?",
+        "options": [
+          "'ab'가 나온다",
+          "문자열이 아니라 숫자로 계산하려 해서 의도와 다르다",
+          "항상 오류가 난다",
+          "'a b'가 나온다"
+        ],
+        "answer": 1,
+        "explain": "MySQL에서 +는 산술 연산자라 문자열을 숫자로 변환해 계산하려 합니다. 문자열 결합은 CONCAT을 써야 합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`UPPER(SUBSTRING('data', 1, 1))` 의 결과는?",
+        "options": ["d", "D", "data", "DATA"],
+        "answer": 1,
+        "explain": "SUBSTRING이 첫 글자 'd'를 뽑고, UPPER가 대문자 'D'로 바꿉니다. 안쪽 함수가 먼저 실행됩니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "함수가 중첩됐을 때 실행 순서는?",
+        "options": [
+          "바깥쪽 함수가 먼저",
+          "안쪽 함수가 먼저 실행되고 결과가 바깥으로 전달",
+          "동시에 실행",
+          "왼쪽부터"
+        ],
+        "answer": 1,
+        "explain": "가장 안쪽 함수가 먼저 실행되고, 그 결과가 바깥 함수의 입력이 됩니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "`CONCAT(emp_name, '님')` 을 emp_name이 '이영희'일 때 실행하면?",
+        "options": ["이영희", "님이영희", "이영희님", "이영희 님 (공백)"],
+        "answer": 2,
+        "explain": "이름 뒤에 '님'이 붙어 '이영희님'이 됩니다. 공백을 넣고 싶으면 CONCAT(emp_name, ' 님')처럼 문자열에 공백을 포함합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "CONCAT에 숫자를 넣어도 되나요?", "a": "네, 숫자도 넣을 수 있고 자동으로 문자열로 변환되어 붙습니다. 예: CONCAT(emp_name, salary) 도 동작합니다." },
+    { "q": "다른 DBMS도 CONCAT을 쓰나요?", "a": "PostgreSQL·Oracle 등은 || 연산자로도 문자열을 합칩니다(예: emp_name || '님'). MySQL은 CONCAT을 씁니다. 이 과정은 MySQL 기준입니다." },
+    { "q": "함수를 몇 겹까지 중첩할 수 있나요?", "a": "제한은 사실상 없지만, 너무 깊게 중첩하면 읽기 어려워집니다. 복잡하면 여러 단계로 나누거나 별칭을 활용해 가독성을 유지하는 것이 좋습니다." }
+  ]
+}

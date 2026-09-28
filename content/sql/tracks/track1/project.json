@@ -1,0 +1,70 @@
+{
+  "id": "track1.project",
+  "trackId": "track1",
+  "title": "회사 데이터베이스 첫 탐험",
+  "intro": "입사 첫날, 회사의 데이터베이스를 처음 열어봅니다. employees(직원)와 departments(부서) 두 테이블의 구조를 파악하고, 기본 조회로 데이터를 살펴보는 것이 오늘의 임무입니다. 트랙1에서 배운 SELECT, 열 선택, 별칭을 모두 활용해봅니다.",
+  "dataset": {
+    "description": "회사 조직 데이터베이스. employees(직원 8명), departments(부서 4개). 자세한 스키마는 sample-db 참조.",
+    "code": "-- employees: emp_id, emp_name, dept_id, position, salary, hire_date, manager_id\n-- departments: dept_id, dept_name, location\n-- 직원 8명, 부서 4개(영업부·개발부·인사부·마케팅부)"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "먼저 employees 테이블의 전체 데이터를 조회해 전체 그림을 파악하세요.",
+      "code": "SELECT ______ FROM employees;",
+      "answers": ["*"],
+      "ignoreCase": true,
+      "output": "직원 8명의 모든 열(emp_id, emp_name, dept_id, position, salary, hire_date, manager_id)이 조회된다",
+      "explain": "SELECT * FROM employees; 로 테이블 전체를 훑어보는 것이 데이터 탐색의 첫걸음입니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "부서 목록이 궁금합니다. departments 테이블의 전체 데이터를 조회하세요.",
+      "code": "SELECT * FROM ______;",
+      "answers": ["departments"],
+      "ignoreCase": true,
+      "output": "(1,영업부,서울) (2,개발부,서울) (3,인사부,부산) (4,마케팅부,서울)",
+      "explain": "departments 테이블에는 부서 4개가 있습니다. 각 부서의 번호·이름·근무지를 확인할 수 있습니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "직원의 이름과 급여만 보고 싶습니다. 두 열만 조회하세요.",
+      "code": "SELECT emp_name, ______ FROM employees;",
+      "answers": ["salary"],
+      "ignoreCase": true,
+      "output": "(김철수,6000) (이영희,3200) (박민수,5000) (정수진,3500) (최지훈,3800) (강다연,4000) (윤서연,3000) (임재현,4800)",
+      "explain": "필요한 열(emp_name, salary)만 골라 조회하면 결과가 깔끔합니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "이름·직급·급여를 순서대로 조회하세요. 가운데 빈칸에 '직급' 열을 넣으세요.",
+      "code": "SELECT emp_name, ______, salary FROM employees;",
+      "answers": ["position"],
+      "ignoreCase": true,
+      "output": "(김철수,부장,6000) (이영희,사원,3200) (박민수,과장,5000) ... (임재현,과장,4800)",
+      "explain": "position(직급)을 가운데 넣어 이름→직급→급여 순으로 조회합니다. 나열 순서가 결과 열 순서를 정합니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "보고서에 쓰기 좋게, salary 열을 '급여'라는 별칭으로 조회하세요.",
+      "code": "SELECT emp_name AS 이름, salary ______ 급여 FROM employees;",
+      "answers": ["AS"],
+      "ignoreCase": true,
+      "output": "열 제목이 '이름', '급여'로 표시되고 8명의 데이터가 조회된다",
+      "explain": "AS로 별칭을 붙이면 결과 열 제목이 보기 좋게 바뀝니다. 데이터 자체는 그대로입니다."
+    }
+  ],
+  "report": {
+    "title": "회사 데이터베이스 탐험 리포트",
+    "template": "탐험한 테이블: employees(직원 {empCount}명), departments(부서 {deptCount}개)\n부서 목록: {deptList}\n급여 범위: 최저 {minSalary} ~ 최고 {maxSalary}\n사용한 개념: {conceptsUsed}",
+    "computedValues": {
+      "empCount": 8,
+      "deptCount": 4,
+      "deptList": "영업부, 개발부, 인사부, 마케팅부",
+      "minSalary": 3000,
+      "maxSalary": 6000,
+      "conceptsUsed": "SELECT, 전체/열 조회, 별칭(AS)"
+    },
+    "conceptsUsed": ["SELECT", "전체 조회(*)", "열 선택", "별칭(AS)"]
+  }
+}

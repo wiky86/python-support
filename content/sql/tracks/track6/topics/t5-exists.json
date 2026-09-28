@@ -1,0 +1,114 @@
+{
+  "id": "track6.exists",
+  "trackId": "track6",
+  "order": 5,
+  "title": "EXISTS — 존재 여부 확인",
+  "content": "## '있는지 없는지'만 확인\n\n**EXISTS**는 서브쿼리 결과가 **한 행이라도 존재하는지**만 확인합니다. 값이 무엇인지는 상관없고, '있다/없다'만 봅니다.\n\n```sql\nSELECT d.dept_name\nFROM departments d\nWHERE EXISTS (\n  SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id\n);\n```\n\n각 부서(d)에 대해, 그 부서에 속한 직원이 **한 명이라도 있으면** 그 부서를 조회합니다. 결과: 직원이 있는 부서(우리 데이터는 모든 부서) 4개.\n\n서브쿼리의 `SELECT 1` 은 관례입니다. EXISTS는 값이 무엇인지 안 보고 '행이 있는지'만 확인하므로, 무엇을 SELECT하든 상관없어 흔히 `1`을 씁니다.\n\n## 상관 서브쿼리\n\n위 서브쿼리는 바깥 쿼리의 `d.dept_id`를 참조합니다. 이렇게 **바깥 행의 값을 참조하는 서브쿼리**를 상관 서브쿼리(correlated subquery)라고 합니다. 바깥의 각 부서마다 서브쿼리가 평가되어 '이 부서에 직원이 있나?'를 확인합니다.\n\n## NOT EXISTS\n\n```sql\nSELECT d.dept_name\nFROM departments d\nWHERE NOT EXISTS (\n  SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id\n);\n```\n\n'직원이 한 명도 없는 부서'를 찾습니다. 우리 데이터는 모든 부서에 직원이 있어 결과가 비어 있습니다(정상).\n\n## EXISTS vs IN\n\n둘 다 '존재 여부'를 확인하는 데 쓸 수 있어 비슷해 보입니다.\n\n- **IN**: 서브쿼리가 만든 '값 목록'과 비교.\n- **EXISTS**: 조건을 만족하는 행이 '있는지'만 확인.\n\n특히 서브쿼리 결과에 NULL이 섞일 수 있을 때는 NOT IN보다 **NOT EXISTS가 안전**합니다. NOT IN은 NULL 때문에 예상과 다르게 동작할 수 있기 때문입니다.\n\n## 정리\n\nEXISTS는 서브쿼리 결과 행이 존재하는지(있다/없다)만 확인합니다. 보통 바깥 행을 참조하는 상관 서브쿼리와 함께 쓰며, NOT EXISTS로 '없는 경우'를 찾습니다. NULL이 얽힌 상황에서는 NOT IN보다 안전합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "직원이 한 명이라도 있는 부서를 조회하세요. '존재 여부'를 확인하는 키워드를 넣으세요.",
+      "code": "SELECT d.dept_name FROM departments d WHERE ______ (SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id);",
+      "answers": ["EXISTS"],
+      "ignoreCase": true,
+      "output": "영업부, 개발부, 인사부, 마케팅부 (직원이 있는 부서)",
+      "explain": "EXISTS는 서브쿼리 결과 행이 하나라도 있는지 확인합니다. 각 부서에 직원이 있으면 그 부서를 조회합니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "EXISTS 서브쿼리에서 관례적으로 SELECT하는 값을 넣으세요. (값은 중요하지 않음)",
+      "code": "WHERE EXISTS (SELECT ______ FROM employees e WHERE e.dept_id = d.dept_id)",
+      "answers": ["1"],
+      "ignoreCase": true,
+      "output": "행 존재 여부만 확인 (값은 무의미)",
+      "explain": "EXISTS는 값이 아니라 '행이 있는지'만 봅니다. 그래서 관례적으로 SELECT 1 을 씁니다. 무엇을 SELECT하든 결과는 같습니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "직원이 한 명도 없는 부서를 찾으세요. 존재하지 '않음'을 확인하는 부정 키워드를 넣으세요.",
+      "code": "SELECT d.dept_name FROM departments d WHERE ______ EXISTS (SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id);",
+      "answers": ["NOT"],
+      "ignoreCase": true,
+      "output": "(빈 결과 — 모든 부서에 직원이 있음)",
+      "explain": "NOT EXISTS는 조건을 만족하는 행이 '없는' 경우를 찾습니다. 직원이 없는 부서를 찾는데, 우리 데이터는 모두 있어 결과가 빕니다(정상)."
+    },
+    {
+      "id": "fb4",
+      "prompt": "EXISTS 서브쿼리가 바깥 쿼리의 부서 번호를 참조하는 부분을 완성하세요. 바깥 테이블 별칭 d를 쓰세요.",
+      "code": "WHERE EXISTS (SELECT 1 FROM employees e WHERE e.dept_id = ______.dept_id)",
+      "answers": ["d"],
+      "ignoreCase": true,
+      "output": "각 부서(d)에 대해 소속 직원 존재 여부 확인",
+      "explain": "서브쿼리가 바깥 쿼리의 d.dept_id를 참조합니다. 이렇게 바깥 값을 참조하는 서브쿼리를 상관 서브쿼리라 합니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "서브쿼리 결과에 NULL이 섞일 수 있을 때, NOT IN보다 안전한 것은?",
+      "code": "NULL이 얽힐 때 NOT IN 대신 = NOT ______",
+      "answers": ["EXISTS"],
+      "ignoreCase": true,
+      "output": "NOT EXISTS (NULL 상황에서 안전)",
+      "explain": "NOT IN은 서브쿼리 결과에 NULL이 있으면 예상과 다르게 동작할 수 있습니다. NOT EXISTS는 이런 문제가 없어 더 안전합니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "EXISTS가 확인하는 것은?",
+        "options": [
+          "서브쿼리 결과의 합계",
+          "서브쿼리 결과 행이 하나라도 존재하는지",
+          "서브쿼리 결과의 평균",
+          "테이블 개수"
+        ],
+        "answer": 1,
+        "explain": "EXISTS는 값이 아니라 '조건을 만족하는 행이 존재하는지(있다/없다)'만 확인합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "EXISTS 서브쿼리에서 흔히 `SELECT 1` 을 쓰는 이유는?",
+        "options": [
+          "1행만 반환하려고",
+          "EXISTS는 값이 아니라 행 존재만 보므로 무엇을 SELECT하든 상관없어서",
+          "1번 열만 필요해서",
+          "성능이 반드시 빨라져서"
+        ],
+        "answer": 1,
+        "explain": "EXISTS는 행의 존재 여부만 봅니다. 값이 무의미하므로 관례적으로 SELECT 1을 씁니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "바깥 쿼리의 값을 참조하는 서브쿼리를 무엇이라 하나?",
+        "options": ["스칼라 서브쿼리", "상관 서브쿼리", "인라인 뷰", "조인"],
+        "answer": 1,
+        "explain": "바깥 행의 값을 참조하는 서브쿼리를 상관 서브쿼리(correlated subquery)라 합니다. EXISTS와 자주 함께 쓰입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "'직원이 없는 부서'를 찾는 것은?",
+        "options": ["EXISTS", "NOT EXISTS", "IN", "= EXISTS"],
+        "answer": 1,
+        "explain": "NOT EXISTS는 조건을 만족하는 행이 없는 경우를 찾습니다. '소속 직원이 없는 부서'가 이에 해당합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "서브쿼리 결과에 NULL이 섞일 수 있을 때 NOT IN 대신 권장되는 것은?",
+        "options": ["= ", "NOT EXISTS", "LIKE", "BETWEEN"],
+        "answer": 1,
+        "explain": "NOT IN은 NULL 때문에 예상과 다르게 동작할 수 있어, NULL 가능성이 있으면 NOT EXISTS가 안전합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "EXISTS와 IN 중 뭘 써야 하나요?", "a": "'목록에 있는지'를 값으로 비교하면 IN, '조건을 만족하는 행이 있는지'만 확인하면 EXISTS가 자연스럽습니다. NULL이 얽히거나 상관 조건이 필요하면 EXISTS가 안전합니다." },
+    { "q": "상관 서브쿼리는 느리지 않나요?", "a": "바깥 행마다 평가될 수 있어 데이터가 많으면 부담이 될 수 있습니다. 다만 DBMS가 최적화하는 경우도 많고, 조인으로 바꿔 쓸 수 있을 때도 있습니다." },
+    { "q": "SELECT 1 대신 SELECT * 를 써도 되나요?", "a": "네, 결과는 같습니다. EXISTS는 행 존재만 보므로 SELECT * , SELECT 1, SELECT emp_id 모두 동일하게 동작합니다. 관례상 SELECT 1을 씁니다." }
+  ]
+}

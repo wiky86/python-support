@@ -6,6 +6,7 @@ import {
   getTrack,
   getProject,
   getAllBadges,
+  getSampleDatabase,
 } from "@/lib/content";
 import { ProjectView } from "@/components/ProjectView";
 
@@ -72,6 +73,8 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     0
   );
 
+  const sampleDb = getSampleDatabase(courseId);
+
   return (
     <ProjectView
       track={track}
@@ -81,6 +84,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
       allTrackTopicsCount={allTrackTopicsCount}
       totalTopicsCount={totalTopicsCount}
       totalTracksCount={allTracks.length}
+      sampleDb={sampleDb}
     />
   );
 }

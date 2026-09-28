@@ -1,0 +1,119 @@
+{
+  "id": "track7.constraints",
+  "trackId": "track7",
+  "order": 5,
+  "title": "제약조건 — 데이터 규칙 정하기",
+  "content": "## 잘못된 데이터를 막는 규칙\n\n**제약조건(constraint)** 은 테이블에 들어올 수 있는 데이터의 규칙을 정하는 것입니다. '이 열은 비어 있으면 안 된다', '중복되면 안 된다', '기본값은 0이다' 같은 규칙을 걸어, 처음부터 잘못된 데이터가 들어오지 못하게 막습니다.\n\n## NOT NULL — 빈 값 금지\n\n```sql\nCREATE TABLE projects (\n  proj_id INT PRIMARY KEY,\n  proj_name VARCHAR(100) NOT NULL\n);\n```\n\nNOT NULL이 붙은 열은 값을 **반드시** 넣어야 합니다. proj_name을 빼고 INSERT하면 오류가 납니다. '이름 없는 프로젝트'는 말이 안 되니 필수로 강제하는 것입니다.\n\n## UNIQUE — 중복 금지\n\n```sql\nemail VARCHAR(100) UNIQUE\n```\n\nUNIQUE가 붙은 열은 값이 **중복될 수 없습니다**. 같은 이메일로 두 번 가입하는 것을 막는 식입니다. (PRIMARY KEY는 NOT NULL + UNIQUE를 동시에 만족하는 특별한 제약입니다.)\n\n## DEFAULT — 기본값\n\n```sql\nbudget INT DEFAULT 0\n```\n\nDEFAULT가 붙으면, INSERT 시 그 열을 생략했을 때 지정한 기본값이 들어갑니다. budget을 안 넣으면 자동으로 0이 됩니다.\n\n## CHECK — 값의 범위 제한\n\n```sql\nsalary INT CHECK (salary >= 0)\n```\n\nCHECK는 조건을 만족하는 값만 허용합니다. 급여가 음수가 되지 않도록 막는 식입니다. (일부 오래된 버전에서는 무시될 수 있지만, 최신 MySQL은 지원합니다.)\n\n## FOREIGN KEY — 참조 무결성\n\n```sql\ndept_id INT,\nFOREIGN KEY (dept_id) REFERENCES departments(dept_id)\n```\n\n외래키 제약은 'dept_id 값은 반드시 departments에 존재하는 값이어야 한다'는 규칙입니다. 존재하지 않는 부서 번호를 가진 직원이 들어오는 것을 막아, 테이블 간 관계를 지킵니다(참조 무결성).\n\n## 정리\n\n제약조건은 잘못된 데이터를 막는 규칙입니다. NOT NULL(필수), UNIQUE(중복 금지), DEFAULT(기본값), CHECK(값 제한), FOREIGN KEY(참조 무결성)가 대표적입니다. 데이터 품질을 처음부터 지키는 안전장치입니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "proj_name을 반드시 입력해야 하도록(빈 값 금지) 제약을 거세요. (두 단어)",
+      "code": "proj_name VARCHAR(100) ______ NULL",
+      "answers": ["NOT"],
+      "ignoreCase": true,
+      "output": "proj_name이 필수 입력 열이 됨(생략 시 오류)",
+      "explain": "NOT NULL은 값을 반드시 넣도록 강제합니다. 이 열을 빼고 INSERT하면 오류가 납니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "email 열의 값이 중복되지 않도록 제약을 거세요. (중복 금지 제약)",
+      "code": "email VARCHAR(100) ______",
+      "answers": ["UNIQUE"],
+      "ignoreCase": true,
+      "output": "email 값이 중복될 수 없게 됨",
+      "explain": "UNIQUE는 값의 중복을 막습니다. 같은 이메일로 두 번 등록하는 것을 방지합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "budget을 생략하면 자동으로 0이 되도록 기본값을 지정하세요. (기본값 키워드)",
+      "code": "budget INT ______ 0",
+      "answers": ["DEFAULT"],
+      "ignoreCase": true,
+      "output": "budget 생략 시 0이 들어감",
+      "explain": "DEFAULT 0은 INSERT 시 budget을 생략하면 0을 기본값으로 넣습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "salary가 음수가 될 수 없도록 값의 범위를 제한하세요. (조건 검사 제약)",
+      "code": "salary INT ______ (salary >= 0)",
+      "answers": ["CHECK"],
+      "ignoreCase": true,
+      "output": "salary가 0 미만이면 입력이 거부됨",
+      "explain": "CHECK는 조건을 만족하는 값만 허용합니다. salary >= 0 으로 음수 급여를 막습니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "dept_id가 departments에 존재하는 값만 허용하도록 참조 제약을 거세요. (외래키 키워드 두 단어 중 첫 단어)",
+      "code": "______ KEY (dept_id) REFERENCES departments(dept_id)",
+      "answers": ["FOREIGN"],
+      "ignoreCase": true,
+      "output": "dept_id는 departments에 있는 값만 허용됨",
+      "explain": "FOREIGN KEY는 참조 무결성을 지킵니다. departments에 없는 부서 번호가 들어오는 것을 막습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "제약조건(constraint)의 목적은?",
+        "options": [
+          "데이터를 빠르게 삭제하려고",
+          "테이블에 들어올 데이터의 규칙을 정해 잘못된 데이터를 막으려고",
+          "조회 속도만 높이려고",
+          "테이블을 숨기려고"
+        ],
+        "answer": 1,
+        "explain": "제약조건은 데이터의 규칙을 정해, 처음부터 잘못된 데이터가 들어오지 못하게 막습니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "값을 반드시 입력하도록 강제하는 제약은?",
+        "options": ["UNIQUE", "NOT NULL", "DEFAULT", "CHECK"],
+        "answer": 1,
+        "explain": "NOT NULL은 빈 값(NULL)을 금지해 값을 반드시 넣도록 합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "값의 중복을 막는 제약은?",
+        "options": ["NOT NULL", "UNIQUE", "DEFAULT", "FOREIGN KEY"],
+        "answer": 1,
+        "explain": "UNIQUE는 그 열의 값이 중복되지 않도록 합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`budget INT DEFAULT 0` 에서 DEFAULT의 역할은?",
+        "options": [
+          "budget을 항상 0으로 고정",
+          "INSERT 시 budget을 생략하면 0을 넣음",
+          "budget을 삭제",
+          "budget을 필수로 만듦"
+        ],
+        "answer": 1,
+        "explain": "DEFAULT는 값을 생략했을 때 들어갈 기본값을 정합니다. 명시적으로 다른 값을 넣으면 그 값이 들어갑니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "FOREIGN KEY 제약이 지키는 것은?",
+        "options": [
+          "값의 중복 방지",
+          "참조 무결성(참조하는 값이 실제로 존재하도록)",
+          "기본값 설정",
+          "정렬 순서"
+        ],
+        "answer": 1,
+        "explain": "FOREIGN KEY는 참조하는 값(dept_id)이 대상 테이블에 실제로 존재하도록 보장합니다. 존재하지 않는 값 입력을 막습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "PRIMARY KEY와 UNIQUE는 뭐가 다른가요?", "a": "둘 다 중복을 막지만, PRIMARY KEY는 NOT NULL도 겸하고 테이블당 하나만 둘 수 있습니다. UNIQUE는 여러 개 둘 수 있고 NULL을 허용하기도 합니다." },
+    { "q": "제약조건은 테이블을 만든 뒤에도 추가할 수 있나요?", "a": "네. 다음 토픽의 ALTER TABLE로 나중에 제약을 추가하거나 삭제할 수 있습니다. 다만 이미 규칙을 어긴 데이터가 있으면 추가가 실패할 수 있습니다." },
+    { "q": "CHECK 제약이 안 걸리는 경우도 있나요?", "a": "MySQL 8.0 이상은 CHECK를 지원하지만, 아주 오래된 버전은 문법만 받고 무시하기도 했습니다. 최신 환경에서는 정상 동작합니다." }
+  ]
+}

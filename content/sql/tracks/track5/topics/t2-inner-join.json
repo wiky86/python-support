@@ -1,0 +1,124 @@
+{
+  "id": "track5.inner-join",
+  "trackId": "track5",
+  "order": 2,
+  "title": "INNER JOIN — 두 테이블 연결하기",
+  "content": "## 기본 문법\n\n두 테이블을 연결하는 가장 기본적인 조인은 **INNER JOIN**입니다.\n\n```sql\nSELECT employees.emp_name, departments.dept_name\nFROM employees\nINNER JOIN departments\nON employees.dept_id = departments.dept_id;\n```\n\n구조를 나눠 보면:\n- **FROM employees**: 기준 테이블.\n- **INNER JOIN departments**: 연결할 테이블.\n- **ON employees.dept_id = departments.dept_id**: 연결 조건(연결 고리).\n\n결과는 각 직원의 이름과 그 직원이 속한 부서 이름이 짝지어 나옵니다. 김철수-영업부, 박민수-개발부 처럼요.\n\n## 열 이름 앞에 테이블 이름\n\n두 테이블을 함께 다루면 같은 이름의 열(dept_id)이 양쪽에 있어 헷갈립니다. 그래서 **테이블이름.열이름** 형태로 어느 테이블의 열인지 명시합니다. `employees.emp_name`, `departments.dept_name` 처럼요.\n\n한 테이블에만 있는 열(emp_name 등)은 테이블 이름을 생략해도 되지만, 명확하게 붙이는 것이 좋은 습관입니다.\n\n## INNER의 의미\n\nINNER JOIN은 **양쪽 테이블에 모두 짝이 있는 행만** 결과에 포함합니다. 예를 들어 어느 부서에도 속하지 않은 직원(dept_id가 없는)이 있다면, INNER JOIN 결과에서 빠집니다. 우리 데이터는 모든 직원이 부서에 속해 있어 8명이 모두 나옵니다.\n\n## INNER 생략\n\n`INNER`는 생략할 수 있습니다. 그냥 `JOIN`이라고 쓰면 INNER JOIN으로 동작합니다.\n\n```sql\nSELECT emp_name, dept_name\nFROM employees JOIN departments\nON employees.dept_id = departments.dept_id;\n```\n\n## WHERE와 함께\n\n```sql\nSELECT emp_name, dept_name\nFROM employees JOIN departments ON employees.dept_id = departments.dept_id\nWHERE departments.dept_name = '개발부';\n```\n\n조인한 뒤 '개발부' 직원만 거릅니다. 다른 테이블(departments)의 열로도 조건을 걸 수 있는 것이 조인의 장점입니다.\n\n## 정리\n\nINNER JOIN은 ON 조건으로 두 테이블을 연결하며, 양쪽에 모두 짝이 있는 행만 결과에 포함합니다. 열은 테이블이름.열이름 으로 명시하고, INNER는 생략 가능합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "employees와 departments를 연결하는 조인 키워드를 넣으세요. (양쪽에 짝이 있는 행만)",
+      "code": "SELECT emp_name, dept_name FROM employees ______ JOIN departments ON employees.dept_id = departments.dept_id;",
+      "answers": ["INNER"],
+      "ignoreCase": true,
+      "output": "각 직원과 그 부서 이름이 짝지어 조회됨 (김철수-영업부 등)",
+      "explain": "INNER JOIN은 양쪽 테이블에 모두 짝이 있는 행만 연결합니다. INNER는 생략하고 JOIN만 써도 됩니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "두 테이블의 연결 조건을 지정하는 키워드를 넣으세요.",
+      "code": "SELECT emp_name, dept_name FROM employees JOIN departments ______ employees.dept_id = departments.dept_id;",
+      "answers": ["ON"],
+      "ignoreCase": true,
+      "output": "dept_id가 같은 행끼리 연결됨",
+      "explain": "ON 뒤에 연결 조건을 씁니다. employees.dept_id = departments.dept_id 로 같은 부서 번호끼리 연결합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "연결 조건에서 departments 쪽의 연결 열을 넣으세요.",
+      "code": "... JOIN departments ON employees.dept_id = departments.______;",
+      "answers": ["dept_id"],
+      "ignoreCase": true,
+      "output": "employees.dept_id = departments.dept_id 로 연결",
+      "explain": "양쪽의 dept_id가 같은 행끼리 짝지어집니다. departments.dept_id가 연결 조건의 오른쪽입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "조인 후 '개발부' 직원만 조회하려 합니다. departments의 부서 이름 열을 조건에 넣으세요.",
+      "code": "SELECT emp_name, dept_name FROM employees JOIN departments ON employees.dept_id = departments.dept_id WHERE departments.______ = '개발부';",
+      "answers": ["dept_name"],
+      "ignoreCase": true,
+      "output": "박민수, 정수진, 최지훈 (개발부 직원)",
+      "explain": "조인하면 departments의 열(dept_name)로도 조건을 걸 수 있습니다. 개발부 직원 3명이 조회됩니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "어느 테이블의 열인지 명시할 때 쓰는 형태는? 빈칸에 알맞은 기호를 넣으세요.",
+      "code": "employees______emp_name  (테이블 이름과 열 이름 사이)",
+      "answers": ["."],
+      "ignoreCase": true,
+      "output": "employees.emp_name (테이블.열 형태)",
+      "explain": "테이블이름.열이름 형태로 어느 테이블의 열인지 명시합니다. 마침표(.)로 연결합니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "두 테이블의 연결 조건을 지정하는 키워드는?",
+        "options": ["IF", "ON", "WITH", "AS"],
+        "answer": 1,
+        "explain": "ON 뒤에 연결 조건(예: employees.dept_id = departments.dept_id)을 씁니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "INNER JOIN의 특징으로 옳은 것은?",
+        "options": [
+          "한쪽 테이블의 모든 행을 다 포함한다",
+          "양쪽 테이블에 모두 짝이 있는 행만 포함한다",
+          "짝이 없는 행만 포함한다",
+          "테이블을 삭제한다"
+        ],
+        "answer": 1,
+        "explain": "INNER JOIN은 ON 조건으로 양쪽에 모두 짝이 있는 행만 결과에 포함합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`employees.emp_name` 에서 마침표(.)의 역할은?",
+        "options": [
+          "문자열 연결",
+          "어느 테이블의 열인지 명시",
+          "소수점",
+          "주석 표시"
+        ],
+        "answer": 1,
+        "explain": "테이블이름.열이름 형태로 어느 테이블의 열인지 명확히 합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`INNER JOIN` 에서 INNER를 생략하고 `JOIN`만 쓰면?",
+        "options": [
+          "오류가 난다",
+          "INNER JOIN과 동일하게 동작한다",
+          "LEFT JOIN이 된다",
+          "테이블이 합쳐진다"
+        ],
+        "answer": 1,
+        "explain": "JOIN만 쓰면 INNER JOIN으로 동작합니다. INNER는 생략 가능합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "조인의 장점으로 옳은 것은?",
+        "options": [
+          "한 테이블만 볼 수 있다",
+          "연결한 다른 테이블의 열로도 조건을 걸고 조회할 수 있다",
+          "데이터를 자동 삭제한다",
+          "정렬이 불가능해진다"
+        ],
+        "answer": 1,
+        "explain": "조인하면 departments.dept_name 같은 다른 테이블의 열로도 조건을 걸거나 조회할 수 있습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "ON과 WHERE는 뭐가 다른가요?", "a": "ON은 '두 테이블을 어떻게 연결할지'의 조건이고, WHERE는 '연결된 결과에서 어떤 행을 남길지'의 조건입니다. 역할이 다르니 구분해서 씁니다." },
+    { "q": "테이블 이름을 매번 다 쓰기 번거로워요.", "a": "다음 토픽에서 배울 '별칭'을 쓰면 employees를 e로 줄여 e.emp_name 처럼 짧게 쓸 수 있습니다." },
+    { "q": "짝이 없는 행도 보고 싶으면요?", "a": "그럴 때는 INNER가 아니라 LEFT JOIN(또는 다른 OUTER JOIN)을 씁니다. 뒤 토픽에서 배웁니다." }
+  ]
+}

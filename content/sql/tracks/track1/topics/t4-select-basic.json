@@ -1,0 +1,114 @@
+{
+  "id": "track1.select-basic",
+  "trackId": "track1",
+  "order": 4,
+  "title": "SELECT 첫걸음 — 전체 조회",
+  "content": "## 가장 기본적인 조회\n\n이제 실제로 데이터를 꺼내봅니다. 테이블의 모든 데이터를 조회하는 가장 기본적인 형태는 이렇습니다.\n\n```sql\nSELECT * FROM employees;\n```\n\n- **SELECT**: \"조회하겠다\"는 명령.\n- **`*`**: \"모든 열\"을 의미하는 기호(별표, asterisk).\n- **FROM employees**: \"employees 테이블에서\".\n- **`;`(세미콜론)**: SQL 문장의 끝을 나타냅니다.\n\n즉 위 쿼리는 \"employees 테이블에서 모든 열을 조회하라\"는 뜻이고, 직원 8명의 전체 정보가 나옵니다.\n\n## 읽는 순서\n\n영어 문장처럼 읽으면 자연스럽습니다: **SELECT**(선택하라) **\\***(모든 것을) **FROM**(어디에서) **employees**(직원 테이블). 실제로 SQL은 `SELECT ... FROM ...` 구조가 조회의 뼈대입니다.\n\n## 세미콜론\n\n문장 끝의 세미콜론(`;`)은 여러 개의 쿼리를 구분하는 역할을 합니다. 쿼리를 하나만 실행할 때는 생략해도 대부분 동작하지만, 붙이는 습관을 들이는 것이 좋습니다.\n\n## departments 테이블도 조회해보기\n\n```sql\nSELECT * FROM departments;\n```\n\n이렇게 하면 부서 4개(영업부·개발부·인사부·마케팅부)의 전체 정보가 조회됩니다. 테이블 이름만 바꾸면 어떤 테이블이든 같은 방식으로 조회할 수 있습니다.\n\n## 정리\n\n`SELECT * FROM 테이블명;` 은 해당 테이블의 모든 데이터를 조회하는 가장 기본적인 쿼리입니다. `*`는 모든 열, `FROM`은 대상 테이블을 뜻합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "employees 테이블의 모든 열·모든 행을 조회하세요. (조회 명령어)",
+      "code": "______ * FROM employees;",
+      "answers": ["SELECT"],
+      "ignoreCase": true,
+      "output": "employees 테이블의 전체 데이터(8행)가 조회된다",
+      "explain": "SELECT는 데이터를 조회하는 명령어입니다. SELECT * FROM employees; 는 모든 열과 모든 행을 가져옵니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "'모든 열'을 의미하는 기호를 넣으세요.",
+      "code": "SELECT ______ FROM employees;",
+      "answers": ["*"],
+      "ignoreCase": true,
+      "output": "employees 테이블의 모든 열이 조회된다",
+      "explain": "별표(*)는 '모든 열'을 의미합니다. 특정 열만 필요하면 다음 토픽처럼 열 이름을 나열합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "'어느 테이블에서' 조회할지 지정하는 키워드를 넣으세요.",
+      "code": "SELECT * ______ employees;",
+      "answers": ["FROM"],
+      "ignoreCase": true,
+      "output": "employees 테이블을 대상으로 조회한다",
+      "explain": "FROM 뒤에 조회 대상 테이블 이름을 씁니다. FROM employees는 'employees 테이블에서'라는 뜻입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "departments(부서) 테이블의 전체 데이터를 조회하세요.",
+      "code": "SELECT * FROM ______;",
+      "answers": ["departments"],
+      "ignoreCase": true,
+      "output": "부서 4개(영업부·개발부·인사부·마케팅부)의 전체 정보가 조회된다",
+      "explain": "FROM 뒤의 테이블 이름만 바꾸면 다른 테이블을 조회할 수 있습니다. departments는 부서 테이블입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "SQL 문장의 끝을 나타내는 기호를 넣으세요.",
+      "code": "SELECT * FROM employees______",
+      "answers": [";"],
+      "ignoreCase": true,
+      "output": "세미콜론으로 문장이 끝난다",
+      "explain": "세미콜론(;)은 SQL 문장의 끝을 나타냅니다. 여러 쿼리를 구분할 때 특히 필요합니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "employees 테이블의 모든 데이터를 조회하는 올바른 쿼리는?",
+        "options": [
+          "GET * FROM employees;",
+          "SELECT * FROM employees;",
+          "SHOW employees;",
+          "SELECT employees ALL;"
+        ],
+        "answer": 1,
+        "explain": "데이터 조회는 SELECT를 쓰며, 모든 열은 *로 표현합니다. SELECT * FROM employees; 가 정답입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "SELECT 문에서 `*` 기호의 의미는?",
+        "options": ["첫 번째 열만", "모든 열", "행의 개수", "곱셈"],
+        "answer": 1,
+        "explain": "SELECT 문에서 *는 '모든 열'을 의미합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "조회 대상 테이블을 지정하는 키워드는?",
+        "options": ["IN", "AT", "FROM", "OF"],
+        "answer": 2,
+        "explain": "FROM 뒤에 조회할 테이블 이름을 씁니다. 예: FROM employees."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "SQL 문장의 끝을 나타내는 기호는?",
+        "options": [".", ",", ";", ":"],
+        "answer": 2,
+        "explain": "세미콜론(;)이 SQL 문장의 끝을 나타냅니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "`SELECT * FROM departments;` 의 실행 결과로 옳은 것은?",
+        "options": [
+          "departments 테이블의 부서 이름만 조회된다",
+          "departments 테이블의 모든 열과 모든 행이 조회된다",
+          "부서 개수(4)만 나온다",
+          "오류가 발생한다"
+        ],
+        "answer": 1,
+        "explain": "SELECT * FROM departments; 는 부서 테이블의 모든 열과 모든 행(부서 4개)을 조회합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "SELECT * 는 실무에서도 그냥 써도 되나요?", "a": "학습·확인용으로는 좋지만, 실무에서는 필요한 열만 골라 조회하는 것이 권장됩니다. 불필요한 데이터까지 가져오면 성능에 영향을 줄 수 있기 때문입니다. 다음 토픽에서 특정 열만 조회하는 법을 배웁니다." },
+    { "q": "세미콜론을 안 붙이면 오류가 나나요?", "a": "쿼리를 하나만 실행할 때는 대부분 생략해도 동작합니다. 다만 여러 쿼리를 한 번에 실행할 때는 구분자로 반드시 필요하니, 붙이는 습관을 들이는 것이 좋습니다." },
+    { "q": "테이블 이름을 잘못 쓰면 어떻게 되나요?", "a": "존재하지 않는 테이블을 조회하면 'table doesn't exist' 같은 오류가 납니다. 테이블 이름의 철자와 대소문자(일부 환경)를 정확히 확인해야 합니다." }
+  ]
+}

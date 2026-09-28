@@ -1,0 +1,124 @@
+{
+  "id": "track2.null",
+  "trackId": "track2",
+  "order": 5,
+  "title": "빈 값 다루기 — NULL",
+  "content": "## NULL이란\n\n**NULL**은 '값이 없음', '아직 모름'을 나타내는 특별한 상태입니다. 0이나 빈 문자열('')과는 다릅니다. 0은 '0이라는 값'이고, NULL은 '값 자체가 없음'입니다.\n\n우리 employees 테이블에서 `manager_id`(직속 상사)가 NULL인 직원이 있습니다. 부장·과장처럼 위에 상사가 없는 사람은 manager_id가 비어 있습니다.\n\n## NULL은 = 로 비교할 수 없다\n\n가장 중요한 규칙입니다. NULL은 `= NULL` 로 찾을 수 **없습니다**. NULL은 '알 수 없는 값'이라 '같다/다르다'를 판단할 수 없기 때문입니다. 대신 **IS NULL** / **IS NOT NULL** 을 씁니다.\n\n```sql\nSELECT emp_name, manager_id FROM employees WHERE manager_id IS NULL;\n```\n\n상사가 없는(manager_id가 비어 있는) 직원을 찾습니다. 결과: 김철수, 박민수, 강다연, 임재현.\n\n```sql\nSELECT emp_name FROM employees WHERE manager_id IS NOT NULL;\n```\n\n반대로 상사가 있는 직원을 찾습니다.\n\n## NULL 대체 — IFNULL (MySQL)\n\n조회 결과에서 NULL을 다른 값으로 바꿔 보여주고 싶을 때 MySQL에서는 **IFNULL**을 씁니다.\n\n```sql\nSELECT emp_name, IFNULL(manager_id, 0) FROM employees;\n```\n\nmanager_id가 NULL이면 0으로 바꿔서 보여줍니다. (다른 DBMS에서는 COALESCE 함수도 널리 쓰입니다. COALESCE는 여러 값 중 NULL이 아닌 첫 값을 반환합니다.)\n\n## 정리\n\nNULL은 '값 없음'을 뜻하며 0이나 빈 문자열과 다릅니다. `= NULL`이 아니라 **IS NULL / IS NOT NULL**로 검색합니다. MySQL에서는 IFNULL로 NULL을 다른 값으로 바꿔 표시할 수 있습니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "직속 상사가 없는(manager_id가 비어 있는) 직원을 조회하세요. (NULL 검색)",
+      "code": "SELECT emp_name, manager_id FROM employees WHERE manager_id ______ NULL;",
+      "answers": ["IS"],
+      "ignoreCase": true,
+      "output": "김철수, 박민수, 강다연, 임재현 (manager_id가 NULL)",
+      "explain": "NULL은 = 로 비교할 수 없어 IS NULL을 씁니다. 상사가 없는 4명이 조회됩니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "직속 상사가 '있는' 직원을 조회하세요. (NULL이 아닌 것 검색)",
+      "code": "SELECT emp_name FROM employees WHERE manager_id IS ______ NULL;",
+      "answers": ["NOT"],
+      "ignoreCase": true,
+      "output": "이영희, 정수진, 최지훈, 윤서연 (manager_id가 있음)",
+      "explain": "IS NOT NULL은 값이 있는(NULL이 아닌) 행을 조회합니다. 상사가 있는 직원이 나옵니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "NULL을 검색할 때 = 대신 사용하는 두 단어 키워드는? (첫 단어)",
+      "code": "WHERE manager_id ______ NULL   -- NULL 검색",
+      "answers": ["IS"],
+      "ignoreCase": true,
+      "output": "IS NULL 형태로 NULL을 검색한다",
+      "explain": "NULL은 IS NULL / IS NOT NULL로 검색합니다. = NULL은 동작하지 않습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "MySQL에서 manager_id가 NULL이면 0으로 바꿔 보여주세요.",
+      "code": "SELECT emp_name, ______(manager_id, 0) FROM employees;",
+      "answers": ["IFNULL"],
+      "ignoreCase": true,
+      "output": "manager_id가 NULL인 직원은 0으로, 나머지는 원래 값으로 표시된다",
+      "explain": "IFNULL(값, 대체값)은 값이 NULL일 때 대체값을 반환합니다. MySQL의 NULL 처리 함수입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "여러 값 중 NULL이 아닌 첫 값을 반환하는, 여러 DBMS 공통 함수는?",
+      "code": "SELECT emp_name, ______(manager_id, 0) FROM employees;",
+      "answers": ["COALESCE"],
+      "ignoreCase": true,
+      "output": "manager_id가 NULL이면 0으로 대체 (IFNULL과 유사)",
+      "explain": "COALESCE(값1, 값2, ...)는 인자 중 NULL이 아닌 첫 값을 반환합니다. 여러 DBMS에서 공통으로 쓰여 IFNULL보다 이식성이 좋습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "NULL에 대한 설명으로 옳은 것은?",
+        "options": [
+          "숫자 0과 완전히 같다",
+          "빈 문자열('')과 같다",
+          "'값이 없음/알 수 없음'을 나타내는 특별한 상태다",
+          "오류를 의미한다"
+        ],
+        "answer": 2,
+        "explain": "NULL은 '값이 없음'을 나타냅니다. 0(숫자 값)이나 빈 문자열(길이 0인 문자열)과는 다릅니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "manager_id가 NULL인 행을 찾는 올바른 조건은?",
+        "options": [
+          "WHERE manager_id = NULL",
+          "WHERE manager_id IS NULL",
+          "WHERE manager_id == NULL",
+          "WHERE manager_id LIKE NULL"
+        ],
+        "answer": 1,
+        "explain": "NULL은 =로 비교할 수 없습니다. IS NULL을 써야 합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`WHERE manager_id = NULL` 을 실행하면?",
+        "options": [
+          "NULL인 행이 정상 조회된다",
+          "의도대로 동작하지 않는다(결과가 비거나 틀림)",
+          "모든 행이 조회된다",
+          "테이블이 삭제된다"
+        ],
+        "answer": 1,
+        "explain": "NULL은 '같다'를 판단할 수 없어 = NULL은 의도대로 동작하지 않습니다. IS NULL을 써야 합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "값이 있는(NULL이 아닌) 행을 조회하는 조건은?",
+        "options": [
+          "WHERE col IS NULL",
+          "WHERE col IS NOT NULL",
+          "WHERE col != NULL",
+          "WHERE col > NULL"
+        ],
+        "answer": 1,
+        "explain": "IS NOT NULL이 값이 있는 행을 조회합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "MySQL에서 NULL을 다른 값으로 대체해 보여주는 함수는?",
+        "options": ["IFNULL", "ISNULL만", "NULLIF", "REPLACE"],
+        "answer": 0,
+        "explain": "MySQL에서는 IFNULL(값, 대체값)로 NULL을 대체합니다. COALESCE도 여러 DBMS 공통으로 널리 쓰입니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "NULL과 0, 빈 문자열은 정말 다른가요?", "a": "네, 완전히 다릅니다. 0은 '숫자 0이라는 값', 빈 문자열은 '길이가 0인 문자열이라는 값', NULL은 '값 자체가 없음'입니다. 예: 급여가 0인 것과 급여를 모르는 것(NULL)은 의미가 다릅니다." },
+    { "q": "왜 NULL은 =로 비교가 안 되나요?", "a": "NULL은 '알 수 없는 값'이라, 'NULL = NULL'조차 '알 수 없음'으로 처리됩니다. 그래서 '같다'로 판단할 수 없고, 전용 키워드 IS NULL을 씁니다." },
+    { "q": "IFNULL과 COALESCE 중 뭘 써야 하나요?", "a": "MySQL만 쓴다면 IFNULL이 간단합니다. 여러 DBMS를 넘나들거나 이식성이 중요하면 COALESCE가 표준이라 더 안전합니다." }
+  ]
+}

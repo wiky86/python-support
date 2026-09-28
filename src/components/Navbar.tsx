@@ -21,6 +21,8 @@ import {
   Layers,
   Terminal,
   Landmark,
+  Database,
+  Code2,
 } from "lucide-react";
 
 export function Navbar() {
@@ -32,6 +34,8 @@ export function Navbar() {
 
   const isPython = pathname?.startsWith("/python");
   const isFinance = pathname?.startsWith("/finance");
+  const isSql = pathname?.startsWith("/sql");
+  const isCodingTest = pathname?.startsWith("/coding-test");
 
   return (
     <div className="sticky top-0 z-40 w-full flex flex-col">
@@ -66,7 +70,7 @@ export function Navbar() {
                   <span className="text-slate-800 dark:text-white"> DataLab</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-normal leading-none">
-                  파이썬 · 디지털 금융
+                  파이썬 · 금융 · SQL
                 </span>
               </div>
             </Link>
@@ -96,7 +100,7 @@ export function Navbar() {
                 }`}
               >
                 <Terminal className="w-3.5 h-3.5 text-emerald-500" />
-                파이썬 데이터 분석
+                파이썬
               </Link>
 
               <Link
@@ -109,7 +113,33 @@ export function Navbar() {
                 }`}
               >
                 <Landmark className="w-3.5 h-3.5 text-amber-500" />
-                디지털 금융 이론
+                금융
+              </Link>
+
+              <Link
+                href="/sql"
+                prefetch={false}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+                  isSql
+                    ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80"
+                    : "text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
+                }`}
+              >
+                <Database className="w-3.5 h-3.5 text-blue-500" />
+                SQL
+              </Link>
+
+              <Link
+                href="/coding-test"
+                prefetch={false}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+                  isCodingTest
+                    ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/80"
+                    : "text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400"
+                }`}
+              >
+                <Code2 className="w-3.5 h-3.5 text-indigo-500" />
+                코딩테스트
               </Link>
 
               <Link

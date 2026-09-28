@@ -1,0 +1,109 @@
+{
+  "id": "track7.create-table",
+  "trackId": "track7",
+  "order": 4,
+  "title": "테이블 만들기 — CREATE TABLE",
+  "content": "## 새 테이블 정의하기\n\n지금까지는 이미 있는 employees·departments를 사용했습니다. **CREATE TABLE**로 새 테이블을 직접 만들 수 있습니다. 데이터를 담기 전에 '어떤 열이 어떤 형식으로 들어갈지'를 먼저 설계하는 것입니다.\n\n## 기본 문법\n\n```sql\nCREATE TABLE projects (\n  proj_id INT PRIMARY KEY,\n  proj_name VARCHAR(100),\n  budget INT,\n  start_date DATE\n);\n```\n\n- **CREATE TABLE 테이블이름 ( ... )**: 테이블을 만들고 괄호 안에 열을 정의.\n- 각 열은 **열이름 + 데이터타입** 으로 정의하고, 콤마로 구분합니다.\n\n## 주요 데이터 타입 (MySQL)\n\n| 타입 | 용도 | 예 |\n|---|---|---|\n| `INT` | 정수 | 나이, 개수, 금액 |\n| `VARCHAR(n)` | 가변 길이 문자열(최대 n자) | 이름, 제목 |\n| `DATE` | 날짜 | 입사일, 생년월일 |\n| `DATETIME` | 날짜+시각 | 작성 시각 |\n| `DECIMAL(p,s)` | 소수(정밀) | 정확한 금액 |\n| `BOOLEAN` | 참/거짓 | 활성 여부 |\n\n열마다 담을 데이터의 성격에 맞는 타입을 정합니다. 이름은 VARCHAR, 금액은 INT나 DECIMAL, 날짜는 DATE처럼요.\n\n## VARCHAR의 길이\n\n`VARCHAR(100)` 은 '최대 100자까지 저장 가능한 문자열'입니다. 이름은 VARCHAR(50), 긴 설명은 VARCHAR(500)처럼 예상 길이에 맞춰 정합니다.\n\n## 기본키 지정\n\n열 정의에 `PRIMARY KEY`를 붙이면 그 열이 기본키가 됩니다. 각 행을 고유하게 구분하는 열이죠(트랙1 복습).\n\n```sql\nproj_id INT PRIMARY KEY\n```\n\n## 정리\n\nCREATE TABLE 이름 (열정의들) 으로 새 테이블을 만듭니다. 각 열은 이름과 데이터 타입(INT, VARCHAR, DATE 등)으로 정의하고, PRIMARY KEY로 기본키를 지정합니다. 다음 토픽에서 더 다양한 제약조건을 배웁니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "projects라는 새 테이블을 만드세요. 테이블 생성 명령어를 넣으세요. (두 단어 중 첫 단어)",
+      "code": "______ TABLE projects (proj_id INT PRIMARY KEY, proj_name VARCHAR(100));",
+      "answers": ["CREATE"],
+      "ignoreCase": true,
+      "output": "projects 테이블이 생성됨",
+      "explain": "CREATE TABLE 이름 (열정의) 으로 새 테이블을 만듭니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "정수를 저장하는 열의 데이터 타입을 넣으세요. (proj_id, budget 등)",
+      "code": "CREATE TABLE projects (proj_id ______ PRIMARY KEY, budget INT);",
+      "answers": ["INT"],
+      "ignoreCase": true,
+      "output": "proj_id가 정수형 기본키로 정의됨",
+      "explain": "INT는 정수형 데이터 타입입니다. 개수·금액·번호 등에 씁니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "최대 100자까지의 문자열을 저장하는 타입을 넣으세요. (proj_name)",
+      "code": "CREATE TABLE projects (proj_id INT PRIMARY KEY, proj_name ______(100));",
+      "answers": ["VARCHAR"],
+      "ignoreCase": true,
+      "output": "proj_name이 최대 100자 문자열로 정의됨",
+      "explain": "VARCHAR(n)은 최대 n자까지 저장하는 가변 길이 문자열 타입입니다. 이름·제목 등에 씁니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "날짜를 저장하는 데이터 타입을 넣으세요. (start_date)",
+      "code": "CREATE TABLE projects (proj_id INT PRIMARY KEY, start_date ______);",
+      "answers": ["DATE"],
+      "ignoreCase": true,
+      "output": "start_date가 날짜형으로 정의됨",
+      "explain": "DATE는 날짜(연-월-일)를 저장하는 타입입니다. 시각까지 필요하면 DATETIME을 씁니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "proj_id를 기본키로 지정하세요. (각 행을 고유하게 구분)",
+      "code": "CREATE TABLE projects (proj_id INT ______ KEY, proj_name VARCHAR(100));",
+      "answers": ["PRIMARY"],
+      "ignoreCase": true,
+      "output": "proj_id가 기본키로 지정됨",
+      "explain": "PRIMARY KEY로 기본키를 지정합니다. 기본키는 각 행을 고유하게 식별하며 중복될 수 없습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "새 테이블을 만드는 명령은?",
+        "options": ["MAKE TABLE", "CREATE TABLE", "NEW TABLE", "INSERT TABLE"],
+        "answer": 1,
+        "explain": "CREATE TABLE 이름 (열정의) 으로 테이블을 만듭니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "정수를 저장하는 데이터 타입은?",
+        "options": ["VARCHAR", "INT", "DATE", "TEXT"],
+        "answer": 1,
+        "explain": "INT가 정수형입니다. VARCHAR는 문자열, DATE는 날짜입니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "이름·제목 같은 가변 길이 문자열에 적합한 타입은?",
+        "options": ["INT", "VARCHAR(n)", "DATE", "BOOLEAN"],
+        "answer": 1,
+        "explain": "VARCHAR(n)은 최대 n자까지 저장하는 문자열 타입으로, 이름·제목 등에 적합합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`VARCHAR(50)` 의 의미는?",
+        "options": [
+          "정확히 50자만 저장",
+          "최대 50자까지 저장 가능한 문자열",
+          "50개의 숫자",
+          "50개 행"
+        ],
+        "answer": 1,
+        "explain": "VARCHAR(50)은 최대 50자까지 저장하는 가변 길이 문자열입니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "각 행을 고유하게 식별하는 열을 지정하는 것은?",
+        "options": ["UNIQUE KEY만", "PRIMARY KEY", "FOREIGN KEY", "INDEX"],
+        "answer": 1,
+        "explain": "PRIMARY KEY로 기본키를 지정합니다. 기본키는 각 행을 고유하게 구분합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "VARCHAR와 CHAR는 뭐가 다른가요?", "a": "VARCHAR는 가변 길이(실제 입력 길이만큼 저장), CHAR는 고정 길이(지정 길이를 항상 채움)입니다. 길이가 들쭉날쭉한 이름 등은 VARCHAR, 길이가 일정한 코드 등은 CHAR가 적합합니다." },
+    { "q": "금액에 INT와 DECIMAL 중 뭘 쓰나요?", "a": "소수점이 없는 정수 금액은 INT, 소수점까지 정확해야 하는 금액(환율·이자 등)은 DECIMAL을 씁니다. DECIMAL이 반올림 오차 없이 정확합니다." },
+    { "q": "테이블 이름이나 열 이름 규칙이 있나요?", "a": "보통 영문 소문자와 밑줄(_)을 씁니다(snake_case). 공백·특수문자는 피하고, 의미가 분명한 이름을 짓는 것이 좋습니다. 예: emp_name, start_date." }
+  ]
+}

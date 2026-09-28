@@ -1,0 +1,23 @@
+{
+  "id": "track7",
+  "order": 7,
+  "title": "데이터 조작과 정의",
+  "description": "데이터를 추가(INSERT)·수정(UPDATE)·삭제(DELETE)하고, 테이블을 만들고(CREATE) 구조를 바꾸는(ALTER) 법을 배웁니다. 조회를 넘어 데이터베이스를 직접 변경하는 명령들로, 실수하면 데이터가 손상될 수 있어 안전 수칙도 함께 익힙니다.",
+  "topicOrder": [
+    "track7.insert",
+    "track7.update",
+    "track7.delete",
+    "track7.create-table",
+    "track7.constraints",
+    "track7.alter-drop"
+  ],
+  "topicFiles": [
+    "topics/t1-insert.json",
+    "topics/t2-update.json",
+    "topics/t3-delete.json",
+    "topics/t4-create-table.json",
+    "topics/t5-constraints.json",
+    "topics/t6-alter-drop.json"
+  ],
+  "projectFile": "project.json"
+}

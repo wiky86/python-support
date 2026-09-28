@@ -1,0 +1,23 @@
+{
+  "id": "track6",
+  "order": 6,
+  "title": "서브쿼리와 고급 조회",
+  "description": "쿼리 안에 또 다른 쿼리를 넣는 서브쿼리를 배웁니다. '평균보다 많이 받는 직원'처럼 한 번에 풀기 어려운 문제를 단계적으로 해결하고, IN·EXISTS·뷰(VIEW)까지 익혀 조회의 표현력을 크게 넓힙니다.",
+  "topicOrder": [
+    "track6.subquery-intro",
+    "track6.where-subquery",
+    "track6.in-subquery",
+    "track6.select-from-subquery",
+    "track6.exists",
+    "track6.view"
+  ],
+  "topicFiles": [
+    "topics/t1-subquery-intro.json",
+    "topics/t2-where-subquery.json",
+    "topics/t3-in-subquery.json",
+    "topics/t4-select-from-subquery.json",
+    "topics/t5-exists.json",
+    "topics/t6-view.json"
+  ],
+  "projectFile": "project.json"
+}

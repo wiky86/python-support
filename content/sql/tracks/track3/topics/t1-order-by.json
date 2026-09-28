@@ -1,0 +1,109 @@
+{
+  "id": "track3.order-by",
+  "trackId": "track3",
+  "order": 1,
+  "title": "결과 정렬 — ORDER BY",
+  "content": "## 순서대로 보기\n\n지금까지 조회 결과는 저장된 순서대로 나왔습니다. 하지만 '급여가 높은 순', '이름 가나다순'처럼 원하는 순서로 정렬하고 싶을 때 **ORDER BY**를 씁니다.\n\n```sql\nSELECT emp_name, salary FROM employees ORDER BY salary DESC;\n```\n\n- **ORDER BY** 뒤에 정렬 기준 열을 씁니다.\n- **DESC**: 내림차순(큰 것 → 작은 것).\n- 위 쿼리는 급여가 높은 순으로 정렬합니다. 결과 맨 위는 김철수(6000), 맨 아래는 윤서연(3000).\n\n## 오름차순과 내림차순\n\n- **ASC** (ascending): 오름차순(작은 것 → 큰 것). **기본값**이라 생략 가능.\n- **DESC** (descending): 내림차순(큰 것 → 작은 것).\n\n```sql\nSELECT emp_name, salary FROM employees ORDER BY salary ASC;\n```\n\n급여가 낮은 순으로 정렬합니다. ASC는 기본값이라 `ORDER BY salary` 만 써도 오름차순으로 정렬됩니다.\n\n## 문자열 정렬\n\n숫자뿐 아니라 문자열도 정렬됩니다.\n\n```sql\nSELECT emp_name FROM employees ORDER BY emp_name ASC;\n```\n\n이름을 가나다순(오름차순)으로 정렬합니다.\n\n## WHERE와 함께 쓰기\n\nORDER BY는 WHERE 뒤에 옵니다.\n\n```sql\nSELECT emp_name, salary FROM employees\nWHERE dept_id = 2\nORDER BY salary DESC;\n```\n\n개발부 직원을 급여 높은 순으로 조회합니다. 순서는 SELECT → FROM → WHERE → ORDER BY 입니다.\n\n## 정리\n\nORDER BY로 결과를 정렬합니다. ASC(오름차순, 기본값), DESC(내림차순)를 지정하며, WHERE가 있으면 그 뒤에 옵니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "직원을 급여 높은 순(내림차순)으로 정렬해 조회하세요. (정렬 키워드)",
+      "code": "SELECT emp_name, salary FROM employees ______ salary DESC;",
+      "answers": ["ORDER BY"],
+      "ignoreCase": true,
+      "output": "김철수(6000), 박민수(5000), 임재현(4800), 강다연(4000), 최지훈(3800), 정수진(3500), 이영희(3200), 윤서연(3000)",
+      "explain": "ORDER BY로 정렬 기준 열을 지정합니다. salary DESC는 급여 내림차순입니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "급여를 높은 순(내림차순)으로 정렬하는 키워드를 넣으세요.",
+      "code": "SELECT emp_name, salary FROM employees ORDER BY salary ______;",
+      "answers": ["DESC"],
+      "ignoreCase": true,
+      "output": "급여가 높은 순으로 정렬 (김철수 6000이 맨 위)",
+      "explain": "DESC(descending)는 내림차순(큰 것→작은 것)입니다. 급여가 높은 순으로 정렬됩니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "급여를 낮은 순(오름차순)으로 정렬하는 키워드를 넣으세요. (기본값이지만 명시)",
+      "code": "SELECT emp_name, salary FROM employees ORDER BY salary ______;",
+      "answers": ["ASC"],
+      "ignoreCase": true,
+      "output": "급여가 낮은 순으로 정렬 (윤서연 3000이 맨 위)",
+      "explain": "ASC(ascending)는 오름차순(작은 것→큰 것)이며 기본값입니다. 생략해도 오름차순으로 정렬됩니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "이름을 가나다순으로 정렬해 조회하세요. 정렬 기준 열을 넣으세요.",
+      "code": "SELECT emp_name FROM employees ORDER BY ______ ASC;",
+      "answers": ["emp_name"],
+      "ignoreCase": true,
+      "output": "이름이 가나다순으로 정렬된다",
+      "explain": "문자열 열(emp_name)도 정렬할 수 있습니다. ASC로 가나다순(오름차순) 정렬됩니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "개발부(dept_id 2) 직원을 급여 높은 순으로 조회하세요. WHERE와 ORDER BY의 순서를 맞춰 빈칸에 절을 넣으세요.",
+      "code": "SELECT emp_name, salary FROM employees ______ dept_id = 2 ORDER BY salary DESC;",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "(박민수,5000) (최지훈,3800) (정수진,3500)",
+      "explain": "순서는 WHERE(조건) → ORDER BY(정렬)입니다. 개발부 직원을 급여 높은 순으로 조회합니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "조회 결과를 정렬하는 절은?",
+        "options": ["SORT BY", "ORDER BY", "GROUP BY", "ARRANGE"],
+        "answer": 1,
+        "explain": "ORDER BY가 정렬 절입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "내림차순(큰 것 → 작은 것) 정렬 키워드는?",
+        "options": ["ASC", "DESC", "DOWN", "HIGH"],
+        "answer": 1,
+        "explain": "DESC(descending)가 내림차순입니다. ASC는 오름차순입니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "ORDER BY에서 정렬 방향을 생략하면 기본값은?",
+        "options": ["내림차순(DESC)", "오름차순(ASC)", "정렬 안 함", "무작위"],
+        "answer": 1,
+        "explain": "생략 시 기본값은 ASC(오름차순)입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "WHERE와 ORDER BY가 함께 있을 때 올바른 순서는?",
+        "options": [
+          "ORDER BY가 WHERE보다 앞",
+          "WHERE가 ORDER BY보다 앞",
+          "순서 상관없음",
+          "둘은 같이 못 쓴다"
+        ],
+        "answer": 1,
+        "explain": "순서는 SELECT → FROM → WHERE → ORDER BY 입니다. WHERE가 앞에 옵니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "`ORDER BY salary DESC` 의 결과 맨 위에 오는 직원은? (급여: 김철수 6000이 최고)",
+        "options": ["급여가 가장 낮은 직원", "급여가 가장 높은 직원", "이름이 빠른 직원", "가장 최근 입사자"],
+        "answer": 1,
+        "explain": "DESC는 큰 값이 위로 오므로 급여가 가장 높은 김철수(6000)가 맨 위입니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "여러 열로 정렬할 수도 있나요?", "a": "네. ORDER BY 열1, 열2 처럼 콤마로 여러 기준을 줄 수 있습니다. 다음 토픽에서 다룹니다." },
+    { "q": "ASC를 꼭 써야 하나요?", "a": "기본값이라 생략해도 오름차순으로 정렬됩니다. 다만 의도를 분명히 하려고 명시하기도 합니다." },
+    { "q": "문자열은 어떤 기준으로 정렬되나요?", "a": "기본적으로 사전 순서(문자 코드 순)로 정렬됩니다. 한글은 가나다순, 영문은 알파벳순이 됩니다. 정확한 순서는 DBMS의 문자 정렬 설정(collation)에 따라 조금 다를 수 있습니다." }
+  ]
+}

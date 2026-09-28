@@ -1,0 +1,71 @@
+{
+  "id": "track3.project",
+  "trackId": "track3",
+  "title": "급여 순위표와 직원 명함 만들기",
+  "intro": "경영진에게 보고할 '급여 순위표'를 만들고, 직원 명함에 쓸 표시 형식을 다듬는 작업입니다. 정렬(ORDER BY), 상위 N개(LIMIT), 그리고 문자열·숫자·날짜 함수를 활용해 데이터를 보기 좋게 가공합니다.",
+  "dataset": {
+    "description": "회사 조직 데이터베이스의 employees 테이블(직원 8명). salary, hire_date, position 등.",
+    "code": "-- employees: emp_id, emp_name, dept_id, position, salary, hire_date, manager_id"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "급여 상위 3명을 조회하세요. (내림차순 정렬 + 상위 3개)",
+      "code": "SELECT emp_name, salary FROM employees ORDER BY salary DESC ______ 3;",
+      "answers": ["LIMIT"],
+      "ignoreCase": true,
+      "output": "(김철수,6000) (박민수,5000) (임재현,4800)",
+      "explain": "ORDER BY salary DESC로 높은 순 정렬 후 LIMIT 3으로 상위 3명을 뽑습니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "가장 오래 근무한(입사일이 가장 이른) 직원 1명을 조회하세요. 입사일 오름차순 정렬을 완성하세요.",
+      "code": "SELECT emp_name, hire_date FROM employees ORDER BY hire_date ______ LIMIT 1;",
+      "answers": ["ASC"],
+      "ignoreCase": true,
+      "output": "(김철수, 2015-03-01)",
+      "explain": "입사일 오름차순(ASC)으로 정렬하면 가장 이른 날짜가 위로 옵니다. LIMIT 1로 최고참 김철수를 뽑습니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "직원 이름과 직급을 '김철수 (부장)' 형태로 합쳐 명함용 표시를 만드세요. (문자열 결합 함수)",
+      "code": "SELECT ______(emp_name, ' (', position, ')') AS 명함 FROM employees;",
+      "answers": ["CONCAT"],
+      "ignoreCase": true,
+      "output": "김철수 (부장), 이영희 (사원), ...",
+      "explain": "CONCAT으로 이름·직급·괄호를 이어 붙여 명함용 표시를 만듭니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "최고 급여자의 10% 인상 급여를 반올림해 보세요. (반올림 함수)",
+      "code": "SELECT emp_name, ______(salary * 1.1) AS 인상후 FROM employees ORDER BY salary DESC LIMIT 1;",
+      "answers": ["ROUND"],
+      "ignoreCase": true,
+      "output": "(김철수, 6600)",
+      "explain": "salary * 1.1로 10% 인상 후 ROUND로 반올림합니다. 최고 급여자 김철수의 인상 급여는 6600입니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "입사일에서 입사 '연도'만 뽑아 조회하세요. (연도 추출 함수)",
+      "code": "SELECT emp_name, ______(hire_date) AS 입사연도 FROM employees ORDER BY hire_date;",
+      "answers": ["YEAR"],
+      "ignoreCase": true,
+      "output": "(김철수,2015) (임재현,2016) (박민수,2017) ... (윤서연,2022)",
+      "explain": "YEAR(hire_date)로 입사 연도만 뽑습니다. 입사일 순으로 정렬해 연도별 입사 흐름을 볼 수 있습니다."
+    }
+  ],
+  "report": {
+    "title": "급여 순위 및 직원 정보 리포트",
+    "template": "최고 급여자: {topPaid} ({topSalary})\n급여 상위 3명: {top3}\n최고참(최초 입사): {senior} ({seniorDate})\n최고 급여자 10% 인상 시: {raised}\n사용 개념: {conceptsUsed}",
+    "computedValues": {
+      "topPaid": "김철수",
+      "topSalary": 6000,
+      "top3": "김철수, 박민수, 임재현",
+      "senior": "김철수",
+      "seniorDate": "2015-03-01",
+      "raised": 6600,
+      "conceptsUsed": "ORDER BY, LIMIT, CONCAT, ROUND, YEAR"
+    },
+    "conceptsUsed": ["ORDER BY", "LIMIT", "CONCAT", "ROUND", "YEAR"]
+  }
+}

@@ -176,6 +176,36 @@ export interface Database {
         };
         Relationships: [];
       };
+      coding_test_progress: {
+        Row: {
+          user_id: string;
+          problem_id: string;
+          lang: string;
+          solved: boolean;
+          attempts: number;
+          last_tried: string | null;
+          solved_at: string | null;
+        };
+        Insert: {
+          user_id: string;
+          problem_id: string;
+          lang: string;
+          solved?: boolean;
+          attempts?: number;
+          last_tried?: string | null;
+          solved_at?: string | null;
+        };
+        Update: {
+          user_id?: string;
+          problem_id?: string;
+          lang?: string;
+          solved?: boolean;
+          attempts?: number;
+          last_tried?: string | null;
+          solved_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       admin_user_list: {
@@ -201,6 +231,7 @@ export type UserStatsRow = Database["public"]["Tables"]["user_stats"]["Row"];
 export type UserBadgeRow = Database["public"]["Tables"]["user_badges"]["Row"];
 export type UserDiagnosticRow = Database["public"]["Tables"]["user_diagnostics"]["Row"];
 export type DiagnosticRetakeGrantRow = Database["public"]["Tables"]["diagnostic_retake_grants"]["Row"];
+export type CodingTestProgressRow = Database["public"]["Tables"]["coding_test_progress"]["Row"];
 export type AdminUserListRow = Database["public"]["Views"]["admin_user_list"]["Row"];
 
 export interface StudentCourseProgress {

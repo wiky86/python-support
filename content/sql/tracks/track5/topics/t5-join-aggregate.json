@@ -1,0 +1,129 @@
+{
+  "id": "track5.join-aggregate",
+  "trackId": "track5",
+  "order": 5,
+  "title": "JOIN과 집계 결합하기",
+  "content": "## 조인한 결과를 그룹 집계\n\n트랙4의 집계(GROUP BY)와 이번 조인을 결합하면 강력해집니다. 예를 들어 '부서 **이름**별 평균 급여'는 조인 없이는 부서 번호(dept_id)로만 볼 수 있었지만, 조인하면 부서 이름으로 볼 수 있습니다.\n\n```sql\nSELECT d.dept_name, ROUND(AVG(e.salary)) AS avg_sal\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nGROUP BY d.dept_name;\n```\n\n두 테이블을 조인한 뒤, 부서 이름으로 그룹을 나눠 평균 급여를 구합니다. 결과: 개발부 4100, 마케팅부 4800, 영업부 4600, 인사부 3500.\n\n## 부서별 인원 (이름으로)\n\n```sql\nSELECT d.dept_name, COUNT(*) AS cnt\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nGROUP BY d.dept_name\nORDER BY cnt DESC;\n```\n\n부서 이름별 인원을 많은 순으로 봅니다. 개발부(3), 영업부(2), 인사부(2), 마케팅부(1).\n\n## 근무지별 집계\n\ndepartments의 `location`(근무지)으로도 그룹화할 수 있습니다.\n\n```sql\nSELECT d.location, COUNT(*) AS cnt\nFROM employees e\nJOIN departments d ON e.dept_id = d.dept_id\nGROUP BY d.location;\n```\n\n근무지별 직원 수: 서울 6명, 부산 2명. 조인 덕분에 employees에 없는 location 정보로도 집계할 수 있습니다.\n\n## 절의 순서\n\n조인이 들어가도 순서는 그대로입니다: FROM(+JOIN) → WHERE → GROUP BY → HAVING → ORDER BY. 조인은 FROM 부분에서 테이블을 합치는 단계라고 보면 됩니다.\n\n## 정리\n\n조인과 집계를 결합하면 '부서 이름별', '근무지별'처럼 다른 테이블의 정보로 그룹 집계를 할 수 있습니다. 조인은 FROM 단계에서 테이블을 합치고, 이후 GROUP BY·집계가 적용됩니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "부서 이름별 평균 급여를 구하세요. 부서 이름으로 그룹화하는 절을 넣으세요.",
+      "code": "SELECT d.dept_name, ROUND(AVG(e.salary)) FROM employees e JOIN departments d ON e.dept_id = d.dept_id ______ d.dept_name;",
+      "answers": ["GROUP BY"],
+      "ignoreCase": true,
+      "output": "(개발부,4100) (마케팅부,4800) (영업부,4600) (인사부,3500)",
+      "explain": "조인 후 GROUP BY d.dept_name으로 부서 이름별 평균 급여를 구합니다. 조인 덕분에 번호가 아닌 이름으로 볼 수 있습니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "부서 이름별 인원을 구하세요. 개수 집계 함수를 넣으세요.",
+      "code": "SELECT d.dept_name, ______(*) AS cnt FROM employees e JOIN departments d ON e.dept_id = d.dept_id GROUP BY d.dept_name;",
+      "answers": ["COUNT"],
+      "ignoreCase": true,
+      "output": "(개발부,3) (마케팅부,1) (영업부,2) (인사부,2)",
+      "explain": "COUNT(*)를 부서 이름 그룹에 적용해 부서별 인원을 셉니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "근무지(location)별 직원 수를 구하세요. departments의 근무지 열로 그룹화하세요.",
+      "code": "SELECT d.location, COUNT(*) FROM employees e JOIN departments d ON e.dept_id = d.dept_id GROUP BY d.______;",
+      "answers": ["location"],
+      "ignoreCase": true,
+      "output": "(부산,2) (서울,6)",
+      "explain": "GROUP BY d.location으로 근무지별 인원을 셉니다. 서울 6명, 부산 2명. employees에 없는 정보로도 집계 가능합니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "부서 이름별 인원을 많은 순으로 정렬하세요. 정렬 절을 넣으세요.",
+      "code": "SELECT d.dept_name, COUNT(*) AS cnt FROM employees e JOIN departments d ON e.dept_id = d.dept_id GROUP BY d.dept_name ______ cnt DESC;",
+      "answers": ["ORDER BY"],
+      "ignoreCase": true,
+      "output": "(개발부,3) (영업부,2) (인사부,2) (마케팅부,1)",
+      "explain": "조인·집계 후 ORDER BY cnt DESC로 인원 많은 순 정렬합니다. 개발부가 3명으로 1위입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "조인이 들어간 쿼리에서 테이블을 합치는(조인하는) 부분은 어느 절에 속하나요?",
+      "code": "조인은 ______ 절에서 테이블을 합친다 (WHERE보다 앞)",
+      "answers": ["FROM"],
+      "ignoreCase": true,
+      "output": "FROM (+JOIN) 단계에서 테이블이 합쳐진다",
+      "explain": "조인은 FROM 단계에서 테이블을 합치는 것입니다. 이후 WHERE → GROUP BY → 집계 순으로 진행됩니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "조인과 집계를 결합하면 가능한 것은?",
+        "options": [
+          "한 테이블 정보로만 집계",
+          "다른 테이블의 정보(부서 이름·근무지 등)로 그룹 집계",
+          "집계가 불가능해짐",
+          "정렬만 가능"
+        ],
+        "answer": 1,
+        "explain": "조인하면 departments의 dept_name, location 같은 다른 테이블 정보로도 그룹 집계를 할 수 있습니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "'부서 이름별 평균 급여'를 구하려면 필요한 조합은?",
+        "options": [
+          "GROUP BY만",
+          "JOIN + GROUP BY + AVG",
+          "ORDER BY만",
+          "DISTINCT만"
+        ],
+        "answer": 1,
+        "explain": "부서 이름은 departments에 있으므로 JOIN으로 연결하고, GROUP BY로 묶어 AVG로 평균을 냅니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "조인이 포함된 쿼리에서 절의 순서로 옳은 것은?",
+        "options": [
+          "WHERE → FROM/JOIN → GROUP BY",
+          "FROM/JOIN → WHERE → GROUP BY → HAVING → ORDER BY",
+          "GROUP BY → JOIN → WHERE",
+          "SELECT → JOIN → FROM"
+        ],
+        "answer": 1,
+        "explain": "조인은 FROM 단계에 속하며, 이후 WHERE → GROUP BY → HAVING → ORDER BY 순입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "근무지별 직원 수를 구하는 핵심 절은?",
+        "options": [
+          "GROUP BY d.location",
+          "GROUP BY e.emp_id",
+          "ORDER BY d.location",
+          "WHERE d.location"
+        ],
+        "answer": 0,
+        "explain": "departments.location으로 GROUP BY하면 근무지별 인원을 셀 수 있습니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "조인·집계 결과를 인원 많은 순으로 정렬하려면?",
+        "options": [
+          "GROUP BY cnt DESC",
+          "ORDER BY cnt DESC",
+          "HAVING cnt DESC",
+          "WHERE cnt DESC"
+        ],
+        "answer": 1,
+        "explain": "정렬은 ORDER BY입니다. 집계 결과 별칭(cnt)을 ORDER BY에서 쓸 수 있습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "GROUP BY를 dept_id로 하는 것과 dept_name으로 하는 것의 차이는?", "a": "결과 그룹은 사실상 같지만, dept_name으로 그룹화하면 결과에 이름이 나와 읽기 좋습니다. 조인을 했기에 이름으로 묶을 수 있는 것입니다." },
+    { "q": "집계 함수 안에는 어느 테이블 열을 넣나요?", "a": "집계 대상 열이 있는 테이블의 것을 넣습니다. 급여는 employees에 있으니 AVG(e.salary)처럼 e(employees)의 열을 씁니다." },
+    { "q": "조인한 상태에서 HAVING도 쓸 수 있나요?", "a": "네. 조인·그룹화 후 HAVING으로 그룹 조건을 걸 수 있습니다. 예: 인원이 2명 이상인 부서만 등." }
+  ]
+}

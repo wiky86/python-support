@@ -1,0 +1,81 @@
+{
+  "course": "sql",
+  "headline": "데이터를 자유자재로 다루는 SQL 여정",
+  "outcome": "이 과정을 마치면, 데이터베이스에서 원하는 데이터를 조회·집계하고, 여러 테이블을 연결하며, 서브쿼리와 윈도우 함수로 복잡한 분석까지 SQL로 해결할 수 있습니다.",
+  "note": "아래 지도는 전체 여정을 보여줄 뿐, 학습은 트랙1부터 순서대로 진행됩니다. 각 트랙은 앞 트랙을 마쳐야 열립니다. (MySQL 기준)",
+  "journey": [
+    {
+      "trackId": "track1",
+      "order": 1,
+      "stationTitle": "데이터베이스와 SQL 입문",
+      "whatYouLearn": "데이터베이스·테이블·행·열 개념, SELECT로 데이터 조회 첫걸음.",
+      "whyItMatters": "SQL을 처음 만나는 출발점입니다. 데이터가 어떻게 저장되는지 이해하면 이후가 쉬워집니다.",
+      "realWorld": "회사 데이터베이스에서 직원 목록을 처음 꺼내 보기.",
+      "preview": null
+    },
+    {
+      "trackId": "track2",
+      "order": 2,
+      "stationTitle": "데이터 조회 기초",
+      "whatYouLearn": "WHERE 조건 검색, 비교·논리 연산자, BETWEEN·IN·LIKE, NULL, DISTINCT.",
+      "whyItMatters": "'원하는 데이터만 골라내는' 능력은 SQL의 가장 기본이자 핵심입니다.",
+      "realWorld": "급여 4000 이상, 특정 부서, 이름 검색 등 조건별 직원 찾기.",
+      "preview": null
+    },
+    {
+      "trackId": "track3",
+      "order": 3,
+      "stationTitle": "정렬과 함수",
+      "whatYouLearn": "ORDER BY 정렬, LIMIT, 문자열·숫자·날짜 함수.",
+      "whyItMatters": "데이터를 원하는 순서로 정리하고 보기 좋게 가공하는 기술입니다.",
+      "realWorld": "급여 순위표 만들기, 이름·날짜 형식 다듬기.",
+      "preview": null
+    },
+    {
+      "trackId": "track4",
+      "order": 4,
+      "stationTitle": "집계와 그룹화",
+      "whatYouLearn": "COUNT·SUM·AVG 집계 함수, GROUP BY, HAVING.",
+      "whyItMatters": "'부서별 평균', '직급별 인원'처럼 데이터를 요약해 인사이트를 뽑는 핵심 기술입니다.",
+      "realWorld": "부서별 인력·급여 현황 요약 리포트 만들기.",
+      "preview": null
+    },
+    {
+      "trackId": "track5",
+      "order": 5,
+      "stationTitle": "여러 테이블 다루기 (JOIN)",
+      "whatYouLearn": "INNER/LEFT JOIN, 테이블 별칭, 조인+집계, self join.",
+      "whyItMatters": "나뉘어 저장된 데이터를 연결하는 JOIN은 관계형 DB의 진짜 힘입니다.",
+      "realWorld": "직원과 부서 이름을 연결하고, 직원-상사 조직도 조회하기.",
+      "preview": null
+    },
+    {
+      "trackId": "track6",
+      "order": 6,
+      "stationTitle": "서브쿼리와 고급 조회",
+      "whatYouLearn": "서브쿼리(WHERE·IN·FROM), EXISTS, 뷰(VIEW).",
+      "whyItMatters": "'평균보다 많이 받는 직원'처럼 한 번에 풀기 어려운 문제를 단계적으로 해결합니다.",
+      "realWorld": "평균 초과자, 고액연봉자 보유 부서 등 조건부 분석.",
+      "preview": null
+    },
+    {
+      "trackId": "track7",
+      "order": 7,
+      "stationTitle": "데이터 조작과 정의",
+      "whatYouLearn": "INSERT·UPDATE·DELETE, CREATE·ALTER·DROP, 제약조건.",
+      "whyItMatters": "조회를 넘어 데이터를 직접 추가·수정·삭제하고 테이블을 설계하는 능력입니다.",
+      "realWorld": "새 프로젝트 관리 테이블을 만들고 데이터를 관리하기.",
+      "preview": null
+    },
+    {
+      "trackId": "track8",
+      "order": 8,
+      "stationTitle": "실무 종합 (윈도우·CTE)",
+      "whatYouLearn": "윈도우 함수(ROW_NUMBER·RANK·PARTITION BY), CTE(WITH), 종합 실전 쿼리.",
+      "whyItMatters": "가장 고급 기술로, 앞서 배운 모든 것을 종합해 실무 분석 쿼리를 완성합니다.",
+      "realWorld": "부서별 급여 1위, 순위표, 비중 분석 등 실전 리포트 쿼리.",
+      "preview": { "type": "info", "note": "배운 모든 기술이 하나로 만나는 마무리 트랙입니다." }
+    }
+  ],
+  "previewWidgets": []
+}

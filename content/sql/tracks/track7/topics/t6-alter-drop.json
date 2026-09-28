@@ -1,0 +1,124 @@
+{
+  "id": "track7.alter-drop",
+  "trackId": "track7",
+  "order": 6,
+  "title": "테이블 구조 변경과 삭제 — ALTER, DROP",
+  "content": "## 이미 만든 테이블 고치기\n\n테이블을 만든 뒤에도 구조를 바꿔야 할 때가 있습니다. '열을 추가한다', '열 이름을 바꾼다', '열을 삭제한다' 같은 변경은 **ALTER TABLE**로 합니다.\n\n## 열 추가 — ADD\n\n```sql\nALTER TABLE employees\nADD email VARCHAR(100);\n```\n\nemployees에 email 열을 추가합니다. 기존 행들의 email은 NULL이 됩니다.\n\n## 열 삭제 — DROP COLUMN\n\n```sql\nALTER TABLE employees\nDROP COLUMN email;\n```\n\nemail 열을 삭제합니다. 그 열의 데이터도 함께 사라집니다.\n\n## 열 자료형 변경 — MODIFY\n\n```sql\nALTER TABLE employees\nMODIFY salary BIGINT;\n```\n\nsalary 열의 타입을 바꿉니다(MySQL 문법). 기존 데이터가 새 타입에 맞아야 합니다.\n\n## 열 이름 변경 — CHANGE / RENAME\n\n```sql\nALTER TABLE employees\nCHANGE email email_address VARCHAR(100);\n```\n\nMySQL에서 CHANGE는 열 이름과 타입을 함께 바꿉니다. 테이블 이름 자체를 바꾸려면:\n\n```sql\nALTER TABLE projects RENAME TO project_list;\n```\n\n## 테이블 삭제 — DROP TABLE\n\n```sql\nDROP TABLE projects;\n```\n\n테이블 **자체**를 삭제합니다. 구조와 데이터가 모두 사라집니다. DELETE(행만 삭제)와 다르다는 점을 다시 기억하세요.\n\n- **DELETE FROM projects**: projects의 행(데이터)만 삭제, 테이블은 남음.\n- **DROP TABLE projects**: projects 테이블 자체를 삭제, 구조까지 사라짐.\n\n## ⚠️ DROP은 되돌리기 어렵다\n\nDROP TABLE은 테이블을 통째로 없앱니다. 실수하면 복구가 매우 어려우니, 실행 전 정말 필요한지 반드시 확인하세요. 존재하지 않아도 오류를 막으려면 `DROP TABLE IF EXISTS 테이블;` 형태를 씁니다.\n\n## 정리\n\nALTER TABLE로 기존 테이블의 구조를 바꿉니다: ADD(열 추가), DROP COLUMN(열 삭제), MODIFY(타입 변경), CHANGE/RENAME(이름 변경). DROP TABLE은 테이블 자체를 삭제하며(DELETE와 구분), 되돌리기 어려우니 신중해야 합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "employees의 구조를 변경하려 합니다. 구조 변경 명령어를 넣으세요. (두 단어 중 첫 단어)",
+      "code": "______ TABLE employees ADD email VARCHAR(100);",
+      "answers": ["ALTER"],
+      "ignoreCase": true,
+      "output": "employees에 email 열이 추가됨",
+      "explain": "ALTER TABLE로 기존 테이블의 구조를 변경합니다. ADD, DROP COLUMN, MODIFY 등과 함께 씁니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "employees에 email 열을 추가하세요. 열 추가 키워드를 넣으세요.",
+      "code": "ALTER TABLE employees ______ email VARCHAR(100);",
+      "answers": ["ADD"],
+      "ignoreCase": true,
+      "output": "email 열이 추가됨(기존 행은 NULL)",
+      "explain": "ADD로 새 열을 추가합니다. 기존 행들의 새 열 값은 NULL이 됩니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "employees에서 email 열을 삭제하세요. 열 삭제 키워드를 넣으세요. (두 단어)",
+      "code": "ALTER TABLE employees ______ COLUMN email;",
+      "answers": ["DROP"],
+      "ignoreCase": true,
+      "output": "email 열과 그 데이터가 삭제됨",
+      "explain": "DROP COLUMN으로 특정 열을 삭제합니다. 그 열의 데이터도 함께 사라집니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "projects 테이블 '자체'를 삭제하세요. (테이블 삭제, 구조까지)",
+      "code": "______ TABLE projects;",
+      "answers": ["DROP"],
+      "ignoreCase": true,
+      "output": "projects 테이블이 구조·데이터 모두 삭제됨",
+      "explain": "DROP TABLE은 테이블 자체를 삭제합니다. DELETE(행만 삭제)와 달리 구조까지 사라집니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "테이블이 없어도 오류가 나지 않게 DROP하려 합니다. 조건 절을 완성하세요. (IF ______ EXISTS)",
+      "code": "DROP TABLE ______ EXISTS projects;",
+      "answers": ["IF"],
+      "ignoreCase": true,
+      "output": "projects가 있으면 삭제, 없으면 오류 없이 넘어감",
+      "explain": "DROP TABLE IF EXISTS는 테이블이 없을 때 오류를 내지 않고 넘어갑니다. 안전하게 삭제할 때 유용합니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "기존 테이블의 구조(열 추가·삭제 등)를 바꾸는 명령은?",
+        "options": ["UPDATE TABLE", "ALTER TABLE", "MODIFY TABLE", "CHANGE TABLE"],
+        "answer": 1,
+        "explain": "ALTER TABLE이 테이블 구조를 변경하는 명령입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "테이블에 새 열을 추가하는 것은?",
+        "options": [
+          "ALTER TABLE ... ADD 열이름 타입",
+          "INSERT 열이름",
+          "UPDATE ADD 열이름",
+          "CREATE COLUMN"
+        ],
+        "answer": 0,
+        "explain": "ALTER TABLE 테이블 ADD 열이름 타입 으로 새 열을 추가합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "DELETE FROM projects 와 DROP TABLE projects 의 차이는?",
+        "options": [
+          "완전히 같다",
+          "DELETE는 행만 삭제(테이블 남음), DROP TABLE은 테이블 자체 삭제",
+          "DELETE가 테이블을 없앤다",
+          "DROP은 행만 지운다"
+        ],
+        "answer": 1,
+        "explain": "DELETE는 행(데이터)만 지우고 테이블은 남깁니다. DROP TABLE은 테이블 구조까지 통째로 삭제합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "특정 열을 삭제하는 것은?",
+        "options": [
+          "ALTER TABLE ... DROP COLUMN 열이름",
+          "DELETE COLUMN 열이름",
+          "DROP TABLE 열이름",
+          "REMOVE 열이름"
+        ],
+        "answer": 0,
+        "explain": "ALTER TABLE 테이블 DROP COLUMN 열이름 으로 열을 삭제합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "DROP TABLE을 쓸 때 주의할 점은?",
+        "options": [
+          "언제든 되돌릴 수 있어 안전하다",
+          "테이블이 통째로 사라지고 복구가 어려우니 신중해야 한다",
+          "행만 지워지므로 안전하다",
+          "구조는 남는다"
+        ],
+        "answer": 1,
+        "explain": "DROP TABLE은 테이블을 통째로 없애고 복구가 어렵습니다. 실행 전 반드시 확인하고, IF EXISTS로 안전장치를 두기도 합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "ALTER로 열을 추가하면 기존 데이터는 어떻게 되나요?", "a": "기존 행은 그대로 있고, 새로 추가된 열의 값만 NULL(또는 지정한 기본값)이 됩니다. 데이터가 사라지지는 않습니다." },
+    { "q": "DROP COLUMN과 DROP TABLE을 헷갈려요.", "a": "DROP COLUMN은 '열 하나'를 지우는 것(ALTER TABLE의 일부), DROP TABLE은 '테이블 전체'를 지우는 것입니다. 범위가 완전히 다릅니다." },
+    { "q": "열 이름 변경 문법이 DBMS마다 다른가요?", "a": "네, 차이가 있습니다. MySQL은 CHANGE(이름+타입)나 RENAME COLUMN을 씁니다. 이 과정은 MySQL 기준이며, 다른 DBMS는 문법이 조금 다를 수 있습니다." }
+  ]
+}

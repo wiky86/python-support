@@ -1,0 +1,23 @@
+{
+  "id": "track8",
+  "order": 8,
+  "title": "실무 종합 — 윈도우 함수와 CTE",
+  "description": "실무에서 강력하게 쓰이는 고급 기술을 배웁니다. 순위를 매기고(ROW_NUMBER·RANK), 그룹별로 값을 유지하며 계산하는 윈도우 함수, 그리고 복잡한 쿼리를 단계로 정리하는 CTE(WITH)까지. 지금까지 배운 모든 것을 종합하는 마지막 트랙입니다.",
+  "topicOrder": [
+    "track8.window-intro",
+    "track8.rank-functions",
+    "track8.partition-by",
+    "track8.window-aggregate",
+    "track8.cte",
+    "track8.final-combine"
+  ],
+  "topicFiles": [
+    "topics/t1-window-intro.json",
+    "topics/t2-rank-functions.json",
+    "topics/t3-partition-by.json",
+    "topics/t4-window-aggregate.json",
+    "topics/t5-cte.json",
+    "topics/t6-final-combine.json"
+  ],
+  "projectFile": "project.json"
+}

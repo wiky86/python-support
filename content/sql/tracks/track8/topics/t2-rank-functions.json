@@ -1,0 +1,114 @@
+{
+  "id": "track8.rank-functions",
+  "trackId": "track8",
+  "order": 2,
+  "title": "순위 매기기 — ROW_NUMBER, RANK, DENSE_RANK",
+  "content": "## 순위를 붙이는 함수\n\n'급여 순위 1등, 2등...'처럼 각 행에 순위를 매기는 윈도우 함수가 세 가지 있습니다. OVER 절에 **ORDER BY로 순위 기준**을 정합니다.\n\n## ROW_NUMBER — 무조건 순번\n\n```sql\nSELECT emp_name, salary,\n       ROW_NUMBER() OVER (ORDER BY salary DESC) AS 순번\nFROM employees;\n```\n\n급여 높은 순으로 1, 2, 3... 번호를 매깁니다. **동점이 있어도 무조건 다른 번호**를 줍니다. 김철수 1, 박민수 2, 임재현 3...\n\n## RANK — 동점은 같은 순위, 다음은 건너뜀\n\n동점자에게 **같은 순위**를 주고, 그 다음 순위는 **건너뜁니다**.\n\n예를 들어 90점 두 명, 80점 한 명이 있으면:\n- RANK: 1, 1, 3 (90점 둘 다 1등, 80점은 3등 — 2등 건너뜀)\n\n## DENSE_RANK — 동점은 같은 순위, 다음은 안 건너뜀\n\n동점자에게 같은 순위를 주되, 다음 순위를 **건너뛰지 않습니다**.\n- DENSE_RANK: 1, 1, 2 (90점 둘 다 1등, 80점은 2등 — 안 건너뜀)\n\n## 세 함수 비교 (90, 90, 80, 70점)\n\n| 점수 | ROW_NUMBER | RANK | DENSE_RANK |\n|---|---|---|---|\n| 90 | 1 | 1 | 1 |\n| 90 | 2 | 1 | 1 |\n| 80 | 3 | 3 | 2 |\n| 70 | 4 | 4 | 3 |\n\n- **ROW_NUMBER**: 동점 무시, 무조건 순번.\n- **RANK**: 동점 같은 순위, 다음 건너뜀(올림픽 순위 방식).\n- **DENSE_RANK**: 동점 같은 순위, 다음 안 건너뜀.\n\n## 어떤 걸 쓸까\n\n- '중복 없는 일련번호'가 필요하면 ROW_NUMBER.\n- '동점을 공동 순위로, 실제 등수 표현'은 RANK.\n- '동점을 공동 순위로, 순위 값을 촘촘히'는 DENSE_RANK.\n\n## 정리\n\n순위 함수는 OVER (ORDER BY ...)로 순위를 매깁니다. ROW_NUMBER는 동점도 다른 번호, RANK는 동점 같은 순위에 다음 건너뜀, DENSE_RANK는 동점 같은 순위에 다음 안 건너뜀. 동점 처리 방식이 핵심 차이입니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "급여 높은 순으로 1,2,3... 순번을 매기세요(동점도 다른 번호). 순번 함수를 넣으세요.",
+      "code": "SELECT emp_name, salary, ______() OVER (ORDER BY salary DESC) AS 순번 FROM employees;",
+      "answers": ["ROW_NUMBER"],
+      "ignoreCase": true,
+      "output": "김철수1, 박민수2, 임재현3, 강다연4, 최지훈5, 정수진6, 이영희7, 윤서연8",
+      "explain": "ROW_NUMBER()는 동점 여부와 상관없이 무조건 1,2,3... 순번을 매깁니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "순위 함수의 OVER 절에서 순위 기준(급여 내림차순)을 정하는 절을 넣으세요.",
+      "code": "SELECT emp_name, RANK() OVER (______ salary DESC) AS 순위 FROM employees;",
+      "answers": ["ORDER BY"],
+      "ignoreCase": true,
+      "output": "급여 높은 순으로 순위가 매겨짐",
+      "explain": "OVER 절 안의 ORDER BY가 순위 기준을 정합니다. salary DESC면 급여 높은 순으로 순위를 매깁니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "동점자에게 같은 순위를 주고 다음 순위를 '건너뛰는' 순위 함수는? (올림픽 방식)",
+      "code": "SELECT emp_name, salary, ______() OVER (ORDER BY salary DESC) FROM employees;",
+      "answers": ["RANK"],
+      "ignoreCase": true,
+      "output": "동점은 같은 순위, 다음은 건너뜀 (예: 1,1,3)",
+      "explain": "RANK()는 동점자에게 같은 순위를 주고 다음 순위를 건너뜁니다. 90,90,80점이면 1,1,3이 됩니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "동점자에게 같은 순위를 주되 다음 순위를 '건너뛰지 않는' 순위 함수는?",
+      "code": "SELECT name, score, ______() OVER (ORDER BY score DESC) FROM t;",
+      "answers": ["DENSE_RANK"],
+      "ignoreCase": true,
+      "output": "동점은 같은 순위, 다음은 안 건너뜀 (예: 1,1,2)",
+      "explain": "DENSE_RANK()는 동점자에게 같은 순위를 주되 다음 순위를 건너뛰지 않습니다. 90,90,80점이면 1,1,2가 됩니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "90,90,80,70점에서 RANK() 결과는 1,1,?,4 입니다. ?에 들어갈 값(80점의 순위)은?",
+      "code": "RANK 결과: 1, 1, ______, 4",
+      "answers": ["3"],
+      "ignoreCase": true,
+      "output": "3 (RANK는 2를 건너뜀)",
+      "explain": "RANK는 동점(90점 둘)이 1등을 공유한 뒤 2등을 건너뛰고, 80점은 3등이 됩니다. DENSE_RANK였다면 2가 됩니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "동점이 있어도 무조건 다른 순번(1,2,3...)을 매기는 함수는?",
+        "options": ["RANK", "DENSE_RANK", "ROW_NUMBER", "COUNT"],
+        "answer": 2,
+        "explain": "ROW_NUMBER는 동점 여부와 무관하게 무조건 고유한 순번을 매깁니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "순위 함수에서 순위 기준을 정하는 것은?",
+        "options": [
+          "OVER 절 안의 ORDER BY",
+          "WHERE 절",
+          "GROUP BY",
+          "LIMIT"
+        ],
+        "answer": 0,
+        "explain": "OVER (ORDER BY 기준열) 형태로 순위 기준을 정합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "점수 90,90,80일 때 RANK() 결과는?",
+        "options": ["1,1,2", "1,1,3", "1,2,3", "1,2,2"],
+        "answer": 1,
+        "explain": "RANK는 동점 90점이 1등을 공유하고 2등을 건너뛰어, 80점이 3등이 됩니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "점수 90,90,80일 때 DENSE_RANK() 결과는?",
+        "options": ["1,1,2", "1,1,3", "1,2,3", "1,2,2"],
+        "answer": 0,
+        "explain": "DENSE_RANK는 동점 90점이 1등을 공유하되 다음을 건너뛰지 않아, 80점이 2등이 됩니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "RANK와 DENSE_RANK의 차이는?",
+        "options": [
+          "RANK는 동점을 다르게 처리한다",
+          "동점 후 RANK는 다음 순위를 건너뛰고, DENSE_RANK는 건너뛰지 않는다",
+          "DENSE_RANK는 순위를 안 매긴다",
+          "둘은 완전히 같다"
+        ],
+        "answer": 1,
+        "explain": "둘 다 동점에 같은 순위를 주지만, RANK는 다음 순위를 건너뛰고 DENSE_RANK는 건너뛰지 않습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "순위 함수에 OVER를 안 쓰면 안 되나요?", "a": "순위 함수는 반드시 OVER 절이 필요합니다. OVER (ORDER BY ...)로 어떤 순서로 순위를 매길지 정해야 하기 때문입니다." },
+    { "q": "세 함수 중 뭘 가장 많이 쓰나요?", "a": "상황에 따라 다릅니다. '각 그룹에서 1등만 뽑기'엔 ROW_NUMBER, '실제 등수 표현'엔 RANK, '순위 값을 촘촘히'엔 DENSE_RANK를 씁니다. 세 개 다 자주 쓰입니다." },
+    { "q": "순위를 오름차순으로 매길 수도 있나요?", "a": "네. OVER (ORDER BY salary ASC)로 하면 급여가 낮은 사람이 1등이 됩니다. 기준과 방향은 자유롭게 정할 수 있습니다." }
+  ]
+}

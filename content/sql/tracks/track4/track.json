@@ -1,0 +1,23 @@
+{
+  "id": "track4",
+  "order": 4,
+  "title": "집계와 그룹화",
+  "description": "데이터를 요약하는 집계 함수(COUNT·SUM·AVG·MAX·MIN)와, 그룹별로 나눠 집계하는 GROUP BY, 그룹에 조건을 거는 HAVING을 배웁니다. '부서별 평균 급여'처럼 데이터에서 인사이트를 뽑는 핵심 기술입니다.",
+  "topicOrder": [
+    "track4.aggregate-basic",
+    "track4.count-null",
+    "track4.group-by",
+    "track4.group-multi",
+    "track4.having",
+    "track4.aggregate-combine"
+  ],
+  "topicFiles": [
+    "topics/t1-aggregate-basic.json",
+    "topics/t2-count-null.json",
+    "topics/t3-group-by.json",
+    "topics/t4-group-multi.json",
+    "topics/t5-having.json",
+    "topics/t6-aggregate-combine.json"
+  ],
+  "projectFile": "project.json"
+}

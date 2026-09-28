@@ -1,0 +1,124 @@
+{
+  "id": "track8.window-aggregate",
+  "trackId": "track8",
+  "order": 4,
+  "title": "집계 윈도우 함수와 비교 분석",
+  "content": "## 집계를 각 행 옆에\n\n앞에서 잠깐 본 것처럼, SUM·AVG·COUNT 같은 집계 함수도 OVER와 함께 쓰면 윈도우 함수가 됩니다. 각 행을 유지하면서 집계 값을 붙이므로, **개별 값과 집계를 비교**하기 좋습니다.\n\n## 전체 대비 비교\n\n```sql\nSELECT emp_name, salary,\n       ROUND(AVG(salary) OVER ()) AS 전체평균,\n       salary - ROUND(AVG(salary) OVER ()) AS 평균과의차이\nFROM employees;\n```\n\n각 직원의 급여가 전체 평균과 얼마나 차이 나는지 한눈에 봅니다. 김철수는 평균(4163)보다 +1837, 윤서연은 -1163 처럼요. 개별 값과 집계를 나란히 두고 뺄셈까지 하는 것이 윈도우 함수의 강점입니다.\n\n## 부서 내 비율\n\n```sql\nSELECT emp_name, dept_id, salary,\n       ROUND(salary * 100.0 / SUM(salary) OVER (PARTITION BY dept_id), 1) AS 부서내비중\nFROM employees;\n```\n\n각 직원의 급여가 자기 부서 총급여에서 차지하는 비율(%)을 구합니다. 부서별 총합(윈도우)으로 나눠 개인 비중을 계산합니다.\n\n## 누적 합계 — ORDER BY와 함께\n\nOVER 안에 ORDER BY를 넣으면 **누적** 계산이 됩니다.\n\n```sql\nSELECT emp_name, salary,\n       SUM(salary) OVER (ORDER BY salary) AS 누적합\nFROM employees;\n```\n\n급여를 낮은 순으로 정렬하면서, 그 행까지의 급여 누적 합계를 구합니다. 낮은 급여부터 차곡차곡 더해집니다. 매출 누적, 랭킹 누적 인원 등에 활용됩니다.\n\n## COUNT 윈도우\n\n```sql\nSELECT emp_name, dept_id,\n       COUNT(*) OVER (PARTITION BY dept_id) AS 부서인원\nFROM employees;\n```\n\n각 직원 옆에 그 부서의 총 인원을 표시합니다. '나는 3명짜리 부서 소속'임을 각 행에서 알 수 있습니다.\n\n## 정리\n\n집계 함수(SUM·AVG·COUNT)에 OVER를 붙이면 각 행을 유지하며 집계 값을 붙입니다. 전체·그룹 평균과의 비교, 그룹 내 비중, 누적 합계(ORDER BY 포함) 등 개별과 집계를 함께 다루는 분석에 강력합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "각 직원의 급여 옆에 전체 평균을 붙이세요. 집계 함수를 윈도우로 쓰는 절을 넣으세요.",
+      "code": "SELECT emp_name, salary, ROUND(AVG(salary) ______ ()) AS 전체평균 FROM employees;",
+      "answers": ["OVER"],
+      "ignoreCase": true,
+      "output": "각 행에 전체평균 4163이 붙음",
+      "explain": "AVG(salary) OVER ()는 각 행을 유지하며 전체 평균을 붙입니다. OVER가 윈도우 함수임을 나타냅니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "각 직원이 자기 부서 총급여에서 차지하는 비중을 구하려 합니다. 부서 총합을 부서별로 계산하는 절을 완성하세요.",
+      "code": "SELECT emp_name, ROUND(salary * 100.0 / SUM(salary) OVER (______ dept_id), 1) AS 부서내비중 FROM employees;",
+      "answers": ["PARTITION BY"],
+      "ignoreCase": true,
+      "output": "각 직원의 부서 내 급여 비중(%)",
+      "explain": "SUM(salary) OVER (PARTITION BY dept_id)로 부서별 총급여를 구하고, 개인 급여를 그것으로 나눠 비중을 계산합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "급여를 낮은 순으로 정렬하며 누적 합계를 구하세요. OVER 안에 누적 순서를 정하는 절을 넣으세요.",
+      "code": "SELECT emp_name, salary, SUM(salary) OVER (______ salary) AS 누적합 FROM employees;",
+      "answers": ["ORDER BY"],
+      "ignoreCase": true,
+      "output": "급여 낮은 순으로 누적된 합계",
+      "explain": "OVER 안에 ORDER BY를 넣으면 누적 계산이 됩니다. SUM(salary) OVER (ORDER BY salary)는 그 행까지의 누적 합입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "각 직원 옆에 그 부서의 총인원을 표시하세요. 개수 집계 함수를 윈도우로 쓰세요.",
+      "code": "SELECT emp_name, dept_id, ______(*) OVER (PARTITION BY dept_id) AS 부서인원 FROM employees;",
+      "answers": ["COUNT"],
+      "ignoreCase": true,
+      "output": "개발부 직원은 모두 3, 영업부는 2 등",
+      "explain": "COUNT(*) OVER (PARTITION BY dept_id)는 각 직원 옆에 그 부서의 총 인원을 붙입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "각 직원의 급여에서 전체 평균을 뺀 '차이'를 구하려 합니다. 전체 평균 윈도우 함수를 넣으세요.",
+      "code": "SELECT emp_name, salary - ROUND(______(salary) OVER ()) AS 평균차이 FROM employees;",
+      "answers": ["AVG"],
+      "ignoreCase": true,
+      "output": "김철수 +1837, 윤서연 -1163 등 (평균 4163 기준)",
+      "explain": "salary - AVG(salary) OVER () 로 개인 급여와 전체 평균의 차이를 구합니다. 개별과 집계를 함께 계산하는 윈도우 함수의 강점입니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "집계 함수를 윈도우 함수로 만드는 것은?",
+        "options": ["GROUP BY 추가", "OVER 절 추가", "HAVING 추가", "DISTINCT 추가"],
+        "answer": 1,
+        "explain": "SUM·AVG·COUNT 등에 OVER 절을 붙이면 윈도우 함수가 되어 각 행을 유지하며 집계합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`salary - AVG(salary) OVER ()` 가 구하는 것은?",
+        "options": [
+          "전체 평균",
+          "각 직원 급여와 전체 평균의 차이",
+          "부서 평균",
+          "급여 합계"
+        ],
+        "answer": 1,
+        "explain": "개인 급여에서 전체 평균을 빼, 평균과 얼마나 차이 나는지 각 행에서 계산합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "OVER 절 안에 ORDER BY를 넣으면?",
+        "options": [
+          "정렬만 되고 계산은 안 됨",
+          "누적 계산이 됨(그 행까지의 합계 등)",
+          "오류가 남",
+          "전체 합계만 나옴"
+        ],
+        "answer": 1,
+        "explain": "OVER (ORDER BY ...)는 누적 계산을 만듭니다. SUM이면 그 행까지의 누적 합계가 됩니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "각 직원 옆에 부서 총인원을 표시하는 것은?",
+        "options": [
+          "COUNT(*) OVER (PARTITION BY dept_id)",
+          "COUNT(*) GROUP BY dept_id",
+          "COUNT(dept_id)",
+          "SUM(*) OVER ()"
+        ],
+        "answer": 0,
+        "explain": "COUNT(*) OVER (PARTITION BY dept_id)는 부서별 인원을 각 행에 붙입니다. GROUP BY와 달리 개별 행이 유지됩니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "집계 윈도우 함수가 GROUP BY보다 유리한 상황은?",
+        "options": [
+          "단순 요약만 필요할 때",
+          "개별 행과 집계 값을 나란히 두고 비교·계산할 때",
+          "행을 삭제할 때",
+          "테이블을 만들 때"
+        ],
+        "answer": 1,
+        "explain": "GROUP BY는 개별 정보가 사라지지만, 집계 윈도우 함수는 개별 행을 유지해 '개인 vs 집계' 비교·계산을 할 수 있습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "100.0으로 나누는 이유가 뭔가요?", "a": "정수끼리 나누면 소수가 잘릴 수 있어, 100.0(소수)을 곱해 실수 나눗셈이 되게 한 것입니다. 비율(%)을 정확히 계산하려는 목적입니다." },
+    { "q": "누적 합계에서 순서가 중요한가요?", "a": "네. OVER (ORDER BY ...)의 정렬 기준에 따라 누적 방향이 정해집니다. salary 오름차순이면 낮은 급여부터 누적됩니다. 날짜순이면 시간 누적이 됩니다." },
+    { "q": "OVER ()와 OVER (PARTITION BY ...)의 차이는?", "a": "OVER ()는 전체를 하나의 윈도우로 봐 전체 집계를, OVER (PARTITION BY 열)은 그룹별로 나눠 그룹 집계를 각 행에 붙입니다." }
+  ]
+}

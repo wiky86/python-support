@@ -1,0 +1,23 @@
+{
+  "id": "track1",
+  "order": 1,
+  "title": "데이터베이스와 SQL 입문",
+  "description": "데이터베이스가 무엇인지, 테이블·행·열의 개념부터 SELECT 첫걸음까지. SQL을 처음 만나는 사람을 위한 출발점입니다.",
+  "topicOrder": [
+    "track1.what-is-db",
+    "track1.table-structure",
+    "track1.what-is-sql",
+    "track1.select-basic",
+    "track1.select-columns",
+    "track1.comments-and-style"
+  ],
+  "topicFiles": [
+    "topics/t1-what-is-db.json",
+    "topics/t2-table-structure.json",
+    "topics/t3-what-is-sql.json",
+    "topics/t4-select-basic.json",
+    "topics/t5-select-columns.json",
+    "topics/t6-comments-and-style.json"
+  ],
+  "projectFile": "project.json"
+}

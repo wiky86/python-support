@@ -9,8 +9,10 @@
     "streak": "현재 연속 접속 일수(계정 전체 스트릭)가 gte 이상"
   },
   "badges": [
-    { "id": "gl_multi_learner",  "scope": "global", "name": "멀티 러너",     "desc": "두 과목 모두 학습을 시작했어요",       "icon": "layers",        "condition": { "type": "courses_started", "gte": 2 } },
-    { "id": "gl_dual_master",    "scope": "global", "name": "듀얼 마스터",   "desc": "두 과목을 모두 완주했어요",           "icon": "medal",         "condition": { "type": "courses_completed", "gte": 2 } },
+    { "id": "gl_multi_learner",  "scope": "global", "name": "멀티 러너",     "desc": "두 개 이상의 과목을 학습하기 시작했어요", "icon": "layers",        "condition": { "type": "courses_started", "gte": 2 } },
+    { "id": "gl_all_started",    "scope": "global", "name": "전 과목 개척자", "desc": "모든 과목을 학습하기 시작했어요",       "icon": "compass",       "condition": { "type": "courses_started", "gte": 3 } },
+    { "id": "gl_dual_master",    "scope": "global", "name": "더블 마스터",   "desc": "두 개 과목을 완주했어요",             "icon": "medal",         "condition": { "type": "courses_completed", "gte": 2 } },
+    { "id": "gl_triple_master",  "scope": "global", "name": "트리플 마스터", "desc": "세 과목을 모두 완주했어요",           "icon": "trophy",        "condition": { "type": "courses_completed", "gte": 3 } },
 
     { "id": "gl_level_5",        "scope": "global", "name": "통합 레벨 5",   "desc": "통합 레벨 5에 도달했어요",           "icon": "chevrons-up",   "condition": { "type": "global_level", "gte": 5 } },
     { "id": "gl_level_10",       "scope": "global", "name": "통합 레벨 10",  "desc": "통합 레벨 10에 도달했어요",          "icon": "chevrons-up",   "condition": { "type": "global_level", "gte": 10 } },

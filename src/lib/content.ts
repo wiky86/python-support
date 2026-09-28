@@ -12,11 +12,15 @@ import {
   XpRulesConfig,
   DiagnosticData,
   RoadmapData,
+  CodingTestProblem,
+  CodingTestConfig,
+  SampleDatabase,
 } from "@/types/content";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const COURSES_JSON_PATH = path.join(CONTENT_DIR, "courses.json");
 const GLOBAL_BADGES_JSON_PATH = path.join(CONTENT_DIR, "global-badges.json");
+const CODING_TEST_DIR = path.join(CONTENT_DIR, "coding-test");
 
 /**
  * Returns all courses defined in content/courses.json sorted by order.
@@ -358,3 +362,77 @@ export function getRoadmap(courseId: string = "python"): RoadmapData | null {
     return null;
   }
 }
+
+/**
+ * Reads coding test problems for a given language ('python' | 'sql')
+ */
+export function getCodingTestProblems(lang: "python" | "sql"): CodingTestProblem[] {
+  const problemsPath = path.join(CODING_TEST_DIR, lang, "problems.json");
+  if (!fs.existsSync(problemsPath)) {
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(problemsPath, "utf-8");
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      return data;
+    }
+    if (data && Array.isArray(data.problems)) {
+      return data.problems;
+    }
+    return [];
+  } catch (err) {
+    console.error(`Error reading coding test problems for ${lang}:`, err);
+    return [];
+  }
+}
+
+/**
+ * Returns a specific coding test problem by language and ID
+ */
+export function getCodingTestProblem(lang: "python" | "sql", problemId: string): CodingTestProblem | null {
+  const problems = getCodingTestProblems(lang);
+  return problems.find((p) => p.id === problemId) || null;
+}
+
+/**
+ * Returns all coding test problems across all languages
+ */
+export function getAllCodingTestProblems(): CodingTestProblem[] {
+  const pythonProblems = getCodingTestProblems("python");
+  const sqlProblems = getCodingTestProblems("sql");
+  return [...pythonProblems, ...sqlProblems];
+}
+
+/**
+ * Dynamically collects unique categories from the problems for a given language
+ */
+export function getCodingTestCategories(lang: "python" | "sql"): string[] {
+  const problems = getCodingTestProblems(lang);
+  const set = new Set<string>();
+  problems.forEach((p) => {
+    if (p.category && p.category.trim()) {
+      set.add(p.category.trim());
+    }
+  });
+  return Array.from(set);
+}
+
+/**
+ * Reads sample database (e.g. content/sql/sample-db.json) for a given course.
+ * Returns null safely if the course does not have a sample-db.json.
+ */
+export function getSampleDatabase(courseId: string = "sql"): SampleDatabase | null {
+  const dbPath = path.join(CONTENT_DIR, courseId, "sample-db.json");
+  if (!fs.existsSync(dbPath)) {
+    return null;
+  }
+  try {
+    const raw = fs.readFileSync(dbPath, "utf-8");
+    return JSON.parse(raw) as SampleDatabase;
+  } catch (err) {
+    console.error(`Error reading sample-db.json for ${courseId}:`, err);
+    return null;
+  }
+}
+

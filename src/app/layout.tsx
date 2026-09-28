@@ -4,8 +4,8 @@ import { AuthProvider } from "@/lib/auth-context";
 import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "UBION KDT DataLab — 파이썬 데이터 분석 & 디지털 금융 통합 학습",
-  description: "실습과 퀴즈, 미니 프로젝트로 완성하는 UBION KDT 파이썬 데이터 분석 및 디지털 금융 학습 공간",
+  title: "UBION KDT DataLab — 파이썬 · 디지털 금융 · SQL 통합 학습",
+  description: "실습과 퀴즈, 미니 프로젝트로 완성하는 UBION KDT 파이썬 데이터 분석, 디지털 금융 이론 및 SQL 데이터베이스 통합 학습 공간",
 };
 
 export default function RootLayout({

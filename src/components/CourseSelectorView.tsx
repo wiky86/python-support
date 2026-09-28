@@ -10,6 +10,7 @@ import {
   BookOpen,
   Terminal,
   Landmark,
+  Database,
   Sparkles,
   Flame,
   Award,
@@ -21,6 +22,7 @@ import {
   BarChart3,
   ShieldCheck,
   Compass,
+  Code2,
 } from "lucide-react";
 
 interface CourseSelectorViewProps {
@@ -56,11 +58,11 @@ export function CourseSelectorView({
               <span className="text-xs text-slate-400 font-mono">단일 계정 멀티 트랙</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-              실무 데이터 분석부터 <br className="hidden sm:block" />
-              디지털 금융 이론까지 한번에.
+              파이썬 데이터 분석 · 디지털 금융 <br className="hidden sm:block" />
+              SQL 데이터베이스까지 한번에.
             </h1>
             <p className="text-sm text-slate-300 leading-relaxed">
-              파이썬 프로그래밍과 데이터 분석 실무, 디지털 금융시장 이론을 단계별 실습과 퀴즈로 학습하고 통합 성취도를 관리하세요.
+              파이썬 데이터 분석 실무, 디지털 금융시장 이론, SQL 질의 언어를 단계별 실습과 퀴즈로 학습하고 통합 성취도를 관리하세요.
             </p>
           </div>
 
@@ -135,10 +137,11 @@ export function CourseSelectorView({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => {
             const isPython = course.id === "python";
             const isFinance = course.id === "finance";
+            const isSql = course.id === "sql";
 
             // Calculate course-specific stats
             const courseProgMap = courseProgressMap[course.id] || {};
@@ -146,7 +149,7 @@ export function CourseSelectorView({
             const completedCount = courseRows.filter(
               (p) => p.status === "completed" && !p.topic_id.endsWith(".project")
             ).length;
-            const totalTopics = courseTopicCounts[course.id] || (isPython ? 43 : 54);
+            const totalTopics = courseTopicCounts[course.id] || (isPython ? 43 : isFinance ? 54 : 0);
             const coursePercent = totalTopics > 0 ? Math.min(100, Math.round((completedCount / totalTopics) * 100)) : 0;
             const courseXp = calculateXpFromProgress(courseRows);
             const courseLevel = getLevel(courseXp);
@@ -157,7 +160,9 @@ export function CourseSelectorView({
                 className={`p-6 sm:p-7 rounded-3xl border transition-all duration-300 hover:shadow-xl relative flex flex-col justify-between group ${
                   isPython
                     ? "bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-transparent dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-transparent border-emerald-200/80 dark:border-emerald-800/60 hover:border-emerald-400 dark:hover:border-emerald-600"
-                    : "bg-gradient-to-br from-amber-500/5 via-yellow-500/5 to-transparent dark:from-amber-950/20 dark:via-yellow-950/10 dark:to-transparent border-amber-200/80 dark:border-amber-800/60 hover:border-amber-400 dark:hover:border-amber-600"
+                    : isFinance
+                    ? "bg-gradient-to-br from-amber-500/5 via-yellow-500/5 to-transparent dark:from-amber-950/20 dark:via-yellow-950/10 dark:to-transparent border-amber-200/80 dark:border-amber-800/60 hover:border-amber-400 dark:hover:border-amber-600"
+                    : "bg-gradient-to-br from-blue-500/5 via-indigo-500/5 to-transparent dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-transparent border-blue-200/80 dark:border-blue-800/60 hover:border-blue-400 dark:hover:border-blue-600"
                 }`}
               >
                 <div className="space-y-4">
@@ -168,17 +173,27 @@ export function CourseSelectorView({
                         className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 ${
                           isPython
                             ? "bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-emerald-500/20"
-                            : "bg-gradient-to-tr from-amber-600 to-yellow-500 shadow-amber-500/20"
+                            : isFinance
+                            ? "bg-gradient-to-tr from-amber-600 to-yellow-500 shadow-amber-500/20"
+                            : "bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-blue-500/20"
                         }`}
                       >
-                        {isPython ? <Terminal className="w-6 h-6" /> : <Landmark className="w-6 h-6" />}
+                        {isPython ? (
+                          <Terminal className="w-6 h-6" />
+                        ) : isFinance ? (
+                          <Landmark className="w-6 h-6" />
+                        ) : (
+                          <Database className="w-6 h-6" />
+                        )}
                       </div>
                       <div>
                         <span
                           className={`text-[11px] font-bold font-mono px-2 py-0.5 rounded-md ${
                             isPython
                               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                              : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                              : isFinance
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                              : "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
                           }`}
                         >
                           TRACK {course.trackCount}개
@@ -192,7 +207,11 @@ export function CourseSelectorView({
                     <div className="text-right">
                       <div
                         className={`text-xs font-mono font-bold ${
-                          isPython ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+                          isPython
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : isFinance
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-blue-600 dark:text-blue-400"
                         }`}
                       >
                         Lv.{courseLevel}
@@ -216,7 +235,11 @@ export function CourseSelectorView({
                       </span>
                       <span
                         className={`font-bold font-mono ${
-                          isPython ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+                          isPython
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : isFinance
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-blue-600 dark:text-blue-400"
                         }`}
                       >
                         {coursePercent}%
@@ -227,7 +250,9 @@ export function CourseSelectorView({
                         className={`h-full rounded-full transition-all duration-700 ${
                           isPython
                             ? "bg-gradient-to-r from-emerald-500 to-teal-400"
-                            : "bg-gradient-to-r from-amber-500 to-yellow-400"
+                            : isFinance
+                            ? "bg-gradient-to-r from-amber-500 to-yellow-400"
+                            : "bg-gradient-to-r from-blue-500 to-indigo-400"
                         }`}
                         style={{ width: `${coursePercent}%` }}
                       />
@@ -243,7 +268,9 @@ export function CourseSelectorView({
                     className={`w-full py-3 px-5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all group-hover:gap-3 ${
                       isPython
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
-                        : "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-500/20"
+                        : isFinance
+                        ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-500/20"
+                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20"
                     }`}
                   >
                     <span>{completedCount > 0 ? "이어서 학습하기" : "과목 학습 시작하기"}</span>
@@ -276,7 +303,36 @@ export function CourseSelectorView({
         </div>
       </div>
 
-      {/* 3. Global Badges Showcase */}
+      {/* 3. Coding Test Showcase Banner */}
+      <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 border border-indigo-500/20 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-2xl">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-bold border border-indigo-500/30 flex items-center gap-1">
+              <Code2 className="w-3 h-3" />
+              실전 문제은행
+            </span>
+            <span className="text-xs text-slate-400 font-mono">자유 실전 연습 • +10 XP</span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
+            파이썬 · SQL 실전 코딩테스트
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            순차 잠금 없이 파이썬 및 SQL 문제를 유형별로 자유롭게 풀어보세요. 결과 예측과 핵심 코드 빈칸 채우기로 실전 문제 해결력을 기릅니다.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto flex-shrink-0">
+          <Link
+            href="/coding-test"
+            prefetch={false}
+            className="w-full md:w-auto px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all hover:gap-3"
+          >
+            <span>코딩테스트 바로가기</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+
+      {/* 4. Global Badges Showcase */}
       <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

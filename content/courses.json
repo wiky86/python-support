@@ -24,6 +24,18 @@
       "icon": "landmark",
       "contentPath": "content/finance",
       "trackCount": 9
+    },
+    {
+      "id": "sql",
+      "order": 3,
+      "title": "데이터베이스 활용을 위한 SQL",
+      "shortTitle": "SQL",
+      "description": "데이터베이스와 SQL의 기초부터 JOIN·서브쿼리·윈도우 함수 같은 실무 기술까지, 데이터를 다루는 질의 언어를 단계별로 익힙니다.",
+      "theme": "sql",
+      "accent": "#3b82f6",
+      "icon": "database",
+      "contentPath": "content/sql",
+      "trackCount": 8
     }
   ]
 }

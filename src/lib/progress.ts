@@ -6,19 +6,21 @@ import { UserProgressRow, TopicStatus } from "@/types/database";
  * 1. Trim leading/trailing whitespace
  * 2. Unify single quotes and double quotes to double quotes
  * 3. Remove all inner whitespace
+ * 4. Convert to lowercase if ignoreCase is true (for SQL / case-insensitive blanks)
  */
-export function normalizeCodeString(s: string): string {
+export function normalizeCodeString(s: string, ignoreCase?: boolean): string {
   if (!s) return "";
-  return s.trim().replace(/['"]/g, '"').replace(/\s+/g, "");
+  const t = s.trim().replace(/['"]/g, '"').replace(/\s+/g, "");
+  return ignoreCase ? t.toLowerCase() : t;
 }
 
 /**
  * Checks if user's input matches any of the accepted answer variations.
  */
-export function checkFillInBlank(input: string, answers: string[]): boolean {
+export function checkFillInBlank(input: string, answers: string[], ignoreCase?: boolean): boolean {
   if (!input || !answers || answers.length === 0) return false;
-  const normalizedInput = normalizeCodeString(input);
-  return answers.some((a) => normalizeCodeString(a) === normalizedInput);
+  const normalizedInput = normalizeCodeString(input, ignoreCase);
+  return answers.some((a) => normalizeCodeString(a, ignoreCase) === normalizedInput);
 }
 
 /**

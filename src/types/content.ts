@@ -36,6 +36,7 @@ export interface FillInBlank {
   answers: string[]; // correct variations
   output: string; // pre-stored expected stdout
   explain?: string; // detailed explanation (from track2 onwards)
+  ignoreCase?: boolean; // ignore case for SQL / case-insensitive blanks
 }
 
 export interface FAQItem {
@@ -224,3 +225,59 @@ export interface RoadmapData {
   journey: RoadmapJourneyItem[];
   previewWidgets: RoadmapWidget[];
 }
+
+export interface CodingTestBlank {
+  id: string;
+  answers: string[];
+  ignoreCase?: boolean;
+}
+
+export interface CodingTestProblem {
+  id: string; // e.g. "ct.py.001"
+  lang: "python" | "sql";
+  category: string; // Dynamic category
+  title: string;
+  prompt: string; // Markdown text
+  type: "result" | "fill";
+
+  // type === 'result'
+  code?: string;
+  answers?: string[];
+  ignoreCase?: boolean;
+  explain?: string;
+
+  // type === 'fill'
+  skeleton?: string;
+  blanks?: CodingTestBlank[];
+  expectedOutput?: string;
+  explainFill?: string;
+
+  // DB context
+  dbNote?: string;
+}
+
+export interface CodingTestConfig {
+  lang: "python" | "sql";
+  problems: CodingTestProblem[];
+}
+
+export interface SampleDbColumn {
+  name: string;
+  type: string;
+  key?: string;
+  desc?: string;
+}
+
+export interface SampleDbTable {
+  description: string;
+  columns: SampleDbColumn[];
+  rows: (string | number | null | boolean)[][];
+}
+
+export interface SampleDatabase {
+  database: string;
+  _comment?: string;
+  tables: Record<string, SampleDbTable>;
+  ddl: string;
+}
+

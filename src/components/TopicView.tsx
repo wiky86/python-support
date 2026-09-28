@@ -3,13 +3,14 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Track, Topic, BadgeDefinition } from "@/types/content";
+import { Track, Topic, BadgeDefinition, SampleDatabase } from "@/types/content";
 import { useAuth } from "@/lib/auth-context";
 import { getTopicStatus } from "@/lib/progress";
 import { MarkdownViewer } from "@/components/MarkdownViewer";
 import { FillInBlankList } from "@/components/FillInBlank";
 import { QuizRunner } from "@/components/QuizRunner";
 import { FaqChatbot } from "@/components/FaqChatbot";
+import { SampleDbViewer } from "@/components/SampleDbViewer";
 import {
   BookOpen,
   CheckCircle2,
@@ -32,6 +33,7 @@ interface TopicViewProps {
   allTrackTopicsCount: Record<string, number>;
   totalTopicsCount: number;
   totalTracksCount: number;
+  sampleDb?: SampleDatabase | null;
 }
 
 export function TopicView({
@@ -42,6 +44,7 @@ export function TopicView({
   allTrackTopicsCount,
   totalTopicsCount,
   totalTracksCount,
+  sampleDb,
 }: TopicViewProps) {
   const router = useRouter();
   const { progress } = useAuth();
@@ -129,7 +132,11 @@ export function TopicView({
             prefetch={false}
             className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
-            {courseId === "python" ? "파이썬 데이터 분석" : "디지털 금융 이론"}
+            {courseId === "python"
+              ? "파이썬 데이터 분석"
+              : courseId === "finance"
+              ? "디지털 금융 이론"
+              : "데이터베이스 활용을 위한 SQL"}
           </Link>
           <span>/</span>
           <span className="font-semibold text-slate-700 dark:text-slate-300">
@@ -202,6 +209,11 @@ export function TopicView({
           </div>
         </div>
       </div>
+
+      {/* Optional Sample Database Viewer (SQL course) */}
+      {sampleDb && (
+        <SampleDbViewer sampleDb={sampleDb} defaultOpen={false} />
+      )}
 
       {/* 2. Unified 4-Step Navigation Tabs */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto pb-px">

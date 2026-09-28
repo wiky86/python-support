@@ -1,0 +1,124 @@
+{
+  "id": "track6.in-subquery",
+  "trackId": "track6",
+  "order": 3,
+  "title": "IN 서브쿼리 — 여러 값과 비교",
+  "content": "## 여러 값을 반환하는 서브쿼리\n\n앞 토픽의 스칼라 서브쿼리는 값 하나였습니다. 하지만 서브쿼리가 **여러 값(목록)** 을 반환할 때도 있습니다. 예를 들어 '서울에 있는 부서들의 번호'는 여러 개입니다. 이런 목록과 비교할 때 **IN**을 씁니다.\n\n## IN 서브쿼리\n\n```sql\nSELECT emp_name\nFROM employees\nWHERE dept_id IN (SELECT dept_id FROM departments WHERE location = '서울');\n```\n\n- 서브쿼리 `SELECT dept_id FROM departments WHERE location = '서울'` 가 서울 부서 번호 목록(1, 2, 4)을 반환합니다.\n- 바깥 쿼리는 `dept_id IN (1, 2, 4)` 처럼, 그 목록에 속한 직원을 찾습니다.\n\n결과: 서울 근무 직원 6명(김철수·이영희·박민수·정수진·최지훈·임재현).\n\n트랙2에서 배운 `IN (1, 4)` 처럼 값을 직접 나열하는 대신, **서브쿼리로 그 목록을 동적으로 구하는** 것이 차이입니다.\n\n## NOT IN\n\n```sql\nSELECT dept_name\nFROM departments\nWHERE dept_id NOT IN (SELECT DISTINCT dept_id FROM employees);\n```\n\n'직원이 한 명도 없는 부서'를 찾습니다. 서브쿼리가 '직원이 있는 부서 번호'를 구하고, 그 목록에 없는(NOT IN) 부서를 찾습니다. 우리 데이터는 모든 부서에 직원이 있어 결과가 비어 있습니다(정상).\n\n## IN vs = 구분\n\n- 서브쿼리 결과가 **값 하나** → `=`, `>` 등 (스칼라)\n- 서브쿼리 결과가 **여러 값** → `IN` (또는 NOT IN)\n\n서브쿼리가 여러 행을 반환하는데 `=`를 쓰면 오류가 납니다. 이럴 때 IN으로 바꿉니다.\n\n## 정리\n\n서브쿼리가 여러 값을 반환하면 IN으로 비교합니다. '서울 부서 소속 직원'처럼, 비교할 목록을 서브쿼리로 동적으로 구하는 것이 핵심입니다. NOT IN으로 반대 조건도 만듭니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "서울에 있는 부서 소속 직원을 조회하세요. 여러 값 목록과 비교하는 연산자를 넣으세요.",
+      "code": "SELECT emp_name FROM employees WHERE dept_id ______ (SELECT dept_id FROM departments WHERE location = '서울');",
+      "answers": ["IN"],
+      "ignoreCase": true,
+      "output": "김철수, 이영희, 박민수, 정수진, 최지훈, 임재현 (서울 근무 6명)",
+      "explain": "서브쿼리가 서울 부서 번호 목록을 반환하고, IN으로 그 목록에 속한 직원을 찾습니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "위 서브쿼리에서 서울 부서만 고르는 조건의 값을 넣으세요.",
+      "code": "... (SELECT dept_id FROM departments WHERE location = ______);",
+      "answers": ["'서울'"],
+      "ignoreCase": true,
+      "output": "서울 부서(1,2,4) 목록이 서브쿼리 결과가 됨",
+      "explain": "서브쿼리 안에서 location = '서울'로 서울 부서 번호를 구합니다. 이 목록이 바깥 IN의 대상이 됩니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "직원이 한 명도 없는 부서를 찾으세요. 목록에 '없는' 것을 찾는 연산자를 넣으세요. (부정 목록)",
+      "code": "SELECT dept_name FROM departments WHERE dept_id ______ IN (SELECT DISTINCT dept_id FROM employees);",
+      "answers": ["NOT"],
+      "ignoreCase": true,
+      "output": "(빈 결과 — 모든 부서에 직원이 있음)",
+      "explain": "NOT IN은 서브쿼리 목록('직원이 있는 부서')에 없는 부서를 찾습니다. 우리 데이터는 모든 부서에 직원이 있어 결과가 비어 있습니다(정상)."
+    },
+    {
+      "id": "fb4",
+      "prompt": "부산에 있는 부서 소속 직원을 조회하려 합니다. 서브쿼리의 근무지 조건을 넣으세요.",
+      "code": "SELECT emp_name FROM employees WHERE dept_id IN (SELECT dept_id FROM departments WHERE location = ______);",
+      "answers": ["'부산'"],
+      "ignoreCase": true,
+      "output": "강다연, 윤서연 (인사부·부산)",
+      "explain": "서브쿼리가 부산 부서 번호(3)를 반환하고, IN으로 그 부서 소속 직원(강다연·윤서연)을 찾습니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "서브쿼리 결과가 값 하나면 =를, 여러 값이면 무엇을 쓰나요?",
+      "code": "서브쿼리 결과가 여러 값일 때 = 대신 ______",
+      "answers": ["IN"],
+      "ignoreCase": true,
+      "output": "IN (여러 값 목록과 비교)",
+      "explain": "값 하나면 =/> 등을, 여러 값이면 IN을 씁니다. 여러 행 서브쿼리에 =를 쓰면 오류가 납니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "서브쿼리가 여러 값을 반환할 때 비교에 쓰는 연산자는?",
+        "options": ["=", "IN", ">", "LIKE"],
+        "answer": 1,
+        "explain": "여러 값 목록과 비교할 때는 IN을 씁니다. 값 하나면 =를 씁니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`WHERE dept_id IN (SELECT dept_id FROM departments WHERE location='서울')` 가 찾는 것은?",
+        "options": [
+          "서울 부서의 이름",
+          "서울에 있는 부서 소속 직원",
+          "부산 근무 직원",
+          "모든 직원"
+        ],
+        "answer": 1,
+        "explain": "서브쿼리가 서울 부서 번호 목록을 만들고, IN으로 그 부서에 속한 직원을 찾습니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "IN 서브쿼리가 값을 직접 나열하는 IN (1,2,4)와 다른 점은?",
+        "options": [
+          "결과가 항상 다르다",
+          "비교할 목록을 서브쿼리로 동적으로 구한다",
+          "IN 서브쿼리는 느리기만 하다",
+          "차이가 없다"
+        ],
+        "answer": 1,
+        "explain": "값을 직접 쓰는 대신, 서브쿼리로 그 목록을 상황에 따라 동적으로 구하는 것이 핵심 차이입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "'직원이 없는 부서'를 찾을 때 쓰는 것은?",
+        "options": [
+          "IN 서브쿼리",
+          "NOT IN 서브쿼리('직원 있는 부서' 목록에 없는 것)",
+          "= 서브쿼리",
+          "GROUP BY"
+        ],
+        "answer": 1,
+        "explain": "'직원이 있는 부서' 목록을 서브쿼리로 구하고, NOT IN으로 그 목록에 없는 부서를 찾습니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "여러 행을 반환하는 서브쿼리에 =를 쓰면?",
+        "options": [
+          "정상 동작",
+          "오류 발생 (IN을 써야 함)",
+          "첫 값만 사용",
+          "전체가 참"
+        ],
+        "answer": 1,
+        "explain": "=는 값 하나를 기대하므로 여러 행이면 오류입니다. 여러 값과 비교하려면 IN을 씁니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "IN 서브쿼리와 조인 중 뭐가 나은가요?", "a": "많은 경우 둘 다 가능합니다. '목록에 속하는지'만 판단하면 IN이 직관적이고, 다른 테이블의 열까지 함께 조회해야 하면 조인이 낫습니다." },
+    { "q": "NOT IN 쓸 때 주의할 점이 있나요?", "a": "서브쿼리 결과에 NULL이 섞이면 NOT IN이 예상과 다르게 동작할 수 있습니다. NULL 가능성이 있으면 NOT EXISTS(다음 토픽)를 쓰는 것이 안전합니다." },
+    { "q": "IN 목록이 아주 많으면 성능은?", "a": "서브쿼리 결과가 매우 크면 성능에 영향이 있을 수 있습니다. 그런 경우 조인이나 EXISTS가 더 효율적일 때가 있습니다." }
+  ]
+}

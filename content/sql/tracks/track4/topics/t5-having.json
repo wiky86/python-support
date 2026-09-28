@@ -1,0 +1,124 @@
+{
+  "id": "track4.having",
+  "trackId": "track4",
+  "order": 5,
+  "title": "그룹에 조건 걸기 — HAVING",
+  "content": "## 집계 결과로 그룹 거르기\n\n'인원이 2명 이상인 부서만', '평균 급여가 4000 이상인 부서만'처럼 **그룹의 집계 결과에 조건**을 걸고 싶을 때가 있습니다. 이때 WHERE가 아니라 **HAVING**을 씁니다.\n\n## 왜 WHERE가 아니라 HAVING인가\n\n핵심 차이입니다.\n\n- **WHERE**: 그룹화 **전에** 개별 행을 거른다. 집계 결과(COUNT 등)를 쓸 수 없다.\n- **HAVING**: 그룹화 **후에** 그룹을 거른다. 집계 결과로 조건을 건다.\n\n```sql\nSELECT dept_id, COUNT(*)\nFROM employees\nGROUP BY dept_id\nHAVING COUNT(*) >= 2;\n```\n\n부서별 인원을 구한 뒤, 인원이 2명 이상인 부서만 남깁니다. 마케팅부(1명)는 제외되고 영업·개발·인사부만 나옵니다.\n\n## HAVING으로 평균 조건 걸기\n\n```sql\nSELECT dept_id, ROUND(AVG(salary))\nFROM employees\nGROUP BY dept_id\nHAVING AVG(salary) >= 4000;\n```\n\n부서별 평균 급여를 구한 뒤, 평균이 4000 이상인 부서만 남깁니다. 인사부(3500)는 제외되고 영업(4600)·개발(4100)·마케팅(4800)이 나옵니다.\n\n## WHERE와 HAVING 함께 쓰기\n\n둘을 같이 쓸 수 있습니다. WHERE로 행을 먼저 거르고, GROUP BY로 묶고, HAVING으로 그룹을 거릅니다.\n\n```sql\nSELECT dept_id, ROUND(AVG(salary)) AS avg_sal\nFROM employees\nWHERE position != '부장'\nGROUP BY dept_id\nHAVING AVG(salary) >= 3500\nORDER BY avg_sal DESC;\n```\n\n부장을 제외한 뒤(WHERE), 부서별 평균을 구하고(GROUP BY), 평균 3500 이상인 부서만(HAVING), 평균 높은 순으로 정렬(ORDER BY)합니다.\n\n## 정리\n\nHAVING은 그룹화 후 집계 결과에 조건을 겁니다. WHERE(그룹화 전 개별 행 필터)와 역할이 다릅니다. 순서는 WHERE → GROUP BY → HAVING → ORDER BY 입니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "인원이 2명 이상인 부서만 조회하세요. 집계 결과에 조건을 거는 절을 넣으세요.",
+      "code": "SELECT dept_id, COUNT(*) FROM employees GROUP BY dept_id ______ COUNT(*) >= 2;",
+      "answers": ["HAVING"],
+      "ignoreCase": true,
+      "output": "(1,2) (2,3) (3,2) — 마케팅부(1명) 제외",
+      "explain": "HAVING은 그룹화 후 집계 결과에 조건을 겁니다. COUNT(*) >= 2로 2명 이상인 부서만 남깁니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "평균 급여가 4000 이상인 부서만 조회하세요. HAVING 조건에 집계 함수를 넣으세요.",
+      "code": "SELECT dept_id, ROUND(AVG(salary)) FROM employees GROUP BY dept_id HAVING ______(salary) >= 4000;",
+      "answers": ["AVG"],
+      "ignoreCase": true,
+      "output": "(1,4600) (2,4100) (4,4800) — 인사부(3500) 제외",
+      "explain": "HAVING AVG(salary) >= 4000 은 평균 급여가 4000 이상인 부서만 남깁니다. 인사부는 평균 3500이라 제외됩니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "집계 결과가 아니라 '개별 행'을 그룹화 전에 거를 때 쓰는 절은? (HAVING과 대비)",
+      "code": "개별 행 필터(그룹화 전) = ______ / 그룹 필터(그룹화 후) = HAVING",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "WHERE(그룹화 전 행 필터) vs HAVING(그룹화 후 그룹 필터)",
+      "explain": "WHERE는 그룹화 전 개별 행을, HAVING은 그룹화 후 집계 결과를 거릅니다. 이 구분이 핵심입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "인원이 2명 이상인 직급만 조회하세요. HAVING 조건을 완성하세요.",
+      "code": "SELECT position, COUNT(*) FROM employees GROUP BY position HAVING COUNT(*) ______ 2;",
+      "answers": [">="],
+      "ignoreCase": true,
+      "output": "(과장,2) (사원,4) — 부장·대리(각 1명) 제외",
+      "explain": "HAVING COUNT(*) >= 2 로 인원이 2명 이상인 직급만 남깁니다. 과장(2), 사원(4)이 나옵니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "부장 제외 후 부서별 평균이 3500 이상인 부서를 평균 높은 순으로 조회합니다. 부장을 거르는 절을 넣으세요.",
+      "code": "SELECT dept_id, ROUND(AVG(salary)) a FROM employees ______ position != '부장' GROUP BY dept_id HAVING AVG(salary) >= 3500 ORDER BY a DESC;",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "(4,4800) (2,4100) (3,3500)",
+      "explain": "WHERE로 부장을 먼저 제외하고, GROUP BY로 묶고, HAVING으로 평균 3500 이상만, ORDER BY로 정렬합니다. WHERE와 HAVING을 함께 쓴 종합 예입니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "그룹의 집계 결과에 조건을 거는 절은?",
+        "options": ["WHERE", "HAVING", "GROUP BY", "FILTER"],
+        "answer": 1,
+        "explain": "HAVING이 그룹화 후 집계 결과에 조건을 겁니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "WHERE와 HAVING의 가장 큰 차이는?",
+        "options": [
+          "둘은 완전히 같다",
+          "WHERE는 그룹화 전 개별 행, HAVING은 그룹화 후 집계 결과에 조건을 건다",
+          "HAVING이 더 빠르다",
+          "WHERE는 숫자만, HAVING은 문자만 된다"
+        ],
+        "answer": 1,
+        "explain": "WHERE는 그룹화 전 개별 행을, HAVING은 그룹화 후 집계 결과를 거릅니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`GROUP BY dept_id HAVING COUNT(*) >= 2` 의 의미는?",
+        "options": [
+          "전체 직원이 2명 이상일 때만",
+          "인원이 2명 이상인 부서만 남긴다",
+          "2번 부서만 조회",
+          "상위 2개 부서"
+        ],
+        "answer": 1,
+        "explain": "HAVING COUNT(*) >= 2 는 그룹(부서)의 인원이 2명 이상인 그룹만 남깁니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`WHERE COUNT(*) >= 2` 를 쓰면 어떻게 되나?",
+        "options": [
+          "정상 동작한다",
+          "WHERE에는 집계 함수를 쓸 수 없어 오류가 난다",
+          "HAVING과 똑같이 동작한다",
+          "전체 행이 나온다"
+        ],
+        "answer": 1,
+        "explain": "WHERE는 그룹화 전이라 집계 결과(COUNT 등)를 쓸 수 없습니다. 집계 조건은 HAVING을 써야 합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "WHERE, GROUP BY, HAVING, ORDER BY의 올바른 순서는?",
+        "options": [
+          "GROUP BY → WHERE → HAVING → ORDER BY",
+          "WHERE → GROUP BY → HAVING → ORDER BY",
+          "HAVING → WHERE → GROUP BY → ORDER BY",
+          "WHERE → HAVING → GROUP BY → ORDER BY"
+        ],
+        "answer": 1,
+        "explain": "WHERE(행 필터) → GROUP BY(그룹화) → HAVING(그룹 필터) → ORDER BY(정렬) 순입니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "HAVING에 집계 함수 말고 일반 조건도 쓸 수 있나요?", "a": "가능은 하지만, 일반 행 조건은 WHERE에 쓰는 것이 원칙이고 성능에도 유리합니다. HAVING은 집계 결과 조건(COUNT, AVG 등)에 쓰세요." },
+    { "q": "HAVING을 GROUP BY 없이 쓸 수 있나요?", "a": "일부 DBMS에서는 전체를 하나의 그룹으로 보고 동작하기도 하지만, 일반적으로 HAVING은 GROUP BY와 함께 씁니다." },
+    { "q": "WHERE로 거를 수 있는 건 HAVING으로도 되니 그냥 HAVING만 쓰면 안 되나요?", "a": "개별 행 조건은 WHERE로 먼저 거르는 것이 좋습니다. 그래야 그룹화 대상이 줄어 성능에 유리하고 의도도 명확합니다. HAVING은 집계 결과 조건 전용으로 쓰세요." }
+  ]
+}

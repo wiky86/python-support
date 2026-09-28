@@ -1,0 +1,124 @@
+{
+  "id": "track1.select-columns",
+  "trackId": "track1",
+  "order": 5,
+  "title": "원하는 열만 조회하기",
+  "content": "## 필요한 열만 골라 보기\n\n`SELECT *`는 모든 열을 가져오지만, 실제로는 필요한 열만 보고 싶을 때가 많습니다. 이때는 `*` 대신 **열 이름을 콤마(,)로 나열**합니다.\n\n```sql\nSELECT emp_name, salary FROM employees;\n```\n\n이 쿼리는 직원의 **이름과 급여만** 조회합니다. emp_id나 dept_id 같은 다른 열은 결과에 나오지 않습니다.\n\n## 열 순서는 내가 정한다\n\n나열한 순서대로 결과의 열 순서가 정해집니다.\n\n```sql\nSELECT emp_name, position, salary FROM employees;\n```\n\n이러면 이름 → 직급 → 급여 순으로 나옵니다. 테이블에 저장된 원래 순서와 달라도 됩니다.\n\n## 왜 필요한 열만 조회할까\n\n- **가독성**: 필요한 정보만 보여 결과를 읽기 쉽습니다.\n- **성능**: 불필요한 데이터를 가져오지 않아 빠릅니다. 특히 데이터가 많을수록 차이가 큽니다.\n\n그래서 실무에서는 `SELECT *`보다 **필요한 열을 명시**하는 것이 권장됩니다.\n\n## 정리\n\n`SELECT 열1, 열2 FROM 테이블;` 처럼 열 이름을 콤마로 나열하면 원하는 열만, 원하는 순서로 조회할 수 있습니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "employees 테이블에서 직원 이름(emp_name)만 조회하세요.",
+      "code": "SELECT ______ FROM employees;",
+      "answers": ["emp_name"],
+      "ignoreCase": true,
+      "output": "김철수, 이영희, 박민수, 정수진, 최지훈, 강다연, 윤서연, 임재현",
+      "explain": "조회하고 싶은 열 이름(emp_name)을 SELECT 뒤에 적으면 그 열만 나옵니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "employees 테이블에서 이름과 급여, 두 열을 조회하세요. (열 사이 구분 기호 포함)",
+      "code": "SELECT emp_name______ salary FROM employees;",
+      "answers": [","],
+      "ignoreCase": true,
+      "output": "(김철수,6000) (이영희,3200) (박민수,5000) (정수진,3500) (최지훈,3800) (강다연,4000) (윤서연,3000) (임재현,4800)",
+      "explain": "여러 열을 조회할 때는 콤마(,)로 구분해 나열합니다. emp_name, salary 처럼요."
+    },
+    {
+      "id": "fb3",
+      "prompt": "employees 테이블에서 이름, 직급, 급여 세 열을 순서대로 조회하세요.",
+      "code": "SELECT emp_name, ______, salary FROM employees;",
+      "answers": ["position"],
+      "ignoreCase": true,
+      "output": "(김철수,부장,6000) (이영희,사원,3200) ... (임재현,과장,4800)",
+      "explain": "position(직급) 열을 가운데에 넣으면 이름→직급→급여 순으로 조회됩니다. 나열 순서가 결과 열 순서를 정합니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "departments 테이블에서 부서 이름(dept_name)만 조회하세요.",
+      "code": "SELECT dept_name FROM ______;",
+      "answers": ["departments"],
+      "ignoreCase": true,
+      "output": "영업부, 개발부, 인사부, 마케팅부",
+      "explain": "FROM 뒤에 departments를 써서 부서 테이블에서 dept_name 열만 조회합니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "employees 테이블에서 근무지가 아닌 '직급'과 '급여'를 조회하려 합니다. 빈칸에 알맞은 열 이름은?",
+      "code": "SELECT position, ______ FROM employees;",
+      "answers": ["salary"],
+      "ignoreCase": true,
+      "output": "(부장,6000) (사원,3200) (과장,5000) ... (과장,4800)",
+      "explain": "급여 열의 이름은 salary입니다. position, salary 두 열을 조회합니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "직원의 이름과 급여만 조회하는 올바른 쿼리는?",
+        "options": [
+          "SELECT emp_name salary FROM employees;",
+          "SELECT emp_name, salary FROM employees;",
+          "SELECT emp_name + salary FROM employees;",
+          "SELECT (emp_name salary) FROM employees;"
+        ],
+        "answer": 1,
+        "explain": "여러 열은 콤마(,)로 구분합니다. SELECT emp_name, salary FROM employees; 가 정답입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "여러 열을 조회할 때 열 이름을 구분하는 기호는?",
+        "options": ["세미콜론(;)", "콤마(,)", "마침표(.)", "슬래시(/)"],
+        "answer": 1,
+        "explain": "열 이름은 콤마(,)로 구분해 나열합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`SELECT position, emp_name FROM employees;` 의 결과 열 순서는?",
+        "options": [
+          "이름 → 직급",
+          "직급 → 이름",
+          "테이블 저장 순서대로",
+          "알파벳 순서대로"
+        ],
+        "answer": 1,
+        "explain": "SELECT에 나열한 순서대로 결과 열이 배치됩니다. position, emp_name 순서이므로 직급 → 이름 순입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "필요한 열만 조회하는 것이 SELECT * 보다 나은 이유로 옳은 것은?",
+        "options": [
+          "결과가 항상 틀리게 나오기 때문",
+          "가독성이 좋고 불필요한 데이터를 안 가져와 성능에 유리하기 때문",
+          "SELECT *는 오류가 나기 때문",
+          "차이가 전혀 없기 때문"
+        ],
+        "answer": 1,
+        "explain": "필요한 열만 조회하면 결과를 읽기 쉽고, 불필요한 데이터를 가져오지 않아 성능에도 유리합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "부서 이름만 조회하는 쿼리로 옳은 것은?",
+        "options": [
+          "SELECT * FROM departments;",
+          "SELECT dept_name FROM departments;",
+          "SELECT departments FROM dept_name;",
+          "SELECT dept_name;"
+        ],
+        "answer": 1,
+        "explain": "부서 이름 열(dept_name)만 departments 테이블에서 조회합니다. SELECT dept_name FROM departments; 가 정답입니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "열 이름 순서를 테이블과 다르게 써도 되나요?", "a": "네. SELECT에 나열한 순서대로 결과가 나옵니다. 테이블에 저장된 원래 순서와 달라도 전혀 문제없습니다." },
+    { "q": "존재하지 않는 열 이름을 쓰면 어떻게 되나요?", "a": "'unknown column' 같은 오류가 납니다. 열 이름의 철자를 정확히 확인해야 합니다." },
+    { "q": "열이 아주 많을 때도 다 적어야 하나요?", "a": "모든 열이 필요하면 *를 쓰는 게 편합니다. 하지만 일부만 필요하다면 그 열들만 적는 것이 가독성과 성능 면에서 좋습니다." }
+  ]
+}

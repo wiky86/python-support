@@ -16,6 +16,7 @@ import {
   Layers,
   Terminal,
   Landmark,
+  Database,
   Globe,
 } from "lucide-react";
 
@@ -76,7 +77,7 @@ export function BadgesView({
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            파이썬, 디지털 금융 과목 및 계정 전체 통합 성취 배지를 수집해 보세요.
+            파이썬, 디지털 금융, SQL 과목 및 계정 전체 통합 성취 배지를 수집해 보세요.
           </p>
         </div>
 
@@ -126,6 +127,7 @@ export function BadgesView({
           const isSelected = activeTab === course.id;
           const courseBadgeCount = (courseBadgesMap[course.id] || []).length;
           const isPython = course.id === "python";
+          const isFinance = course.id === "finance";
 
           return (
             <button
@@ -135,11 +137,19 @@ export function BadgesView({
                 isSelected
                   ? isPython
                     ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
-                    : "border-amber-500 text-amber-600 dark:text-amber-400"
+                    : isFinance
+                    ? "border-amber-500 text-amber-600 dark:text-amber-400"
+                    : "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
-              {isPython ? <Terminal className="w-4 h-4 text-emerald-500" /> : <Landmark className="w-4 h-4 text-amber-500" />}
+              {isPython ? (
+                <Terminal className="w-4 h-4 text-emerald-500" />
+              ) : isFinance ? (
+                <Landmark className="w-4 h-4 text-amber-500" />
+              ) : (
+                <Database className="w-4 h-4 text-blue-500" />
+              )}
               <span>{course.title} ({courseBadgeCount})</span>
             </button>
           );

@@ -1,0 +1,71 @@
+{
+  "id": "track5.project",
+  "trackId": "track5",
+  "title": "부서·근무지·조직도 통합 조회",
+  "intro": "그동안 부서 번호(dept_id)로만 보던 데이터를, 이제 부서 이름과 근무지까지 붙여 사람이 읽기 좋은 형태로 만듭니다. 또 직원-상사 조직도도 조회합니다. INNER JOIN, LEFT JOIN, 조인+집계, self join을 종합하는 실전 과제입니다.",
+  "dataset": {
+    "description": "회사 조직 데이터베이스. employees(직원 8명)와 departments(부서 4개)를 dept_id로 연결. manager_id로 상사 관계 표현.",
+    "code": "-- employees.dept_id → departments.dept_id (부서)\n-- employees.manager_id → employees.emp_id (상사, self)"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "각 직원의 이름과 소속 부서 '이름'을 함께 조회하세요. 두 테이블을 연결하는 조인 키워드를 넣으세요.",
+      "code": "SELECT e.emp_name, d.dept_name FROM employees e ______ departments d ON e.dept_id = d.dept_id;",
+      "answers": ["JOIN", "INNER JOIN"],
+      "ignoreCase": true,
+      "output": "김철수-영업부, 이영희-영업부, 박민수-개발부, ... 임재현-마케팅부",
+      "explain": "JOIN(INNER JOIN)으로 dept_id를 연결해 직원 이름 옆에 부서 이름을 붙입니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "부산에서 근무하는 직원을 조회하세요. 근무지 조건을 완성하세요.",
+      "code": "SELECT e.emp_name, d.location FROM employees e JOIN departments d ON e.dept_id = d.dept_id WHERE d.location = ______;",
+      "answers": ["'부산'"],
+      "ignoreCase": true,
+      "output": "강다연, 윤서연 (인사부·부산)",
+      "explain": "조인 후 departments.location으로 조건을 겁니다. 부산 근무자는 인사부의 강다연·윤서연입니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "부서 이름별 인원을 많은 순으로 조회하세요. 부서 이름으로 그룹화하세요.",
+      "code": "SELECT d.dept_name, COUNT(*) AS cnt FROM employees e JOIN departments d ON e.dept_id = d.dept_id ______ d.dept_name ORDER BY cnt DESC;",
+      "answers": ["GROUP BY"],
+      "ignoreCase": true,
+      "output": "(개발부,3) (인사부,2) (영업부,2) (마케팅부,1)",
+      "explain": "조인 후 GROUP BY d.dept_name으로 부서 이름별 인원을 세고, 많은 순으로 정렬합니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "근무지별 평균 급여를 구하세요. departments의 근무지 열로 그룹화하세요.",
+      "code": "SELECT d.location, ROUND(AVG(e.salary)) FROM employees e JOIN departments d ON e.dept_id = d.dept_id GROUP BY d.______;",
+      "answers": ["location"],
+      "ignoreCase": true,
+      "output": "(부산,3500) (서울,4383)",
+      "explain": "근무지(location)로 그룹화해 평균 급여를 구합니다. 서울 근무자 평균이 부산보다 높습니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "직원과 그 상사의 이름을 함께 조회하세요(상사가 있는 직원만). employees를 자기 자신과 조인할 때 상사 역할 별칭을 넣으세요.",
+      "code": "SELECT e.emp_name AS 직원, m.emp_name AS 상사 FROM employees e JOIN employees ______ ON e.manager_id = m.emp_id;",
+      "answers": ["m"],
+      "ignoreCase": true,
+      "output": "이영희-김철수, 정수진-박민수, 최지훈-박민수, 윤서연-강다연",
+      "explain": "self join으로 employees를 직원(e)·상사(m) 두 역할로 나눠 조인합니다. INNER JOIN이라 상사가 있는 직원만 나옵니다."
+    }
+  ],
+  "report": {
+    "title": "부서·조직 통합 조회 리포트",
+    "template": "부서 이름 붙인 직원 수: {joined}명\n부산 근무 직원: {busan}명\n최다 인원 부서: {topDept} ({topCnt}명)\n서울 평균 급여: {seoulAvg}\n상사가 있는 직원: {hasManager}명\n사용 개념: {conceptsUsed}",
+    "computedValues": {
+      "joined": 8,
+      "busan": 2,
+      "topDept": "개발부",
+      "topCnt": 3,
+      "seoulAvg": 4383,
+      "hasManager": 4,
+      "conceptsUsed": "INNER JOIN, LEFT JOIN, JOIN+GROUP BY, self join"
+    },
+    "conceptsUsed": ["INNER JOIN", "LEFT JOIN", "JOIN + 집계", "self join", "별칭"]
+  }
+}

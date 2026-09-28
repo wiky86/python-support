@@ -1,0 +1,69 @@
+{
+  "id": "track8.project",
+  "trackId": "track8",
+  "title": "종합 인사 분석 — 순위와 고급 조회",
+  "intro": "SQL 과정의 마지막 프로젝트입니다. 경영진이 '급여 순위표', '부서별 1위', '부서 평균 초과자' 등 종합 인사 분석을 요청했습니다. 윈도우 함수와 CTE를 활용해, 지금까지 배운 모든 기술을 결합한 실전 분석 쿼리를 완성합니다.",
+  "dataset": {
+    "description": "회사 조직 데이터베이스. employees(8명), departments(4개). 전체 평균 약 4163.",
+    "code": "-- employees, departments (dept_id로 연결)"
+  },
+  "missions": [
+    {
+      "id": "m1",
+      "prompt": "전체 급여 순위를 매기세요(동점도 다른 번호). 순번 윈도우 함수를 넣으세요.",
+      "code": "SELECT emp_name, salary, ______() OVER (ORDER BY salary DESC) AS 순위 FROM employees;",
+      "answers": ["ROW_NUMBER"],
+      "ignoreCase": true,
+      "output": "김철수1, 박민수2, 임재현3, ... 윤서연8",
+      "explain": "ROW_NUMBER() OVER (ORDER BY salary DESC)로 급여 높은 순 순번을 매깁니다."
+    },
+    {
+      "id": "m2",
+      "prompt": "부서별 급여 순위를 매기세요. 부서로 나누는 절을 넣으세요.",
+      "code": "SELECT emp_name, dept_id, salary, RANK() OVER (______ dept_id ORDER BY salary DESC) AS 부서순위 FROM employees;",
+      "answers": ["PARTITION BY"],
+      "ignoreCase": true,
+      "output": "각 부서마다 1위부터 순위가 매겨짐",
+      "explain": "PARTITION BY dept_id로 부서별로 나눈 뒤 급여 순위를 매깁니다. 각 부서에서 1위가 나옵니다."
+    },
+    {
+      "id": "m3",
+      "prompt": "각 직원 옆에 전체 평균 급여를 붙이세요. 평균 윈도우 함수를 완성하세요.",
+      "code": "SELECT emp_name, salary, ROUND(AVG(salary) ______ ()) AS 전체평균 FROM employees;",
+      "answers": ["OVER"],
+      "ignoreCase": true,
+      "output": "각 행에 전체평균 4163이 붙음",
+      "explain": "AVG(salary) OVER ()로 각 직원 행에 전체 평균을 붙여 개인 급여와 비교할 수 있게 합니다."
+    },
+    {
+      "id": "m4",
+      "prompt": "부서별 급여 1위 직원을 뽑는 쿼리를 CTE로 정리하려 합니다. CTE 시작 키워드를 넣으세요.",
+      "code": "______ ranked AS (SELECT e.emp_name, d.dept_name, e.salary, ROW_NUMBER() OVER (PARTITION BY e.dept_id ORDER BY e.salary DESC) rn FROM employees e JOIN departments d ON e.dept_id=d.dept_id) SELECT emp_name, dept_name, salary FROM ranked WHERE rn=1;",
+      "answers": ["WITH"],
+      "ignoreCase": true,
+      "output": "김철수(영업), 박민수(개발), 임재현(마케팅), 강다연(인사)",
+      "explain": "WITH로 순위 계산을 ranked CTE로 정리하고, 바깥에서 rn=1(각 부서 1위)만 뽑습니다. 조인+윈도우+CTE 종합입니다."
+    },
+    {
+      "id": "m5",
+      "prompt": "자기 부서 평균보다 많이 받는 직원을 찾으세요. CTE로 부서 평균을 구한 뒤 조인 비교합니다. 부서 평균과 연결하는 조인 키워드를 넣으세요.",
+      "code": "WITH da AS (SELECT dept_id, AVG(salary) a FROM employees GROUP BY dept_id) SELECT e.emp_name FROM employees e ______ da ON e.dept_id = da.dept_id WHERE e.salary > da.a;",
+      "answers": ["JOIN", "INNER JOIN"],
+      "ignoreCase": true,
+      "output": "김철수, 박민수, 강다연 (부서 평균 초과)",
+      "explain": "CTE(da)로 부서별 평균을 구하고, employees와 조인해 개인 급여가 부서 평균보다 큰 직원을 찾습니다."
+    }
+  ],
+  "report": {
+    "title": "종합 인사 분석 리포트",
+    "template": "전체 급여 1위: {top1}\n부서별 1위: {deptTops}\n전체 평균 급여: {avgAll}\n부서 평균 초과 직원: {aboveDept}\n사용 개념: {conceptsUsed}",
+    "computedValues": {
+      "top1": "김철수 (6000)",
+      "deptTops": "김철수(영업), 박민수(개발), 임재현(마케팅), 강다연(인사)",
+      "avgAll": 4163,
+      "aboveDept": "김철수, 박민수, 강다연",
+      "conceptsUsed": "ROW_NUMBER, RANK, PARTITION BY, AVG OVER, CTE, JOIN"
+    },
+    "conceptsUsed": ["윈도우 함수(ROW_NUMBER/RANK)", "PARTITION BY", "집계 윈도우(AVG OVER)", "CTE(WITH)", "JOIN"]
+  }
+}

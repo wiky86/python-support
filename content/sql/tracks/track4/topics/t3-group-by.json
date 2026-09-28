@@ -1,0 +1,124 @@
+{
+  "id": "track4.group-by",
+  "trackId": "track4",
+  "order": 3,
+  "title": "그룹별 집계 — GROUP BY",
+  "content": "## 전체가 아니라 그룹별로\n\n앞에서는 전체 직원의 평균·합계를 구했습니다. 하지만 보통은 '**부서별** 평균 급여', '**직급별** 인원'처럼 그룹으로 나눠 집계하고 싶습니다. 이때 **GROUP BY**를 씁니다.\n\n## GROUP BY 기본\n\n```sql\nSELECT dept_id, COUNT(*)\nFROM employees\nGROUP BY dept_id;\n```\n\n`GROUP BY dept_id` 는 같은 부서끼리 묶습니다. 그리고 각 그룹마다 COUNT(*)를 계산합니다. 결과:\n\n| dept_id | COUNT(*) |\n|---|---|\n| 1 | 2 |\n| 2 | 3 |\n| 3 | 2 |\n| 4 | 1 |\n\n부서별 인원이 한눈에 나옵니다.\n\n## 그룹별 평균·합계\n\n```sql\nSELECT dept_id, ROUND(AVG(salary))\nFROM employees\nGROUP BY dept_id;\n```\n\n부서별 평균 급여를 구합니다. 영업부(1) 4600, 개발부(2) 4100, 인사부(3) 3500, 마케팅부(4) 4800. 집계 함수가 **전체가 아니라 각 그룹에** 적용됩니다.\n\n## 중요한 규칙\n\nSELECT에 쓰는 일반 열은 **GROUP BY에 있는 열**이거나 **집계 함수** 안에 있어야 합니다. 예를 들어 `SELECT dept_id, emp_name, COUNT(*) ... GROUP BY dept_id` 는 문제가 됩니다. emp_name은 그룹당 여러 개라 하나로 정할 수 없기 때문입니다. GROUP BY로 묶은 열(dept_id)과 집계 결과(COUNT)만 SELECT하는 것이 원칙입니다.\n\n## 정리\n\nGROUP BY는 같은 값끼리 그룹으로 묶고, 집계 함수를 각 그룹에 적용합니다. '부서별', '직급별' 같은 그룹 집계의 핵심입니다. SELECT에는 GROUP BY 열과 집계 함수만 쓰는 것이 원칙입니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "부서별 직원 수를 구하세요. 그룹으로 묶는 키워드를 넣으세요.",
+      "code": "SELECT dept_id, COUNT(*) FROM employees ______ dept_id;",
+      "answers": ["GROUP BY"],
+      "ignoreCase": true,
+      "output": "(1,2) (2,3) (3,2) (4,1)",
+      "explain": "GROUP BY dept_id는 같은 부서끼리 묶고, 각 그룹의 COUNT(*)를 계산합니다. 부서별 인원이 나옵니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "부서별 평균 급여를 구하세요. GROUP BY의 기준 열을 넣으세요.",
+      "code": "SELECT dept_id, ROUND(AVG(salary)) FROM employees GROUP BY ______;",
+      "answers": ["dept_id"],
+      "ignoreCase": true,
+      "output": "(1,4600) (2,4100) (3,3500) (4,4800)",
+      "explain": "dept_id로 그룹을 나누면 AVG(salary)가 각 부서별로 계산됩니다. 부서별 평균 급여가 나옵니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "직급별 인원을 구하세요. GROUP BY의 기준 열을 넣으세요.",
+      "code": "SELECT position, COUNT(*) FROM employees GROUP BY ______;",
+      "answers": ["position"],
+      "ignoreCase": true,
+      "output": "(과장,2) (대리,1) (부장,1) (사원,4)",
+      "explain": "position으로 그룹을 나누면 직급별 인원이 나옵니다. 사원이 4명으로 가장 많습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "부서별 급여 합계를 구하세요. 합계 집계 함수를 넣으세요.",
+      "code": "SELECT dept_id, ______(salary) FROM employees GROUP BY dept_id;",
+      "answers": ["SUM"],
+      "ignoreCase": true,
+      "output": "(1,9200) (2,12300) (3,7000) (4,4800)",
+      "explain": "SUM(salary)을 GROUP BY dept_id와 함께 쓰면 부서별 급여 합계가 나옵니다. 개발부(2)가 12300으로 가장 큽니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "GROUP BY와 함께 SELECT할 수 있는 것은 그룹 기준 열과 무엇인가요? (개념)",
+      "code": "GROUP BY 사용 시 SELECT 가능한 것: 그룹 기준 열 + ______ 함수",
+      "answers": ["집계", "aggregate"],
+      "ignoreCase": true,
+      "output": "집계 함수(COUNT, SUM, AVG 등)",
+      "explain": "GROUP BY 사용 시 SELECT에는 그룹 기준 열과 집계 함수만 쓰는 것이 원칙입니다. 그룹당 여러 값을 갖는 일반 열은 쓸 수 없습니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "'부서별 평균 급여'처럼 그룹으로 나눠 집계할 때 쓰는 절은?",
+        "options": ["ORDER BY", "GROUP BY", "WHERE", "DISTINCT"],
+        "answer": 1,
+        "explain": "GROUP BY가 같은 값끼리 그룹으로 묶어 집계합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`SELECT dept_id, COUNT(*) FROM employees GROUP BY dept_id;` 의 결과는?",
+        "options": [
+          "전체 직원 수 하나",
+          "부서별 직원 수",
+          "직원 이름 목록",
+          "부서 이름"
+        ],
+        "answer": 1,
+        "explain": "dept_id로 그룹을 나누고 각 그룹의 COUNT(*)를 구하므로 부서별 직원 수가 나옵니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "GROUP BY와 함께 SELECT에 쓸 수 있는 것으로 옳은 것은?",
+        "options": [
+          "어떤 열이든 자유롭게",
+          "그룹 기준 열과 집계 함수",
+          "집계 함수만",
+          "일반 열만"
+        ],
+        "answer": 1,
+        "explain": "GROUP BY 사용 시 SELECT에는 그룹 기준 열(GROUP BY에 있는 열)과 집계 함수를 씁니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`SELECT dept_id, emp_name, COUNT(*) FROM employees GROUP BY dept_id;` 가 문제인 이유는?",
+        "options": [
+          "COUNT를 쓸 수 없어서",
+          "emp_name은 그룹당 여러 개라 하나로 정할 수 없어서",
+          "dept_id를 GROUP BY에 쓸 수 없어서",
+          "문제가 없다"
+        ],
+        "answer": 1,
+        "explain": "emp_name은 한 부서에 여러 명이라 그룹당 하나로 결정되지 않습니다. GROUP BY 열이나 집계 함수 안에 있어야 합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "직급별 인원을 구하는 올바른 쿼리는?",
+        "options": [
+          "SELECT COUNT(*) FROM employees;",
+          "SELECT position, COUNT(*) FROM employees GROUP BY position;",
+          "SELECT position FROM employees ORDER BY position;",
+          "SELECT DISTINCT position FROM employees;"
+        ],
+        "answer": 1,
+        "explain": "position으로 GROUP BY하고 COUNT(*)를 구하면 직급별 인원이 나옵니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "GROUP BY 없이 집계 함수만 쓰면?", "a": "전체를 하나의 그룹으로 보고 집계합니다. 예: SELECT AVG(salary) FROM employees; 는 전체 평균입니다. GROUP BY를 넣으면 그룹별로 나뉩니다." },
+    { "q": "GROUP BY와 ORDER BY를 같이 쓸 수 있나요?", "a": "네. GROUP BY로 묶어 집계한 뒤 ORDER BY로 정렬합니다. 순서는 GROUP BY 다음에 ORDER BY입니다. 예: 부서별 인원을 많은 순으로 정렬." },
+    { "q": "왜 GROUP BY 열만 SELECT할 수 있나요?", "a": "그룹으로 묶으면 그룹당 한 줄로 요약됩니다. 그런데 emp_name 같은 일반 열은 그룹 안에 여러 값이 있어 한 줄로 표현할 수 없습니다. 그래서 그룹 기준 열이나 집계 값만 쓸 수 있습니다." }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "id": "track5.join-alias",
+  "trackId": "track5",
+  "order": 3,
+  "title": "테이블 별칭으로 간결하게",
+  "content": "## 긴 테이블 이름 줄이기\n\n조인을 하면 `employees.emp_name`, `departments.dept_name` 처럼 테이블 이름을 반복해서 써야 합니다. 테이블 이름이 길면 쿼리가 지저분해집니다. **테이블 별칭(alias)** 으로 짧게 줄일 수 있습니다.\n\n```sql\nSELECT e.emp_name, d.dept_name\nFROM employees AS e\nINNER JOIN departments AS d\nON e.dept_id = d.dept_id;\n```\n\n`employees AS e` 로 employees를 `e`라고 부르기로 하고, 이후 `e.emp_name` 처럼 짧게 씁니다. departments는 `d`로요. 쿼리가 훨씬 깔끔해집니다.\n\n## AS 생략\n\n열 별칭처럼 테이블 별칭도 AS를 생략할 수 있습니다.\n\n```sql\nFROM employees e INNER JOIN departments d ON e.dept_id = d.dept_id\n```\n\n`employees e` 처럼 AS 없이 이름 뒤에 별칭만 써도 됩니다. 실무에서는 이 형태를 많이 씁니다.\n\n## 별칭은 관례적으로 짧게\n\n보통 테이블 이름의 첫 글자나 의미 있는 약자를 씁니다. employees → e, departments → d 처럼요. 짧으면서도 무엇을 가리키는지 알 수 있게 정합니다.\n\n## 별칭을 쓰면 좋은 이유\n\n- **가독성**: 쿼리가 짧고 읽기 쉬워집니다.\n- **필수인 경우**: 뒤에서 배울 '자기 자신과의 조인(self join)'에서는 같은 테이블을 두 번 쓰므로 별칭이 반드시 필요합니다.\n\n## 정리\n\n테이블 별칭으로 긴 테이블 이름을 짧게 줄여 쿼리를 간결하게 만듭니다. `employees AS e` 또는 `employees e` 형태로 쓰며, 조인에서 특히 유용합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "employees에 e라는 별칭을 붙이세요. (별칭 키워드)",
+      "code": "SELECT e.emp_name FROM employees ______ e;",
+      "answers": ["AS"],
+      "ignoreCase": true,
+      "output": "employees를 e로 부르며 조회",
+      "explain": "AS로 테이블 별칭을 붙입니다. employees AS e 이후로는 e.emp_name 처럼 짧게 씁니다. AS는 생략도 가능합니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "별칭 e와 d를 사용해 조인 조건을 완성하세요. employees의 별칭을 넣으세요.",
+      "code": "SELECT e.emp_name, d.dept_name FROM employees e JOIN departments d ON ______.dept_id = d.dept_id;",
+      "answers": ["e"],
+      "ignoreCase": true,
+      "output": "각 직원과 부서 이름이 조회됨",
+      "explain": "employees의 별칭 e를 써서 e.dept_id로 참조합니다. 별칭을 정하면 이후 그 별칭으로만 참조합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "departments에 d라는 별칭을 붙이세요. (AS 생략 형태 — 빈칸에 별칭만)",
+      "code": "SELECT e.emp_name, d.dept_name FROM employees e JOIN departments ______ ON e.dept_id = d.dept_id;",
+      "answers": ["d"],
+      "ignoreCase": true,
+      "output": "departments를 d로 부르며 조인",
+      "explain": "departments d 처럼 AS 없이 이름 뒤에 별칭 d만 써도 됩니다. 실무에서 자주 쓰는 형태입니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "별칭 e를 사용해 직원 이름 열을 조회하세요.",
+      "code": "SELECT ______.emp_name, d.dept_name FROM employees e JOIN departments d ON e.dept_id = d.dept_id;",
+      "answers": ["e"],
+      "ignoreCase": true,
+      "output": "직원 이름과 부서 이름이 조회됨",
+      "explain": "별칭을 정한 뒤에는 e.emp_name 처럼 별칭으로 열을 참조합니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "별칭이 '반드시' 필요한 조인은? (같은 테이블을 두 번 쓰는 조인)",
+      "code": "같은 테이블을 두 번 조인하는 것 = ______ join",
+      "answers": ["self", "셀프", "자기"],
+      "ignoreCase": true,
+      "output": "self join (자기 참조 조인)",
+      "explain": "self join(자기 자신과의 조인)은 같은 테이블을 두 번 쓰므로 서로 구분할 별칭이 반드시 필요합니다. 뒤 토픽에서 배웁니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "테이블 별칭을 사용하는 주된 이유는?",
+        "options": [
+          "테이블을 삭제하려고",
+          "긴 테이블 이름을 짧게 줄여 쿼리를 간결하게 하려고",
+          "데이터를 바꾸려고",
+          "정렬하려고"
+        ],
+        "answer": 1,
+        "explain": "테이블 별칭으로 긴 이름을 짧게 줄여 쿼리 가독성을 높입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`FROM employees AS e` 에서 e의 의미는?",
+        "options": [
+          "employees의 첫 행",
+          "employees 테이블을 e라는 별칭으로 부름",
+          "employees의 열 개수",
+          "새 테이블 생성"
+        ],
+        "answer": 1,
+        "explain": "employees AS e 는 employees 테이블에 e라는 별칭을 붙인 것입니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "테이블 별칭에서 AS를 생략한 올바른 형태는?",
+        "options": [
+          "employees = e",
+          "employees e",
+          "e employees",
+          "employees.e"
+        ],
+        "answer": 1,
+        "explain": "employees e 처럼 이름 뒤에 별칭만 써도 됩니다. AS는 생략 가능합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "별칭을 e로 정한 뒤 직원 이름을 참조하는 올바른 형태는?",
+        "options": ["employees.emp_name", "e.emp_name", "emp_name.e", "e(emp_name)"],
+        "answer": 1,
+        "explain": "별칭을 정하면 이후에는 e.emp_name 처럼 별칭으로 참조합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "테이블 별칭이 '반드시' 필요한 경우는?",
+        "options": [
+          "모든 조인",
+          "같은 테이블을 두 번 조인하는 self join",
+          "단일 테이블 조회",
+          "정렬할 때"
+        ],
+        "answer": 1,
+        "explain": "self join은 같은 테이블을 두 번 쓰므로 둘을 구분할 별칭이 반드시 필요합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "별칭 이름은 마음대로 정해도 되나요?", "a": "네, 규칙만 지키면 자유입니다. 다만 관례적으로 테이블의 첫 글자나 의미 있는 약자(e, d, emp, dept)를 써서 알아보기 쉽게 합니다." },
+    { "q": "별칭을 정하면 원래 테이블 이름은 못 쓰나요?", "a": "별칭을 정한 쿼리 안에서는 별칭으로 참조하는 것이 원칙입니다. employees.emp_name 대신 e.emp_name을 씁니다." },
+    { "q": "열 별칭(AS)과 테이블 별칭(AS)은 같은 건가요?", "a": "둘 다 AS를 쓰지만 대상이 다릅니다. 열 별칭은 결과 열 이름을, 테이블 별칭은 테이블 참조 이름을 바꿉니다. 위치로 구분됩니다." }
+  ]
+}

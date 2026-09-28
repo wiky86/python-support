@@ -22,6 +22,7 @@ import {
   ArrowLeft,
   Terminal,
   Landmark,
+  Database,
   Compass,
   HelpCircle,
   Layers,
@@ -46,6 +47,7 @@ export function DashboardView({
 
   const isPython = course.id === "python";
   const isFinance = course.id === "finance";
+  const isSql = course.id === "sql";
 
   // Calculate course-specific progress
   const courseProgMap = courseProgressMap[course.id] || {};
@@ -87,12 +89,14 @@ export function DashboardView({
         className={`rounded-3xl p-6 sm:p-8 text-white border shadow-xl relative overflow-hidden ${
           isPython
             ? "bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-emerald-500/20"
-            : "bg-gradient-to-r from-amber-950 via-slate-900 to-yellow-950 border-amber-500/20"
+            : isFinance
+            ? "bg-gradient-to-r from-amber-950 via-slate-900 to-yellow-950 border-amber-500/20"
+            : "bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border-blue-500/20"
         }`}
       >
         <div
           className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
-            isPython ? "bg-emerald-500/10" : "bg-amber-500/10"
+            isPython ? "bg-emerald-500/10" : isFinance ? "bg-amber-500/10" : "bg-blue-500/10"
           }`}
         />
 
@@ -103,10 +107,18 @@ export function DashboardView({
                 className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
                   isPython
                     ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                    : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    : isFinance
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    : "bg-blue-500/20 text-blue-300 border-blue-500/30"
                 }`}
               >
-                {isPython ? <Terminal className="w-3.5 h-3.5" /> : <Landmark className="w-3.5 h-3.5" />}
+                {isPython ? (
+                  <Terminal className="w-3.5 h-3.5" />
+                ) : isFinance ? (
+                  <Landmark className="w-3.5 h-3.5" />
+                ) : (
+                  <Database className="w-3.5 h-3.5" />
+                )}
                 {course.title}
               </span>
               <span className="text-xs text-slate-400 font-mono">총 {tracks.length}개 트랙</span>
@@ -258,7 +270,16 @@ export function DashboardView({
         </div>
 
         <div className="space-y-6">
-          {tracks.map((track) => {
+          {tracks.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+              <Database className="w-10 h-10 text-blue-500 mx-auto opacity-70" />
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">학습 콘텐츠 준비 중입니다</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                {course.title} 과목의 트랙과 실습 콘텐츠가 곧 등록될 예정입니다.
+              </p>
+            </div>
+          ) : (
+            tracks.map((track) => {
             const project = projectsMap[track.id];
             const projectUnlocked = isProjectUnlocked(track, progress);
             const projectId = `${track.id}.project`;
@@ -443,8 +464,9 @@ export function DashboardView({
                 )}
               </div>
             );
-          })}
-        </div>
+          })
+        )}
+      </div>
       </div>
     </div>
   );

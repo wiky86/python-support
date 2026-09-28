@@ -1,0 +1,124 @@
+{
+  "id": "track8.partition-by",
+  "trackId": "track8",
+  "order": 3,
+  "title": "그룹별 순위·계산 — PARTITION BY",
+  "content": "## 그룹 안에서 순위 매기기\n\n앞 토픽의 순위는 '전체 기준'이었습니다. 그런데 '**부서별로** 급여 순위'가 필요할 때가 있습니다. 각 부서 안에서 1등, 2등을 따로 매기는 것이죠. 이때 OVER 절에 **PARTITION BY**를 씁니다.\n\n## PARTITION BY 기본\n\n```sql\nSELECT emp_name, dept_id, salary,\n       RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS 부서내순위\nFROM employees;\n```\n\n- **PARTITION BY dept_id**: 부서별로 나눈다(윈도우를 부서 단위로 쪼갬).\n- **ORDER BY salary DESC**: 각 부서 안에서 급여 높은 순으로.\n\n결과는 각 부서마다 순위가 **1부터 다시 시작**합니다.\n\n```\n김철수  1(영업)  1\n이영희  1(영업)  2\n박민수  2(개발)  1\n최지훈  2(개발)  2\n정수진  2(개발)  3\n강다연  3(인사)  1\n...\n```\n\n영업부의 1등(김철수), 개발부의 1등(박민수)처럼 부서마다 따로 순위가 매겨집니다.\n\n## GROUP BY의 PARTITION 버전\n\nPARTITION BY는 GROUP BY와 '그룹을 나눈다'는 점이 비슷합니다. 하지만 결정적 차이가 있습니다.\n\n- **GROUP BY**: 그룹을 한 줄로 합침.\n- **PARTITION BY**: 그룹으로 나누되 **각 행은 그대로 유지**.\n\n그래서 '각 직원 + 그 부서 내 순위'를 나란히 볼 수 있습니다.\n\n## PARTITION BY로 그룹별 집계도\n\n순위뿐 아니라 집계 윈도우 함수에도 씁니다.\n\n```sql\nSELECT emp_name, dept_id, salary,\n       ROUND(AVG(salary) OVER (PARTITION BY dept_id)) AS 부서평균\nFROM employees;\n```\n\n각 직원 옆에 그 직원이 속한 부서의 평균 급여가 붙습니다. 개발부 직원 세 명은 모두 부서평균 4100이 표시됩니다.\n\n## 정리\n\nPARTITION BY는 윈도우를 그룹으로 나눕니다. OVER (PARTITION BY 열 ORDER BY 열)로 그룹별 순위를, OVER (PARTITION BY 열)로 그룹별 집계를 각 행에 붙입니다. GROUP BY와 달리 개별 행이 유지되는 것이 핵심입니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "부서별로 급여 순위를 매기세요(각 부서 안에서 1등부터). 그룹으로 나누는 절을 넣으세요.",
+      "code": "SELECT emp_name, dept_id, salary, RANK() OVER (______ dept_id ORDER BY salary DESC) AS 부서내순위 FROM employees;",
+      "answers": ["PARTITION BY"],
+      "ignoreCase": true,
+      "output": "각 부서마다 순위가 1부터 다시 시작 (영업1위 김철수, 개발1위 박민수 등)",
+      "explain": "PARTITION BY dept_id는 부서별로 윈도우를 나눕니다. 각 부서 안에서 급여 순위가 따로 매겨집니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "PARTITION BY의 기준을 부서(dept_id)로 정하세요.",
+      "code": "RANK() OVER (PARTITION BY ______ ORDER BY salary DESC)",
+      "answers": ["dept_id"],
+      "ignoreCase": true,
+      "output": "부서별로 나뉘어 각각 순위가 매겨짐",
+      "explain": "PARTITION BY dept_id로 부서 단위로 그룹을 나눕니다. 각 부서가 독립된 순위 범위가 됩니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "각 직원 옆에 그가 속한 부서의 평균 급여를 붙이세요. 부서별로 나누는 절을 완성하세요.",
+      "code": "SELECT emp_name, dept_id, salary, ROUND(AVG(salary) OVER (PARTITION BY ______)) AS 부서평균 FROM employees;",
+      "answers": ["dept_id"],
+      "ignoreCase": true,
+      "output": "개발부 3명은 모두 부서평균 4100, 영업부 2명은 4600 등",
+      "explain": "AVG(salary) OVER (PARTITION BY dept_id)는 부서별 평균을 각 행에 붙입니다. GROUP BY와 달리 개별 직원 행이 유지됩니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "PARTITION BY와 GROUP BY의 차이: PARTITION BY는 그룹으로 나누되 각 행을 어떻게 하나요? (합침 / 유지)",
+      "code": "PARTITION BY는 그룹으로 나누되 각 행을 ______",
+      "answers": ["유지", "유지함", "유지한다"],
+      "ignoreCase": true,
+      "output": "각 행을 유지 (GROUP BY는 합침)",
+      "explain": "PARTITION BY는 그룹으로 나누지만 각 행을 유지합니다. 이 점이 그룹을 한 줄로 합치는 GROUP BY와 다릅니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "각 부서에서 급여 1위인 직원만 뽑고 싶습니다. 부서별 순번을 매기는 함수를 넣으세요(1위만 걸러내기 좋게).",
+      "code": "SELECT emp_name, dept_id FROM (SELECT emp_name, dept_id, ______() OVER (PARTITION BY dept_id ORDER BY salary DESC) rn FROM employees) t WHERE t.rn = 1;",
+      "answers": ["ROW_NUMBER"],
+      "ignoreCase": true,
+      "output": "각 부서 급여 1위: 김철수(영업), 박민수(개발), 강다연(인사), 임재현(마케팅)",
+      "explain": "부서별 ROW_NUMBER로 순번을 매기고, 바깥에서 rn=1만 걸러내면 각 부서 1위를 뽑습니다. 윈도우 함수의 대표 활용 패턴입니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "윈도우를 그룹으로 나누는 절은?",
+        "options": ["GROUP BY", "PARTITION BY", "ORDER BY", "DIVIDE BY"],
+        "answer": 1,
+        "explain": "OVER 절 안의 PARTITION BY가 윈도우를 그룹으로 나눕니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC)` 의 결과는?",
+        "options": [
+          "전체 급여 순위",
+          "부서별로 각각 매긴 급여 순위",
+          "부서 개수",
+          "전체 평균"
+        ],
+        "answer": 1,
+        "explain": "PARTITION BY dept_id로 부서별로 나눈 뒤 각 부서 안에서 급여 순위를 매깁니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "PARTITION BY와 GROUP BY의 차이는?",
+        "options": [
+          "완전히 같다",
+          "GROUP BY는 그룹을 합치고, PARTITION BY는 나누되 각 행을 유지",
+          "PARTITION BY는 집계를 못 한다",
+          "GROUP BY가 더 느리다"
+        ],
+        "answer": 1,
+        "explain": "둘 다 그룹을 나누지만, GROUP BY는 한 줄로 합치고 PARTITION BY는 개별 행을 유지합니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "각 직원 옆에 부서 평균을 붙이는 것은?",
+        "options": [
+          "AVG(salary) OVER (PARTITION BY dept_id)",
+          "AVG(salary) GROUP BY dept_id",
+          "AVG(salary) WHERE dept_id",
+          "SUM(salary)"
+        ],
+        "answer": 0,
+        "explain": "AVG(salary) OVER (PARTITION BY dept_id)는 부서별 평균을 각 행에 붙입니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "'각 부서에서 급여 1위만 뽑기'의 일반적 방법은?",
+        "options": [
+          "GROUP BY로 평균 구하기",
+          "부서별 ROW_NUMBER를 매긴 뒤 순번=1만 걸러내기",
+          "DISTINCT 쓰기",
+          "전체 정렬 후 LIMIT 1"
+        ],
+        "answer": 1,
+        "explain": "PARTITION BY로 부서별 순번(ROW_NUMBER)을 매기고, 바깥 쿼리에서 순번=1인 행만 걸러내면 각 부서 1위가 나옵니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "PARTITION BY와 ORDER BY를 같이 써도 되나요?", "a": "네, 함께 자주 씁니다. OVER (PARTITION BY dept_id ORDER BY salary DESC)는 '부서별로 나눈 뒤 각 부서 안에서 급여순 정렬'을 뜻합니다." },
+    { "q": "PARTITION BY에 열을 여러 개 쓸 수 있나요?", "a": "네. PARTITION BY dept_id, position 처럼 여러 기준으로 나눌 수 있습니다. 부서+직급 조합별로 윈도우가 나뉩니다." },
+    { "q": "왜 순위 1위를 바로 WHERE로 못 거르나요?", "a": "윈도우 함수 결과(순위)는 WHERE 단계에서 아직 계산 전이라 직접 조건에 못 씁니다. 그래서 서브쿼리로 감싼 뒤 바깥에서 걸러냅니다(또는 CTE 사용)." }
+  ]
+}

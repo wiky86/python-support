@@ -1,0 +1,109 @@
+{
+  "id": "track2.operators",
+  "trackId": "track2",
+  "order": 2,
+  "title": "여러 조건 조합 — AND, OR, NOT",
+  "content": "## 조건을 여러 개 걸기\n\n조건 하나로는 부족할 때가 있습니다. '급여가 3000 초과이면서 5000 미만'처럼 여러 조건을 조합하려면 **논리 연산자**를 씁니다.\n\n## AND — 모두 만족\n\n두 조건을 **모두** 만족하는 행만 조회합니다.\n\n```sql\nSELECT emp_name, salary FROM employees\nWHERE salary > 3000 AND salary < 5000;\n```\n\n급여가 3000 초과이면서 동시에 5000 미만인 직원: 이영희(3200), 정수진(3500), 최지훈(3800), 강다연(4000), 임재현(4800). 두 조건을 다 만족해야 합니다.\n\n## OR — 하나라도 만족\n\n두 조건 중 **하나라도** 만족하면 조회합니다.\n\n```sql\nSELECT emp_name FROM employees\nWHERE dept_id = 1 OR dept_id = 3;\n```\n\n영업부(1) 또는 인사부(3) 소속: 김철수, 이영희(영업부), 강다연, 윤서연(인사부). 둘 중 한 부서면 됩니다.\n\n## NOT — 부정\n\n조건을 **뒤집습니다**.\n\n```sql\nSELECT emp_name FROM employees\nWHERE NOT dept_id = 2;\n```\n\n개발부(2)가 **아닌** 직원을 조회합니다. `dept_id != 2` 와 같은 결과입니다.\n\n## 우선순위와 괄호\n\nAND가 OR보다 먼저 계산됩니다. 의도를 명확히 하려면 **괄호**로 묶는 것이 안전합니다.\n\n```sql\nWHERE (dept_id = 1 OR dept_id = 2) AND salary >= 4000\n```\n\n괄호로 \"영업부 또는 개발부\"를 먼저 묶은 뒤, 그중 급여 4000 이상을 찾습니다. 괄호가 없으면 의도와 다르게 계산될 수 있습니다.\n\n## 정리\n\nAND(모두 만족), OR(하나라도 만족), NOT(부정)으로 여러 조건을 조합합니다. AND가 OR보다 우선하므로, 헷갈릴 때는 괄호로 묶어 의도를 명확히 합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "급여가 3000 초과이면서 5000 미만인 직원을 조회하세요. (두 조건을 모두 만족)",
+      "code": "SELECT emp_name, salary FROM employees WHERE salary > 3000 ______ salary < 5000;",
+      "answers": ["AND"],
+      "ignoreCase": true,
+      "output": "(이영희,3200) (정수진,3500) (최지훈,3800) (강다연,4000) (임재현,4800)",
+      "explain": "AND는 두 조건을 모두 만족하는 행만 조회합니다. 3000 초과 그리고 5000 미만인 5명이 나옵니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "영업부(1) 또는 인사부(3)에 소속된 직원을 조회하세요. (둘 중 하나라도 만족)",
+      "code": "SELECT emp_name FROM employees WHERE dept_id = 1 ______ dept_id = 3;",
+      "answers": ["OR"],
+      "ignoreCase": true,
+      "output": "김철수, 이영희, 강다연, 윤서연",
+      "explain": "OR는 두 조건 중 하나라도 만족하면 조회합니다. 영업부 또는 인사부 소속 4명이 나옵니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "개발부(dept_id 2)가 아닌 직원을 조회하세요. (부정 연산자)",
+      "code": "SELECT emp_name FROM employees WHERE ______ dept_id = 2;",
+      "answers": ["NOT"],
+      "ignoreCase": true,
+      "output": "김철수, 이영희, 강다연, 윤서연, 임재현 (개발부 제외)",
+      "explain": "NOT은 조건을 뒤집습니다. NOT dept_id = 2 는 개발부가 아닌 직원을 조회하며, dept_id != 2 와 같습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "'영업부(1) 또는 개발부(2)' 중에서 급여가 4000 이상인 직원을 조회하려 합니다. 우선순위를 명확히 하는 기호(여는 것)를 넣으세요.",
+      "code": "SELECT emp_name FROM employees WHERE ______dept_id = 1 OR dept_id = 2) AND salary >= 4000;",
+      "answers": ["("],
+      "ignoreCase": true,
+      "output": "(김철수,6000·영업) (박민수,5000·개발) (임재현? 아니오-마케팅). 영업/개발 중 4000이상: 김철수, 박민수",
+      "explain": "괄호로 (dept_id=1 OR dept_id=2)를 먼저 묶어 '영업부 또는 개발부'를 만든 뒤, 그중 급여 4000 이상을 찾습니다. 괄호가 없으면 AND가 먼저 계산돼 의도와 달라집니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "급여가 4000 이상이면서 직급이 '과장'인 직원을 조회하세요. (두 조건 모두 만족)",
+      "code": "SELECT emp_name FROM employees WHERE salary >= 4000 ______ position = '과장';",
+      "answers": ["AND"],
+      "ignoreCase": true,
+      "output": "박민수(5000,과장), 임재현(4800,과장)",
+      "explain": "AND로 두 조건을 모두 만족하는 행을 찾습니다. 급여 4000 이상이면서 과장인 박민수, 임재현이 나옵니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "두 조건을 '모두' 만족하는 행만 조회하는 연산자는?",
+        "options": ["OR", "AND", "NOT", "IN"],
+        "answer": 1,
+        "explain": "AND는 두 조건을 모두 만족해야 조회합니다. 하나라도 만족하면 OR입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`WHERE dept_id = 1 OR dept_id = 3` 의 결과로 옳은 것은?",
+        "options": [
+          "영업부이면서 동시에 인사부인 직원",
+          "영업부 또는 인사부 소속 직원",
+          "영업부도 인사부도 아닌 직원",
+          "부서가 없는 직원"
+        ],
+        "answer": 1,
+        "explain": "OR는 하나라도 만족하면 조회하므로, 영업부(1) 또는 인사부(3) 소속 직원이 나옵니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`NOT dept_id = 2` 와 같은 의미의 조건은?",
+        "options": ["dept_id = 2", "dept_id != 2", "dept_id > 2", "dept_id IS NULL"],
+        "answer": 1,
+        "explain": "NOT은 조건을 부정하므로 NOT dept_id = 2 는 dept_id != 2(개발부가 아님)와 같습니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "AND와 OR가 섞였을 때, 먼저 계산되는 것은?",
+        "options": ["OR가 먼저", "AND가 먼저", "왼쪽부터 순서대로", "무작위"],
+        "answer": 1,
+        "explain": "AND가 OR보다 우선순위가 높아 먼저 계산됩니다. 의도를 명확히 하려면 괄호를 씁니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "여러 조건의 우선순위를 명확히 하고 싶을 때 사용하는 것은?",
+        "options": ["대괄호 [ ]", "괄호 ( )", "중괄호 { }", "따옴표 ' '"],
+        "answer": 1,
+        "explain": "괄호 ( )로 묶으면 그 안의 조건이 먼저 계산됩니다. AND/OR가 섞일 때 의도를 명확히 합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "AND와 OR를 한 쿼리에 여러 개 써도 되나요?", "a": "네, 얼마든지 조합할 수 있습니다. 다만 많아질수록 우선순위가 헷갈리니 괄호로 묶어 의도를 분명히 하는 것이 좋습니다." },
+    { "q": "NOT은 어디에 붙이나요?", "a": "조건 앞에 붙입니다. NOT dept_id = 2 처럼요. 또는 NOT IN, NOT LIKE, NOT BETWEEN 처럼 다른 연산자와 결합해 쓰기도 합니다(뒤 토픽 참고)." },
+    { "q": "괄호를 안 쓰면 무조건 틀리나요?", "a": "틀리는 건 아니지만, AND가 먼저 계산되는 규칙 때문에 의도와 다른 결과가 나올 수 있습니다. 조건이 복잡하면 괄호로 명확히 하는 습관이 안전합니다." }
+  ]
+}

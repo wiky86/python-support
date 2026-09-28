@@ -1,0 +1,114 @@
+{
+  "id": "track2.where-basic",
+  "trackId": "track2",
+  "order": 1,
+  "title": "WHERE — 조건으로 골라내기",
+  "content": "## 필요한 행만 골라내기\n\n지금까지는 테이블의 모든 행을 조회했습니다. 하지만 보통은 '급여가 4000 이상인 직원'처럼 **조건에 맞는 행만** 보고 싶습니다. 이때 **WHERE** 절을 씁니다.\n\n```sql\nSELECT emp_name, salary FROM employees WHERE salary >= 4000;\n```\n\n- **WHERE** 뒤에 조건을 씁니다.\n- `salary >= 4000` 은 \"급여가 4000 이상\"이라는 조건입니다.\n- 조건을 **만족하는 행만** 결과에 나옵니다.\n\n위 쿼리 결과는 김철수(6000), 박민수(5000), 강다연(4000), 임재현(4800) 네 명입니다.\n\n## 비교 연산자\n\nWHERE 조건에는 비교 연산자를 씁니다.\n\n| 연산자 | 의미 | 예시 |\n|---|---|---|\n| `=` | 같다 | `dept_id = 2` |\n| `>` | 크다 | `salary > 4000` |\n| `>=` | 크거나 같다 | `salary >= 4000` |\n| `<` | 작다 | `salary < 3500` |\n| `<=` | 작거나 같다 | `salary <= 3500` |\n| `!=` 또는 `<>` | 같지 않다 | `position != '사원'` |\n\n주의: SQL에서 '같다'는 `==`가 아니라 **`=` 하나**입니다. (프로그래밍 언어와 다른 점)\n\n## 문자열 조건\n\n문자열을 비교할 때는 **작은따옴표(')** 로 감쌉니다.\n\n```sql\nSELECT emp_name FROM employees WHERE position = '사원';\n```\n\n직급이 '사원'인 직원만 조회합니다. 숫자는 따옴표가 필요 없지만, 문자열은 반드시 따옴표로 감싸야 합니다.\n\n## 정리\n\nWHERE 절로 조건에 맞는 행만 골라냅니다. 비교 연산자(`=`, `>`, `>=`, `<`, `<=`, `!=`)를 쓰며, 문자열 값은 작은따옴표로 감쌉니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "급여(salary)가 4000 이상인 직원의 이름과 급여를 조회하세요. (조건절 키워드)",
+      "code": "SELECT emp_name, salary FROM employees ______ salary >= 4000;",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "(김철수,6000) (박민수,5000) (강다연,4000) (임재현,4800)",
+      "explain": "WHERE 절로 조건을 지정합니다. salary >= 4000 조건을 만족하는 4명이 조회됩니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "개발부(dept_id가 2)에 소속된 직원 이름을 조회하세요. (같다 연산자 사용)",
+      "code": "SELECT emp_name FROM employees WHERE dept_id ______ 2;",
+      "answers": ["="],
+      "ignoreCase": true,
+      "output": "박민수, 정수진, 최지훈",
+      "explain": "SQL에서 '같다'는 = 하나입니다(==가 아님). dept_id = 2 는 개발부 소속 3명을 조회합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "직급(position)이 '사원'인 직원을 조회하세요. 빈칸에 문자열 값을 넣으세요.",
+      "code": "SELECT emp_name, position FROM employees WHERE position = ______;",
+      "answers": ["'사원'"],
+      "ignoreCase": true,
+      "output": "이영희, 정수진, 최지훈, 윤서연 (모두 사원)",
+      "explain": "문자열 값은 작은따옴표로 감쌉니다. '사원'처럼요. 따옴표를 빠뜨리면 오류가 납니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "급여가 3500 미만인 직원을 조회하세요. (작다 연산자)",
+      "code": "SELECT emp_name, salary FROM employees WHERE salary ______ 3500;",
+      "answers": ["<"],
+      "ignoreCase": true,
+      "output": "(이영희,3200) (윤서연,3000)",
+      "explain": "< 는 '작다'입니다. 3500 미만이므로 3500은 포함되지 않고, 3200과 3000만 조회됩니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "직급이 '사원'이 아닌 직원을 조회하세요. (같지 않다 연산자)",
+      "code": "SELECT emp_name FROM employees WHERE position ______ '사원';",
+      "answers": ["!=", "<>"],
+      "ignoreCase": true,
+      "output": "김철수, 박민수, 강다연, 임재현",
+      "explain": "'같지 않다'는 != 또는 <> 를 씁니다. 사원이 아닌 부장·과장·대리 4명이 조회됩니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "조건에 맞는 행만 골라낼 때 사용하는 절은?",
+        "options": ["FROM", "WHERE", "SELECT", "ORDER"],
+        "answer": 1,
+        "explain": "WHERE 절로 조건을 지정해 맞는 행만 조회합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "SQL에서 '같다'를 나타내는 연산자는?",
+        "options": ["==", "=", "eq", ":="],
+        "answer": 1,
+        "explain": "SQL에서 '같다'는 = 하나입니다. 많은 프로그래밍 언어의 ==와 다릅니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "문자열 값을 조건에 쓸 때 올바른 형태는?",
+        "options": [
+          "WHERE position = 사원",
+          "WHERE position = '사원'",
+          "WHERE position = (사원)",
+          "WHERE position = [사원]"
+        ],
+        "answer": 1,
+        "explain": "문자열 값은 작은따옴표로 감쌉니다. '사원'처럼요."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`WHERE salary >= 4000` 이 의미하는 것은?",
+        "options": [
+          "급여가 4000 초과",
+          "급여가 4000 이상(4000 포함)",
+          "급여가 4000 미만",
+          "급여가 정확히 4000"
+        ],
+        "answer": 1,
+        "explain": ">= 는 '크거나 같다'이므로 4000을 포함합니다. 4000 초과만 원하면 > 를 씁니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "'같지 않다'를 나타내는 연산자로 옳은 것은?",
+        "options": ["=/=", "!= 또는 <>", "NOT=", "><"],
+        "answer": 1,
+        "explain": "SQL에서 '같지 않다'는 != 또는 <> 로 씁니다. 둘 다 동일하게 동작합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "WHERE는 SELECT 어디에 위치하나요?", "a": "FROM 테이블명 뒤에 옵니다. 순서는 SELECT 열 → FROM 테이블 → WHERE 조건 입니다." },
+    { "q": "숫자에도 따옴표를 붙여야 하나요?", "a": "아닙니다. 숫자(salary >= 4000)는 따옴표 없이 씁니다. 따옴표는 문자열('사원')에만 붙입니다." },
+    { "q": "= 와 == 를 헷갈립니다.", "a": "SQL은 '같다'가 = 하나입니다. 파이썬·자바 등의 == 와 다르니 주의하세요. SQL에서 ==를 쓰면 오류가 납니다." }
+  ]
+}

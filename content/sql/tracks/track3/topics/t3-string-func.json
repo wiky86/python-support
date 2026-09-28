@@ -1,0 +1,104 @@
+{
+  "id": "track3.string-func",
+  "trackId": "track3",
+  "order": 3,
+  "title": "문자열 함수",
+  "content": "## 함수란\n\n**함수(function)** 는 값을 넣으면 가공된 결과를 돌려주는 도구입니다. SQL에는 문자열·숫자·날짜를 다루는 다양한 함수가 있습니다. 이 토픽에서는 자주 쓰는 문자열 함수를 봅니다. (MySQL 기준)\n\n## LENGTH — 길이\n\n```sql\nSELECT emp_name, LENGTH(emp_name) FROM employees;\n```\n\n문자열의 길이를 구합니다. 주의: MySQL의 LENGTH는 '바이트 수'라 한글은 글자 수와 다를 수 있습니다. 글자 수를 세려면 **CHAR_LENGTH**를 씁니다.\n\n## UPPER / LOWER — 대소문자 변환\n\n```sql\nSELECT UPPER('sql'), LOWER('SQL');\n```\n\nUPPER는 대문자로(`SQL`), LOWER는 소문자로(`sql`) 바꿉니다. 영문에 적용됩니다.\n\n## SUBSTRING — 일부 잘라내기\n\n```sql\nSELECT SUBSTRING(emp_name, 1, 1) FROM employees;\n```\n\n`SUBSTRING(문자열, 시작위치, 길이)` 형태로, 특정 위치부터 몇 글자를 잘라냅니다. 위 예는 이름의 첫 글자(성)만 뽑습니다. SQL에서 위치는 **1부터** 셉니다. (SUBSTR로 줄여 쓰기도 합니다.)\n\n## REPLACE — 바꾸기\n\n```sql\nSELECT REPLACE('2024-01-01', '-', '/');\n```\n\n`REPLACE(문자열, 찾을값, 바꿀값)` 으로 특정 부분을 다른 값으로 바꿉니다. 결과: `2024/01/01`.\n\n## TRIM — 공백 제거\n\n```sql\nSELECT TRIM('  hello  ');\n```\n\n양쪽 공백을 제거합니다. 결과: `hello`. 데이터를 정제할 때 유용합니다.\n\n## 정리\n\n문자열 함수로 데이터를 가공합니다. LENGTH/CHAR_LENGTH(길이), UPPER/LOWER(대소문자), SUBSTRING(일부 자르기, 1부터), REPLACE(바꾸기), TRIM(공백 제거)이 자주 쓰입니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "각 직원 이름의 글자 수(길이)를 구하세요. (길이 함수)",
+      "code": "SELECT emp_name, ______(emp_name) FROM employees;",
+      "answers": ["LENGTH", "CHAR_LENGTH"],
+      "ignoreCase": true,
+      "output": "(김철수,3) (이영희,3) ... 각 이름의 길이",
+      "explain": "LENGTH는 문자열 길이를 구합니다. 한글 글자 수를 정확히 세려면 CHAR_LENGTH가 더 적합합니다(MySQL의 LENGTH는 바이트 수)."
+    },
+    {
+      "id": "fb2",
+      "prompt": "'sql'을 대문자로 바꾸세요. (대문자 변환 함수)",
+      "code": "SELECT ______('sql');",
+      "answers": ["UPPER"],
+      "ignoreCase": true,
+      "output": "SQL",
+      "explain": "UPPER는 문자열을 대문자로 바꿉니다. 반대로 소문자는 LOWER입니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "이름의 첫 글자(성)만 잘라내세요. (부분 문자열 함수)",
+      "code": "SELECT ______(emp_name, 1, 1) FROM employees;",
+      "answers": ["SUBSTRING", "SUBSTR"],
+      "ignoreCase": true,
+      "output": "김, 이, 박, 정, 최, 강, 윤, 임 (각 이름의 첫 글자)",
+      "explain": "SUBSTRING(문자열, 시작, 길이)로 일부를 잘라냅니다. (1, 1)은 1번째부터 1글자, 즉 첫 글자입니다. SQL은 위치를 1부터 셉니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "'2024-01-01'의 하이픈(-)을 슬래시(/)로 바꾸세요. (치환 함수)",
+      "code": "SELECT ______('2024-01-01', '-', '/');",
+      "answers": ["REPLACE"],
+      "ignoreCase": true,
+      "output": "2024/01/01",
+      "explain": "REPLACE(문자열, 찾을값, 바꿀값)로 특정 부분을 바꿉니다. 모든 '-'가 '/'로 바뀝니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "'  hello  '의 양쪽 공백을 제거하세요. (공백 제거 함수)",
+      "code": "SELECT ______('  hello  ');",
+      "answers": ["TRIM"],
+      "ignoreCase": true,
+      "output": "hello",
+      "explain": "TRIM은 문자열 양쪽의 공백을 제거합니다. 데이터 정제에 자주 쓰입니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "문자열을 대문자로 변환하는 함수는?",
+        "options": ["UPPER", "BIG", "CAPITAL", "TOUP"],
+        "answer": 0,
+        "explain": "UPPER가 대문자 변환 함수입니다. 소문자는 LOWER입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`SUBSTRING('데이터베이스', 1, 3)` 의 결과는?",
+        "options": ["데이터", "이터베", "베이스", "데이터베이스"],
+        "answer": 0,
+        "explain": "1번째부터 3글자를 잘라내므로 '데이터'입니다. SQL은 위치를 1부터 셉니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "SQL에서 문자열의 위치(인덱스)는 몇부터 시작하나?",
+        "options": ["0부터", "1부터", "-1부터", "정해져 있지 않음"],
+        "answer": 1,
+        "explain": "SQL의 문자열 위치는 1부터 시작합니다. (0부터 시작하는 프로그래밍 언어와 다릅니다.)"
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`REPLACE('a-b-c', '-', '+')` 의 결과는?",
+        "options": ["a-b-c", "a+b+c", "abc", "a+b-c"],
+        "answer": 1,
+        "explain": "REPLACE는 찾은 값을 모두 바꿉니다. 모든 '-'가 '+'로 바뀌어 'a+b+c'가 됩니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "문자열 양쪽의 공백을 제거하는 함수는?",
+        "options": ["CUT", "TRIM", "STRIP", "CLEAN"],
+        "answer": 1,
+        "explain": "TRIM이 양쪽 공백을 제거합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "LENGTH와 CHAR_LENGTH 차이가 뭔가요?", "a": "LENGTH는 바이트 수, CHAR_LENGTH는 글자 수입니다. 영문은 보통 같지만, 한글은 한 글자가 여러 바이트라 LENGTH로 세면 글자 수와 다를 수 있습니다. 글자 수가 필요하면 CHAR_LENGTH를 쓰세요." },
+    { "q": "SUBSTRING과 SUBSTR은 다른 함수인가요?", "a": "MySQL에서는 같은 함수입니다. SUBSTR은 SUBSTRING의 축약형이라 둘 다 동일하게 동작합니다." },
+    { "q": "함수 이름도 대소문자를 구분하나요?", "a": "SQL 키워드처럼 함수 이름도 대소문자를 구분하지 않습니다. upper()와 UPPER()는 같습니다. 관례상 대문자로 씁니다." }
+  ]
+}

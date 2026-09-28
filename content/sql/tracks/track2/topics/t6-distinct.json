@@ -1,0 +1,119 @@
+{
+  "id": "track2.distinct",
+  "trackId": "track2",
+  "order": 6,
+  "title": "중복 제거 — DISTINCT",
+  "content": "## 중복된 값 없애기\n\n직급 목록을 보려고 position 열을 조회하면, 같은 직급('사원')이 여러 번 나옵니다. '어떤 직급들이 있는가'만 알고 싶을 때 중복은 방해가 됩니다. 이때 **DISTINCT**를 씁니다.\n\n```sql\nSELECT DISTINCT position FROM employees;\n```\n\nDISTINCT는 중복을 제거하고 **고유한 값만** 보여줍니다. 결과: 부장, 사원, 과장, 대리 (사원이 4명이어도 '사원'은 한 번만).\n\n## DISTINCT의 위치\n\nDISTINCT는 **SELECT 바로 뒤, 열 이름 앞**에 옵니다.\n\n```sql\nSELECT DISTINCT dept_id FROM employees;\n```\n\n직원들이 속한 부서 번호를 중복 없이 조회합니다. 결과: 1, 2, 3, 4 (각 부서에 여러 명이 있어도 부서 번호는 한 번씩).\n\n## 여러 열의 DISTINCT\n\n여러 열에 DISTINCT를 쓰면, **열들의 조합**이 중복되지 않는 것만 보여줍니다.\n\n```sql\nSELECT DISTINCT dept_id, position FROM employees;\n```\n\n'부서 + 직급' 조합이 같은 것은 하나로 칩니다. 예를 들어 개발부의 사원이 2명이면 (2, 사원) 조합은 한 번만 나옵니다.\n\n## 정리\n\nDISTINCT는 조회 결과에서 중복을 제거해 고유한 값만 보여줍니다. SELECT 바로 뒤에 쓰며, '어떤 종류의 값들이 있는지' 파악할 때 유용합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "직급(position)의 종류를 중복 없이 조회하세요. (중복 제거 키워드)",
+      "code": "SELECT ______ position FROM employees;",
+      "answers": ["DISTINCT"],
+      "ignoreCase": true,
+      "output": "부장, 사원, 과장, 대리 (중복 제거됨)",
+      "explain": "DISTINCT는 중복을 제거하고 고유한 값만 보여줍니다. 사원이 4명이어도 '사원'은 한 번만 나옵니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "직원들이 속한 부서 번호를 중복 없이 조회하세요.",
+      "code": "SELECT DISTINCT ______ FROM employees;",
+      "answers": ["dept_id"],
+      "ignoreCase": true,
+      "output": "1, 2, 3, 4",
+      "explain": "DISTINCT dept_id 는 직원들이 속한 부서 번호를 중복 없이 보여줍니다. 각 부서에 여러 명이 있어도 번호는 한 번씩입니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "'부서 번호 + 직급' 조합을 중복 없이 조회하세요. 빈칸에 두 번째 열을 넣으세요.",
+      "code": "SELECT DISTINCT dept_id, ______ FROM employees;",
+      "answers": ["position"],
+      "ignoreCase": true,
+      "output": "(1,부장) (1,사원) (2,과장) (2,사원) (3,대리) (3,사원) (4,과장) — 조합 기준 중복 제거",
+      "explain": "여러 열에 DISTINCT를 쓰면 열들의 '조합'이 중복되지 않는 것만 보여줍니다. 개발부 사원이 2명이면 (2,사원)은 한 번만 나옵니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "DISTINCT는 SELECT 문에서 어디에 위치하나요? 아래 빈칸에 키워드를 넣으세요.",
+      "code": "SELECT ______ dept_name FROM departments;",
+      "answers": ["DISTINCT"],
+      "ignoreCase": true,
+      "output": "영업부, 개발부, 인사부, 마케팅부 (부서 이름이 원래 고유하므로 그대로)",
+      "explain": "DISTINCT는 SELECT 바로 뒤, 열 이름 앞에 옵니다. departments의 dept_name은 원래 중복이 없어 결과가 그대로지만, 문법 위치를 익히는 것이 핵심입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "근무지(location)의 종류를 중복 없이 조회하세요. (departments 테이블)",
+      "code": "SELECT DISTINCT location FROM ______;",
+      "answers": ["departments"],
+      "ignoreCase": true,
+      "output": "서울, 부산 (서울이 3개 부서지만 한 번만)",
+      "explain": "DISTINCT location 은 근무지 종류를 중복 없이 보여줍니다. 영업·개발·마케팅부가 모두 서울이지만 '서울'은 한 번만 나옵니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "조회 결과에서 중복을 제거하는 키워드는?",
+        "options": ["UNIQUE", "DISTINCT", "GROUP", "NODUP"],
+        "answer": 1,
+        "explain": "DISTINCT가 중복을 제거하고 고유한 값만 조회합니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "DISTINCT의 올바른 위치는?",
+        "options": [
+          "FROM 뒤",
+          "SELECT 바로 뒤, 열 이름 앞",
+          "WHERE 뒤",
+          "테이블 이름 뒤"
+        ],
+        "answer": 1,
+        "explain": "DISTINCT는 SELECT 바로 뒤, 열 이름 앞에 옵니다. 예: SELECT DISTINCT position ..."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "position에 사원이 4명 있을 때 `SELECT DISTINCT position FROM employees;` 결과에서 '사원'은 몇 번 나오나?",
+        "options": ["4번", "1번", "0번", "8번"],
+        "answer": 1,
+        "explain": "DISTINCT는 중복을 제거하므로 사원이 몇 명이든 '사원'은 한 번만 나옵니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`SELECT DISTINCT dept_id, position FROM employees;` 가 중복 제거하는 기준은?",
+        "options": [
+          "dept_id만",
+          "position만",
+          "dept_id와 position의 조합",
+          "전체 행 개수"
+        ],
+        "answer": 2,
+        "explain": "여러 열에 DISTINCT를 쓰면 열들의 '조합'을 기준으로 중복을 제거합니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "DISTINCT를 주로 사용하는 상황으로 가장 적절한 것은?",
+        "options": [
+          "데이터를 삭제할 때",
+          "'어떤 종류의 값들이 있는지' 고유 목록을 파악할 때",
+          "행 개수를 늘릴 때",
+          "테이블을 만들 때"
+        ],
+        "answer": 1,
+        "explain": "DISTINCT는 중복을 없애 고유한 값의 목록을 볼 때 유용합니다. 예: 어떤 직급·부서·근무지가 있는지 파악."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "DISTINCT와 GROUP BY는 뭐가 다른가요?", "a": "고유 값만 볼 때는 둘 다 쓸 수 있습니다. 다만 GROUP BY는 그룹별 집계(합계·평균 등)까지 할 수 있어 더 강력합니다. 단순 중복 제거만 필요하면 DISTINCT가 간단합니다. GROUP BY는 트랙4에서 배웁니다." },
+    { "q": "DISTINCT는 특정 열에만 적용할 수 있나요?", "a": "DISTINCT는 SELECT한 열 전체에 적용됩니다. 한 열에만 적용하고 나머지는 그대로 두는 식은 불가능합니다. 여러 열을 쓰면 그 조합 기준으로 중복을 제거합니다." },
+    { "q": "DISTINCT를 쓰면 느려지나요?", "a": "중복 제거를 위해 정렬·비교가 일어나므로 데이터가 많으면 부하가 생길 수 있습니다. 꼭 필요할 때만 쓰는 것이 좋습니다." }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "course": "sql",
+  "title": "데이터베이스 활용 SQL 사전 진단",
+  "description": "과정 시작 전, SQL과 데이터베이스에 대한 현재 나의 이해도를 확인합니다. 이 결과는 학습 순서를 바꾸지 않으며 참고용입니다. 학습은 트랙1부터 순서대로 진행됩니다. (MySQL 기준)",
+  "instruction": "총 13문항입니다. 각 트랙의 핵심 개념을 묻습니다. 모르는 문항은 '모르겠음'을 선택해도 좋습니다(찍기보다 정확한 진단에 도움이 됩니다). 진단은 1회만 응시할 수 있습니다.",
+  "allowDontKnow": true,
+  "questions": [
+    {
+      "id": "diag.sql.1",
+      "trackId": "track1",
+      "type": "mcq",
+      "q": "관계형 데이터베이스에서 데이터가 저장되는 기본 단위이며, 행과 열로 이루어진 것은?",
+      "options": ["폴더", "테이블", "함수", "인덱스"],
+      "answer": 1,
+      "explain": "관계형 데이터베이스는 데이터를 테이블(행과 열로 된 표) 형태로 저장합니다."
+    },
+    {
+      "id": "diag.sql.2",
+      "trackId": "track1",
+      "type": "mcq",
+      "q": "employees 테이블의 모든 열과 모든 행을 조회하는 올바른 쿼리는?",
+      "options": [
+        "GET ALL FROM employees;",
+        "SELECT * FROM employees;",
+        "SHOW employees;",
+        "SELECT ALL employees;"
+      ],
+      "answer": 1,
+      "explain": "SELECT * FROM 테이블; 이 전체 조회입니다. *는 모든 열을 의미합니다."
+    },
+    {
+      "id": "diag.sql.3",
+      "trackId": "track2",
+      "type": "mcq",
+      "q": "급여(salary)가 4000 이상인 직원만 조회하는 조건으로 옳은 것은?",
+      "options": [
+        "WHERE salary => 4000",
+        "WHERE salary >= 4000",
+        "IF salary >= 4000",
+        "HAVING salary >= 4000"
+      ],
+      "answer": 1,
+      "explain": "조건은 WHERE 절에 쓰고, '이상'은 >= 입니다. (=> 는 잘못된 표기입니다.)"
+    },
+    {
+      "id": "diag.sql.4",
+      "trackId": "track2",
+      "type": "mcq",
+      "q": "값이 NULL인 행을 찾는 올바른 조건은?",
+      "options": [
+        "WHERE col = NULL",
+        "WHERE col IS NULL",
+        "WHERE col == NULL",
+        "WHERE col EQUALS NULL"
+      ],
+      "answer": 1,
+      "explain": "NULL은 =로 비교할 수 없어 IS NULL을 씁니다."
+    },
+    {
+      "id": "diag.sql.5",
+      "trackId": "track3",
+      "type": "mcq",
+      "q": "급여가 높은 순으로 정렬하는 절은?",
+      "options": [
+        "ORDER BY salary ASC",
+        "ORDER BY salary DESC",
+        "SORT salary DOWN",
+        "GROUP BY salary"
+      ],
+      "answer": 1,
+      "explain": "ORDER BY salary DESC가 내림차순(높은 순) 정렬입니다. ASC는 오름차순입니다."
+    },
+    {
+      "id": "diag.sql.6",
+      "trackId": "track3",
+      "type": "mcq",
+      "q": "급여 상위 3명만 조회할 때 MySQL에서 개수를 제한하는 키워드는?",
+      "options": ["TOP 3", "LIMIT 3", "FIRST 3", "ROWNUM 3"],
+      "answer": 1,
+      "explain": "MySQL은 LIMIT 3으로 개수를 제한합니다. ORDER BY와 함께 써야 '상위 3명'이 됩니다."
+    },
+    {
+      "id": "diag.sql.7",
+      "trackId": "track4",
+      "type": "mcq",
+      "q": "'부서별 평균 급여'를 구할 때 그룹으로 묶는 절은?",
+      "options": ["ORDER BY dept_id", "GROUP BY dept_id", "WHERE dept_id", "PARTITION dept_id"],
+      "answer": 1,
+      "explain": "GROUP BY dept_id로 부서별로 묶은 뒤 AVG(salary)로 부서별 평균을 구합니다."
+    },
+    {
+      "id": "diag.sql.8",
+      "trackId": "track4",
+      "type": "mcq",
+      "q": "그룹으로 묶은 뒤 '집계 결과'에 조건을 거는 절은? (예: 인원 2명 이상 부서)",
+      "options": ["WHERE", "HAVING", "GROUP BY", "ON"],
+      "answer": 1,
+      "explain": "집계 결과 조건은 HAVING을 씁니다. WHERE는 그룹화 전 개별 행 조건입니다."
+    },
+    {
+      "id": "diag.sql.9",
+      "trackId": "track5",
+      "type": "mcq",
+      "q": "두 테이블을 연결해 조회할 때, 연결 조건을 지정하는 키워드는?",
+      "options": ["IF", "ON", "AS", "WITH"],
+      "answer": 1,
+      "explain": "JOIN ... ON 연결조건 형태로 두 테이블을 연결합니다. 예: ON e.dept_id = d.dept_id."
+    },
+    {
+      "id": "diag.sql.10",
+      "trackId": "track5",
+      "type": "mcq",
+      "q": "왼쪽 테이블의 모든 행을 유지하고, 오른쪽에 짝이 없으면 NULL로 채우는 조인은?",
+      "options": ["INNER JOIN", "LEFT JOIN", "CROSS JOIN", "SELF JOIN"],
+      "answer": 1,
+      "explain": "LEFT JOIN은 왼쪽 테이블의 모든 행을 유지하고, 오른쪽에 짝이 없으면 NULL로 채웁니다."
+    },
+    {
+      "id": "diag.sql.11",
+      "trackId": "track6",
+      "type": "mcq",
+      "q": "'평균보다 많이 받는 직원'을 찾을 때 쓰는, 쿼리 안의 쿼리는?",
+      "options": ["조인", "서브쿼리", "인덱스", "트리거"],
+      "answer": 1,
+      "explain": "서브쿼리로 평균을 먼저 구하고(WHERE salary > (SELECT AVG(salary)...)), 그보다 큰 직원을 찾습니다."
+    },
+    {
+      "id": "diag.sql.12",
+      "trackId": "track7",
+      "type": "mcq",
+      "q": "기존 데이터를 수정하는 명령은? (WHERE를 빠뜨리면 전체가 바뀌어 위험한 명령)",
+      "options": ["SELECT", "UPDATE", "CREATE", "DROP"],
+      "answer": 1,
+      "explain": "UPDATE가 기존 행을 수정합니다. WHERE 없이 쓰면 모든 행이 수정되므로 주의해야 합니다."
+    },
+    {
+      "id": "diag.sql.13",
+      "trackId": "track8",
+      "type": "mcq",
+      "q": "행을 합치지 않고 각 행을 유지하면서 순위나 집계를 붙이는 함수는? (OVER 절 사용)",
+      "options": ["집계 함수(GROUP BY)", "윈도우 함수", "문자열 함수", "날짜 함수"],
+      "answer": 1,
+      "explain": "윈도우 함수는 OVER 절을 써서 각 행을 유지한 채 순위·집계를 붙입니다. GROUP BY와 달리 개별 행이 사라지지 않습니다."
+    }
+  ]
+}

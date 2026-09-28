@@ -1,0 +1,104 @@
+{
+  "id": "track3.number-func",
+  "trackId": "track3",
+  "order": 4,
+  "title": "숫자 함수와 연산",
+  "content": "## 산술 연산\n\nSQL에서 숫자 열에 사칙연산을 할 수 있습니다.\n\n```sql\nSELECT emp_name, salary, salary * 1.1 FROM employees;\n```\n\n급여에 10% 인상(× 1.1)을 적용한 값을 함께 조회합니다. `+`(더하기), `-`(빼기), `*`(곱하기), `/`(나누기), `%`(나머지)를 쓸 수 있습니다.\n\n## ROUND — 반올림\n\n```sql\nSELECT ROUND(salary * 1.1) FROM employees;\n```\n\n`ROUND(값)` 은 반올림합니다. `ROUND(값, 자릿수)` 로 소수점 아래 자릿수를 지정할 수도 있습니다. 예: `ROUND(3.14159, 2)` → `3.14`.\n\n인상된 급여처럼 소수가 생기는 계산에서 깔끔한 정수로 만들 때 유용합니다.\n\n## CEIL / FLOOR — 올림 / 내림\n\n- **CEIL(값)**: 올림(무조건 큰 정수로). `CEIL(3.1)` → `4`.\n- **FLOOR(값)**: 내림(무조건 작은 정수로). `FLOOR(3.9)` → `3`.\n\n## ABS — 절댓값\n\n```sql\nSELECT ABS(-100);\n```\n\n부호를 없앤 절댓값을 구합니다. 결과: `100`. 차이(차액)를 계산할 때 음수를 양수로 만드는 데 씁니다.\n\n## MOD (나머지)\n\n```sql\nSELECT 17 % 5;      -- 결과 2\nSELECT MOD(17, 5);  -- 결과 2 (같은 의미)\n```\n\n나눗셈의 나머지를 구합니다. 짝수/홀수 판별 등에 씁니다.\n\n## 정리\n\n숫자 열에 사칙연산(`+ - * / %`)을 할 수 있고, ROUND(반올림), CEIL(올림), FLOOR(내림), ABS(절댓값), MOD(나머지) 함수로 수치를 가공합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "급여를 10% 인상한 값(salary × 1.1)을 함께 조회하세요. 곱셈 연산자를 넣으세요.",
+      "code": "SELECT emp_name, salary ______ 1.1 FROM employees;",
+      "answers": ["*"],
+      "ignoreCase": true,
+      "output": "각 급여에 1.1을 곱한 값 (예: 6000→6600, 3200→3520)",
+      "explain": "* 는 곱셈입니다. salary * 1.1 은 10% 인상된 급여를 계산합니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "10% 인상된 급여를 반올림해 깔끔한 정수로 만드세요. (반올림 함수)",
+      "code": "SELECT emp_name, ______(salary * 1.1) FROM employees;",
+      "answers": ["ROUND"],
+      "ignoreCase": true,
+      "output": "6600, 3520, 5500 ... (반올림된 정수)",
+      "explain": "ROUND는 반올림 함수입니다. ROUND(값, 자릿수)로 소수 자릿수도 지정할 수 있습니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "3.14159를 소수점 아래 둘째 자리까지 반올림하세요. 자릿수를 넣으세요.",
+      "code": "SELECT ROUND(3.14159, ______);",
+      "answers": ["2"],
+      "ignoreCase": true,
+      "output": "3.14",
+      "explain": "ROUND(값, 2)는 소수점 아래 둘째 자리까지 반올림합니다. 3.14159 → 3.14."
+    },
+    {
+      "id": "fb4",
+      "prompt": "-100의 절댓값을 구하세요. (절댓값 함수)",
+      "code": "SELECT ______(-100);",
+      "answers": ["ABS"],
+      "ignoreCase": true,
+      "output": "100",
+      "explain": "ABS는 절댓값(부호를 없앤 값)을 구합니다. 차액 계산 등에서 음수를 양수로 만들 때 유용합니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "17을 5로 나눈 나머지를 구하세요. (나머지 연산자)",
+      "code": "SELECT 17 ______ 5;",
+      "answers": ["%"],
+      "ignoreCase": true,
+      "output": "2",
+      "explain": "% 는 나머지 연산자입니다. 17 % 5 는 2입니다. MOD(17, 5)로도 같은 결과를 얻습니다. 짝수/홀수 판별에 자주 씁니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "숫자를 반올림하는 함수는?",
+        "options": ["ROUND", "CUT", "HALF", "NEAR"],
+        "answer": 0,
+        "explain": "ROUND가 반올림 함수입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`ROUND(3.14159, 2)` 의 결과는?",
+        "options": ["3", "3.1", "3.14", "3.142"],
+        "answer": 2,
+        "explain": "둘째 자리까지 반올림하므로 3.14입니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "`CEIL(3.1)` 과 `FLOOR(3.9)` 의 결과를 바르게 짝지은 것은?",
+        "options": ["3, 4", "4, 3", "3, 3", "4, 4"],
+        "answer": 1,
+        "explain": "CEIL은 올림(3.1→4), FLOOR는 내림(3.9→3)입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`ABS(-100)` 의 결과는?",
+        "options": ["-100", "100", "0", "10"],
+        "answer": 1,
+        "explain": "ABS는 절댓값이므로 -100의 절댓값 100이 됩니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "`17 % 5` 의 결과(나머지)는?",
+        "options": ["3", "2", "3.4", "12"],
+        "answer": 1,
+        "explain": "17을 5로 나누면 몫 3, 나머지 2입니다. % 는 나머지 연산자입니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "% 는 LIKE의 와일드카드 아니었나요?", "a": "맥락에 따라 다릅니다. LIKE 문자열 안에서는 와일드카드(임의 문자)지만, 숫자 연산에서는 나머지 연산자입니다. 헷갈리면 나머지는 MOD() 함수를 쓰면 명확합니다." },
+    { "q": "ROUND와 FLOOR/CEIL은 언제 구분해 쓰나요?", "a": "ROUND는 반올림(가까운 쪽), FLOOR는 무조건 내림, CEIL은 무조건 올림입니다. 예를 들어 가격을 '올림'해서 청구하려면 CEIL, 나이를 '내림'하려면 FLOOR를 씁니다." },
+    { "q": "정수끼리 나누면 소수가 나오나요?", "a": "MySQL에서 / 로 나누면 소수가 나올 수 있습니다. 몫(정수)만 원하면 DIV 연산자나 FLOOR를 함께 씁니다." }
+  ]
+}

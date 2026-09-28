@@ -1,0 +1,114 @@
+{
+  "id": "track4.aggregate-basic",
+  "trackId": "track4",
+  "order": 1,
+  "title": "집계 함수 — COUNT, SUM, AVG, MAX, MIN",
+  "content": "## 여러 행을 하나의 값으로\n\n지금까지는 행을 하나씩 조회했습니다. 하지만 '직원이 몇 명인가?', '급여 합계는?', '평균은?'처럼 **여러 행을 하나의 요약 값으로** 만들고 싶을 때가 있습니다. 이때 **집계 함수(aggregate function)** 를 씁니다.\n\n## 다섯 가지 기본 집계 함수\n\n| 함수 | 의미 |\n|---|---|\n| `COUNT(*)` | 행의 개수 |\n| `SUM(열)` | 합계 |\n| `AVG(열)` | 평균 |\n| `MAX(열)` | 최댓값 |\n| `MIN(열)` | 최솟값 |\n\n## COUNT — 개수 세기\n\n```sql\nSELECT COUNT(*) FROM employees;\n```\n\n전체 직원 수를 셉니다. 결과: 8. `COUNT(*)` 는 행의 개수를 셉니다. WHERE와 함께 쓰면 조건에 맞는 행의 개수를 셉니다.\n\n```sql\nSELECT COUNT(*) FROM employees WHERE dept_id = 2;\n```\n\n개발부 직원 수(3명)를 셉니다.\n\n## SUM, AVG — 합계와 평균\n\n```sql\nSELECT SUM(salary), AVG(salary) FROM employees;\n```\n\n급여의 합계(33300)와 평균(4162.5)을 구합니다. 평균이 소수로 나오면 ROUND로 다듬을 수 있습니다.\n\n## MAX, MIN — 최대와 최소\n\n```sql\nSELECT MAX(salary), MIN(salary) FROM employees;\n```\n\n최고 급여(6000)와 최저 급여(3000)를 구합니다.\n\n## 여러 집계 함수 한 번에\n\n```sql\nSELECT COUNT(*), SUM(salary), AVG(salary), MAX(salary), MIN(salary)\nFROM employees;\n```\n\n한 쿼리에서 여러 요약 값을 동시에 구할 수 있습니다.\n\n## 정리\n\n집계 함수는 여러 행을 하나의 요약 값으로 만듭니다. COUNT(개수), SUM(합계), AVG(평균), MAX(최대), MIN(최소)이 기본이며, WHERE와 함께 쓰면 조건에 맞는 행만 집계합니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "전체 직원 수를 세세요. (개수 집계 함수)",
+      "code": "SELECT ______(*) FROM employees;",
+      "answers": ["COUNT"],
+      "ignoreCase": true,
+      "output": "8",
+      "explain": "COUNT(*)는 행의 개수를 셉니다. 전체 직원은 8명입니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "전체 급여의 합계를 구하세요. (합계 집계 함수)",
+      "code": "SELECT ______(salary) FROM employees;",
+      "answers": ["SUM"],
+      "ignoreCase": true,
+      "output": "33300",
+      "explain": "SUM(salary)은 급여 열의 합계를 구합니다. 8명의 급여 총합은 33300입니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "평균 급여를 구하세요. (평균 집계 함수)",
+      "code": "SELECT ______(salary) FROM employees;",
+      "answers": ["AVG"],
+      "ignoreCase": true,
+      "output": "4162.5",
+      "explain": "AVG(salary)는 급여 평균을 구합니다. 33300 / 8 = 4162.5입니다. ROUND로 정수화할 수 있습니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "가장 높은 급여를 구하세요. (최댓값 집계 함수)",
+      "code": "SELECT ______(salary) FROM employees;",
+      "answers": ["MAX"],
+      "ignoreCase": true,
+      "output": "6000",
+      "explain": "MAX(salary)는 최고 급여를 구합니다. 김철수의 6000이 최댓값입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "개발부(dept_id 2) 직원 수를 세세요. WHERE와 함께 사용합니다.",
+      "code": "SELECT COUNT(*) FROM employees ______ dept_id = 2;",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "3",
+      "explain": "COUNT(*)에 WHERE 조건을 더하면 조건에 맞는 행만 셉니다. 개발부 직원은 3명입니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "행의 개수를 세는 집계 함수는?",
+        "options": ["SUM", "COUNT", "TOTAL", "NUM"],
+        "answer": 1,
+        "explain": "COUNT가 행의 개수를 세는 함수입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "집계 함수에 대한 설명으로 옳은 것은?",
+        "options": [
+          "한 행을 여러 행으로 나눈다",
+          "여러 행을 하나의 요약 값으로 만든다",
+          "행을 삭제한다",
+          "열을 추가한다"
+        ],
+        "answer": 1,
+        "explain": "집계 함수는 여러 행을 하나의 요약 값(개수·합계·평균 등)으로 만듭니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "급여 평균을 구하는 함수는?",
+        "options": ["MEAN(salary)", "AVG(salary)", "AVERAGE(salary)", "MID(salary)"],
+        "answer": 1,
+        "explain": "SQL에서 평균은 AVG 함수입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "`SELECT MAX(salary), MIN(salary) FROM employees;` 의 결과로 옳은 것은? (급여 3000~6000)",
+        "options": ["6000, 3000", "3000, 6000", "4162.5, 4162.5", "8, 8"],
+        "answer": 0,
+        "explain": "MAX는 최댓값(6000), MIN은 최솟값(3000)입니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "개발부 직원 수를 세는 올바른 쿼리는?",
+        "options": [
+          "SELECT COUNT(*) FROM employees;",
+          "SELECT COUNT(*) FROM employees WHERE dept_id = 2;",
+          "SELECT SUM(*) FROM employees WHERE dept_id = 2;",
+          "SELECT dept_id FROM employees;"
+        ],
+        "answer": 1,
+        "explain": "COUNT(*)에 WHERE dept_id = 2 조건을 더하면 개발부 직원 수만 셉니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "집계 함수 결과에도 별칭을 붙일 수 있나요?", "a": "네. SELECT COUNT(*) AS 직원수 처럼 AS로 별칭을 붙이면 결과 열 제목이 보기 좋아집니다." },
+    { "q": "집계 함수와 일반 열을 같이 SELECT하면 안 되나요?", "a": "GROUP BY 없이 집계 함수와 일반 열(emp_name 등)을 함께 쓰면 의도치 않은 결과나 오류가 납니다. 일반 열과 함께 집계하려면 GROUP BY가 필요합니다(뒤 토픽)." },
+    { "q": "AVG 결과가 소수로 나오는데 정수로 만들려면?", "a": "ROUND(AVG(salary))처럼 ROUND로 감싸면 됩니다. 트랙3에서 배운 숫자 함수를 집계 결과에도 적용할 수 있습니다." }
+  ]
+}

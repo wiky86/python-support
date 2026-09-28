@@ -1,0 +1,119 @@
+{
+  "id": "track4.aggregate-combine",
+  "trackId": "track4",
+  "order": 6,
+  "title": "집계 종합 — 조회의 전체 흐름",
+  "content": "## 지금까지 배운 것을 한 쿼리로\n\n이 토픽에서는 WHERE, GROUP BY, HAVING, ORDER BY, LIMIT를 모두 조합해 실전 같은 집계 쿼리를 만듭니다. 조회 쿼리의 전체 구조를 완성하는 단계입니다.\n\n## 전체 절의 순서 (작성 순서)\n\n```sql\nSELECT   dept_id, ROUND(AVG(salary)) AS avg_sal, COUNT(*) AS cnt\nFROM     employees\nWHERE    position != '부장'\nGROUP BY dept_id\nHAVING   COUNT(*) >= 2\nORDER BY avg_sal DESC\nLIMIT    3;\n```\n\n이 쿼리는 이렇게 읽습니다: 부장을 제외하고(WHERE), 부서별로 묶어(GROUP BY) 평균 급여와 인원을 구한 뒤, 인원 2명 이상인 부서만(HAVING), 평균 급여 높은 순으로(ORDER BY) 상위 3개(LIMIT).\n\n## 작성 순서 정리\n\n항상 이 순서를 지킵니다.\n\n1. **SELECT** — 무엇을 볼지(열·집계)\n2. **FROM** — 어느 테이블에서\n3. **WHERE** — 개별 행 조건 (그룹화 전)\n4. **GROUP BY** — 그룹 기준\n5. **HAVING** — 그룹 조건 (그룹화 후)\n6. **ORDER BY** — 정렬\n7. **LIMIT** — 개수 제한\n\n## 별칭을 ORDER BY에서 쓰기\n\nSELECT에서 붙인 별칭(avg_sal)을 ORDER BY에서 쓸 수 있습니다. 집계 결과를 정렬 기준으로 삼을 때 편리합니다.\n\n## 자주 쓰는 패턴\n\n'부서별 평균 급여를 높은 순으로' 같은 요청은 실무에서 매우 흔합니다.\n\n```sql\nSELECT dept_id, ROUND(AVG(salary)) AS avg_sal\nFROM employees\nGROUP BY dept_id\nORDER BY avg_sal DESC;\n```\n\n이 패턴(그룹 집계 + 정렬)을 익혀두면 대부분의 요약 조회를 해결할 수 있습니다.\n\n## 정리\n\n조회 쿼리는 SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT 순서로 작성합니다. 이 흐름을 이해하면 복잡한 요약 조회도 단계별로 조립할 수 있습니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "부서별 평균 급여를 높은 순으로 조회하세요. 정렬 절을 넣으세요.",
+      "code": "SELECT dept_id, ROUND(AVG(salary)) AS avg_sal FROM employees GROUP BY dept_id ______ avg_sal DESC;",
+      "answers": ["ORDER BY"],
+      "ignoreCase": true,
+      "output": "(4,4800) (1,4600) (2,4100) (3,3500)",
+      "explain": "GROUP BY로 부서별 평균을 구한 뒤 ORDER BY avg_sal DESC로 평균 높은 순 정렬합니다. SELECT의 별칭을 ORDER BY에서 쓸 수 있습니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "위 쿼리에서 인원이 2명 이상인 부서만 남기려 합니다. 그룹 조건 절을 넣으세요.",
+      "code": "SELECT dept_id, COUNT(*) cnt FROM employees GROUP BY dept_id ______ COUNT(*) >= 2 ORDER BY cnt DESC;",
+      "answers": ["HAVING"],
+      "ignoreCase": true,
+      "output": "(2,3) (1,2) (3,2)",
+      "explain": "HAVING COUNT(*) >= 2 로 2명 이상 부서만 남기고, cnt 내림차순으로 정렬합니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "부장 제외 후 부서별 평균을 구하려 합니다. 그룹화 전에 부장을 거르는 절을 넣으세요.",
+      "code": "SELECT dept_id, ROUND(AVG(salary)) FROM employees ______ position != '부장' GROUP BY dept_id;",
+      "answers": ["WHERE"],
+      "ignoreCase": true,
+      "output": "부장을 뺀 부서별 평균 급여",
+      "explain": "WHERE는 그룹화 전에 개별 행(부장)을 거릅니다. 그 후 GROUP BY로 부서별 평균을 구합니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "평균 급여 상위 2개 부서만 조회하려 합니다. 개수 제한 절을 넣으세요.",
+      "code": "SELECT dept_id, ROUND(AVG(salary)) a FROM employees GROUP BY dept_id ORDER BY a DESC ______ 2;",
+      "answers": ["LIMIT"],
+      "ignoreCase": true,
+      "output": "(4,4800) (1,4600)",
+      "explain": "ORDER BY로 평균 높은 순 정렬 후 LIMIT 2로 상위 2개 부서만 뽑습니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "조회 쿼리 작성 순서에서 GROUP BY 바로 다음, ORDER BY 바로 앞에 오는 절은?",
+      "code": "... GROUP BY → ______ → ORDER BY ...",
+      "answers": ["HAVING"],
+      "ignoreCase": true,
+      "output": "HAVING (그룹화 후 그룹 조건)",
+      "explain": "작성 순서는 WHERE → GROUP BY → HAVING → ORDER BY 입니다. HAVING이 GROUP BY 다음, ORDER BY 앞에 옵니다."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "조회 쿼리 절의 올바른 작성 순서는?",
+        "options": [
+          "SELECT → WHERE → FROM → GROUP BY → ORDER BY",
+          "SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT",
+          "FROM → SELECT → GROUP BY → WHERE → ORDER BY",
+          "SELECT → GROUP BY → FROM → WHERE → HAVING"
+        ],
+        "answer": 1,
+        "explain": "SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT 순서입니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "SELECT에서 붙인 별칭(avg_sal)을 사용할 수 있는 절은?",
+        "options": ["WHERE", "ORDER BY", "GROUP BY 이전", "FROM"],
+        "answer": 1,
+        "explain": "ORDER BY에서는 SELECT의 별칭을 쓸 수 있습니다. 집계 결과를 정렬 기준으로 삼을 때 편리합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "'부서별 평균 급여를 높은 순으로'를 구현하는 핵심 조합은?",
+        "options": [
+          "WHERE + ORDER BY",
+          "GROUP BY + 집계 함수 + ORDER BY",
+          "DISTINCT + LIMIT",
+          "HAVING만"
+        ],
+        "answer": 1,
+        "explain": "GROUP BY로 부서별로 묶고, AVG로 평균을 구하고, ORDER BY로 정렬합니다. 요약 조회의 대표 패턴입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "다음 중 그룹화 '후'에 적용되는 절만 모은 것은?",
+        "options": [
+          "WHERE, GROUP BY",
+          "HAVING, (그리고 집계 결과 기준의) ORDER BY",
+          "FROM, WHERE",
+          "SELECT, FROM"
+        ],
+        "answer": 1,
+        "explain": "HAVING은 그룹화 후 그룹 조건을, ORDER BY는 (집계 결과 포함) 정렬을 그룹화 후에 적용합니다. WHERE는 그룹화 전입니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "평균 급여 상위 2개 부서를 구할 때 마지막에 붙이는 절은?",
+        "options": ["WHERE 2", "LIMIT 2", "TOP 2", "HAVING 2"],
+        "answer": 1,
+        "explain": "MySQL에서는 ORDER BY로 정렬 후 LIMIT 2로 상위 2개를 뽑습니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "절 순서를 틀리면 어떻게 되나요?", "a": "문법 오류가 납니다. 예를 들어 WHERE를 GROUP BY 뒤에 쓰면 오류입니다. SELECT→FROM→WHERE→GROUP BY→HAVING→ORDER BY→LIMIT 순서를 지켜야 합니다." },
+    { "q": "실행 순서와 작성 순서가 다른가요?", "a": "네, 미묘하게 다릅니다. 작성은 SELECT부터 쓰지만, 실행은 FROM→WHERE→GROUP BY→HAVING→SELECT→ORDER BY→LIMIT 순입니다. 그래서 WHERE에서는 SELECT 별칭을 못 쓰고 ORDER BY에서는 쓸 수 있습니다." },
+    { "q": "이 조합을 다 외워야 하나요?", "a": "억지로 외우기보다 '행 거르기(WHERE) → 묶기(GROUP BY) → 그룹 거르기(HAVING) → 정렬(ORDER BY) → 자르기(LIMIT)'라는 흐름으로 이해하면 자연스럽게 순서가 기억됩니다." }
+  ]
+}

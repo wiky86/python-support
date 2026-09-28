@@ -11,7 +11,7 @@ import { BadgeDefinition } from "@/types/content";
 
 export const metadata: Metadata = {
   title: "배지 도감 · UBION KDT DataLab",
-  description: "파이썬 데이터 분석 및 디지털 금융 이론, 통합 성취 배지 도감",
+  description: "파이썬 데이터 분석, 디지털 금융 이론, SQL 데이터베이스 및 통합 성취 배지 도감",
 };
 
 export default function BadgesPage() {

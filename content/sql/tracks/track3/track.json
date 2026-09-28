@@ -1,0 +1,23 @@
+{
+  "id": "track3",
+  "order": 3,
+  "title": "정렬과 함수",
+  "description": "조회 결과를 원하는 순서로 정렬(ORDER BY)하고 상위 N개만 뽑는 법(LIMIT), 그리고 문자열·숫자·날짜를 다루는 함수들을 배웁니다. 데이터를 보기 좋게 가공하는 기술입니다.",
+  "topicOrder": [
+    "track3.order-by",
+    "track3.order-limit",
+    "track3.string-func",
+    "track3.number-func",
+    "track3.date-func",
+    "track3.func-combine"
+  ],
+  "topicFiles": [
+    "topics/t1-order-by.json",
+    "topics/t2-order-limit.json",
+    "topics/t3-string-func.json",
+    "topics/t4-number-func.json",
+    "topics/t5-date-func.json",
+    "topics/t6-func-combine.json"
+  ],
+  "projectFile": "project.json"
+}

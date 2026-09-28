@@ -1,0 +1,23 @@
+{
+  "id": "track5",
+  "order": 5,
+  "title": "여러 테이블 다루기 — JOIN",
+  "description": "두 개 이상의 테이블을 연결해 조회하는 JOIN을 배웁니다. INNER JOIN, LEFT JOIN의 차이, 조인과 집계의 결합, 자기 자신과의 조인까지. 관계형 데이터베이스의 진짜 힘을 활용하는 핵심 기술입니다.",
+  "topicOrder": [
+    "track5.join-intro",
+    "track5.inner-join",
+    "track5.join-alias",
+    "track5.outer-join",
+    "track5.join-aggregate",
+    "track5.self-join"
+  ],
+  "topicFiles": [
+    "topics/t1-join-intro.json",
+    "topics/t2-inner-join.json",
+    "topics/t3-join-alias.json",
+    "topics/t4-outer-join.json",
+    "topics/t5-join-aggregate.json",
+    "topics/t6-self-join.json"
+  ],
+  "projectFile": "project.json"
+}
