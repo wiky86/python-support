@@ -53,7 +53,7 @@ export function CourseSelectorView({
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-          <div className="space-y-3 max-w-2xl">
+          <div className="space-y-4 max-w-2xl">
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30 flex items-center gap-1.5">
                 <GraduationCap className="w-3.5 h-3.5" />
@@ -61,11 +61,11 @@ export function CourseSelectorView({
               </span>
               <span className="text-xs text-slate-400 font-mono">단일 계정 멀티 트랙</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-snug sm:leading-[1.38]">
               파이썬 데이터 분석 · 디지털 금융 <br className="hidden sm:block" />
               SQL · 금융데이터 분석까지 한번에.
             </h1>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <p className="text-sm text-slate-300 leading-relaxed sm:leading-loose">
               파이썬 데이터 분석 실무, 디지털 금융시장 이론, SQL 질의 언어 및 실전 금융 데이터 분석을 단계별 실습과 퀴즈로 학습하고 통합 성취도를 관리하세요.
             </p>
           </div>
@@ -165,7 +165,7 @@ export function CourseSelectorView({
             return (
               <div
                 key={course.id}
-                className={`p-6 sm:p-7 rounded-3xl border transition-all duration-300 hover:shadow-xl relative flex flex-col justify-between group ${
+                className={`p-6 rounded-3xl border transition-all duration-300 hover:shadow-xl relative flex flex-col justify-between group ${
                   isPython
                     ? "bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-transparent dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-transparent border-emerald-200/80 dark:border-emerald-800/60 hover:border-emerald-400 dark:hover:border-emerald-600"
                     : isFinance
@@ -175,54 +175,47 @@ export function CourseSelectorView({
                     : "bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-transparent dark:from-violet-950/20 dark:via-purple-950/10 dark:to-transparent border-violet-200/80 dark:border-violet-800/60 hover:border-violet-400 dark:hover:border-violet-600"
                 }`}
               >
-                <div className="space-y-4">
-                  {/* Card Header */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 ${
-                          isPython
-                            ? "bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-emerald-500/20"
-                            : isFinance
-                            ? "bg-gradient-to-tr from-amber-600 to-yellow-500 shadow-amber-500/20"
-                            : isSql
-                            ? "bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-blue-500/20"
-                            : "bg-gradient-to-tr from-violet-600 to-purple-500 shadow-violet-500/20"
-                        }`}
-                      >
-                        {isPython ? (
-                          <Terminal className="w-6 h-6" />
-                        ) : isFinance ? (
-                          <Landmark className="w-6 h-6" />
-                        ) : isSql ? (
-                          <Database className="w-6 h-6" />
-                        ) : (
-                          <BarChart3 className="w-6 h-6" />
-                        )}
-                      </div>
-                      <div>
-                        <span
-                          className={`text-[11px] font-bold font-mono px-2 py-0.5 rounded-md ${
-                            isPython
-                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                              : isFinance
-                              ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
-                              : isSql
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-                              : "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300"
-                          }`}
-                        >
-                          TRACK {course.trackCount}개
-                        </span>
-                        <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-1">
-                          {course.title}
-                        </h3>
-                      </div>
+                <div className="space-y-3.5">
+                  {/* Card Header Top: Icon & Badges */}
+                  <div className="flex items-center justify-between">
+                    <div
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 ${
+                        isPython
+                          ? "bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-emerald-500/20"
+                          : isFinance
+                          ? "bg-gradient-to-tr from-amber-600 to-yellow-500 shadow-amber-500/20"
+                          : isSql
+                          ? "bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-blue-500/20"
+                          : "bg-gradient-to-tr from-violet-600 to-purple-500 shadow-violet-500/20"
+                      }`}
+                    >
+                      {isPython ? (
+                        <Terminal className="w-5 h-5" />
+                      ) : isFinance ? (
+                        <Landmark className="w-5 h-5" />
+                      ) : isSql ? (
+                        <Database className="w-5 h-5" />
+                      ) : (
+                        <BarChart3 className="w-5 h-5" />
+                      )}
                     </div>
 
-                    <div className="text-right">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[11px] font-bold font-mono px-2 py-0.5 rounded-md ${
+                          isPython
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                            : isFinance
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                            : isSql
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                            : "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300"
+                        }`}
+                      >
+                        TRACK {course.trackCount}개
+                      </span>
                       <div
-                        className={`text-xs font-mono font-bold ${
+                        className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100/90 dark:bg-slate-800/90 ${
                           isPython
                             ? "text-emerald-600 dark:text-emerald-400"
                             : isFinance
@@ -234,21 +227,25 @@ export function CourseSelectorView({
                       >
                         Lv.{courseLevel}
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                        {courseXp.toLocaleString()} XP
-                      </div>
                     </div>
                   </div>
 
+                  {/* Course Title */}
+                  <div className="min-h-[32px] flex items-center">
+                    <h3 className="text-lg sm:text-[19px] font-extrabold text-slate-900 dark:text-white break-keep tracking-tight leading-snug">
+                      {course.title}
+                    </h3>
+                  </div>
+
                   {/* Description */}
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed min-h-[40px]">
+                  <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed min-h-[56px] break-keep">
                     {course.description}
                   </p>
 
                   {/* Progress Bar */}
-                  <div className="space-y-1.5 pt-2">
+                  <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 dark:text-slate-400 font-medium">
+                      <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">
                         진도율 ({completedCount}/{totalTopics} 토픽)
                       </span>
                       <span
@@ -282,8 +279,38 @@ export function CourseSelectorView({
                   </div>
                 </div>
 
-                {/* Card Action Links */}
-                <div className="pt-6 space-y-2.5">
+                {/* Card Action Links: Mini buttons on top, Main Action Button on the very bottom */}
+                <div className="pt-5 space-y-2 mt-auto">
+                  {(hasDiag || hasRoad) ? (
+                    <div className={`grid gap-1.5 text-xs ${hasDiag && hasRoad ? "grid-cols-2" : "grid-cols-1"}`}>
+                      {hasDiag && (
+                        <Link
+                          href={`/${course.id}/diagnostic`}
+                          prefetch={false}
+                          className="py-2 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
+                        >
+                          <Sparkles className="w-3 h-3 text-emerald-500" />
+                          <span>사전 진단</span>
+                        </Link>
+                      )}
+
+                      {hasRoad && (
+                        <Link
+                          href={`/${course.id}/roadmap`}
+                          prefetch={false}
+                          className="py-2 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
+                        >
+                          <Compass className="w-3 h-3 text-cyan-500" />
+                          <span>여정 로드맵</span>
+                        </Link>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="h-[34px] flex items-center justify-center text-[11px] text-slate-400 font-medium rounded-xl bg-slate-50/50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800">
+                      <span>실습 중심 프로젝트 코스</span>
+                    </div>
+                  )}
+
                   <Link
                     href={`/${course.id}`}
                     prefetch={false}
@@ -300,32 +327,6 @@ export function CourseSelectorView({
                     <span>{completedCount > 0 ? "이어서 학습하기" : "과목 학습 시작하기"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
-
-                  {(hasDiag || hasRoad) && (
-                    <div className={`grid gap-2 text-xs ${hasDiag && hasRoad ? "grid-cols-2" : "grid-cols-1"}`}>
-                      {hasDiag && (
-                        <Link
-                          href={`/${course.id}/diagnostic`}
-                          prefetch={false}
-                          className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
-                        >
-                          <Sparkles className="w-3 h-3 text-emerald-500" />
-                          <span>사전 진단</span>
-                        </Link>
-                      )}
-
-                      {hasRoad && (
-                        <Link
-                          href={`/${course.id}/roadmap`}
-                          prefetch={false}
-                          className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
-                        >
-                          <Compass className="w-3 h-3 text-cyan-500" />
-                          <span>여정 로드맵</span>
-                        </Link>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             );
