@@ -26,6 +26,7 @@ import {
   Compass,
   HelpCircle,
   Layers,
+  BarChart3,
 } from "lucide-react";
 
 interface DashboardViewProps {
@@ -34,6 +35,8 @@ interface DashboardViewProps {
   topicsMap: Record<string, Topic>;
   badges: BadgeDefinition[];
   projectsMap?: Record<string, Project>;
+  hasDiagnostic?: boolean;
+  hasRoadmap?: boolean;
 }
 
 export function DashboardView({
@@ -42,12 +45,15 @@ export function DashboardView({
   topicsMap,
   badges,
   projectsMap = {},
+  hasDiagnostic = false,
+  hasRoadmap = false,
 }: DashboardViewProps) {
   const { stats, progress, courseProgressMap, badges: userBadges } = useAuth();
 
   const isPython = course.id === "python";
   const isFinance = course.id === "finance";
   const isSql = course.id === "sql";
+  const isFindata = course.id === "findata";
 
   // Calculate course-specific progress
   const courseProgMap = courseProgressMap[course.id] || {};
@@ -91,12 +97,20 @@ export function DashboardView({
             ? "bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-emerald-500/20"
             : isFinance
             ? "bg-gradient-to-r from-amber-950 via-slate-900 to-yellow-950 border-amber-500/20"
-            : "bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border-blue-500/20"
+            : isSql
+            ? "bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border-blue-500/20"
+            : "bg-gradient-to-r from-violet-950 via-slate-900 to-purple-950 border-violet-500/20"
         }`}
       >
         <div
           className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
-            isPython ? "bg-emerald-500/10" : isFinance ? "bg-amber-500/10" : "bg-blue-500/10"
+            isPython
+              ? "bg-emerald-500/10"
+              : isFinance
+              ? "bg-amber-500/10"
+              : isSql
+              ? "bg-blue-500/10"
+              : "bg-violet-500/10"
           }`}
         />
 
@@ -109,15 +123,19 @@ export function DashboardView({
                     ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
                     : isFinance
                     ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                    : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                    : isSql
+                    ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                    : "bg-violet-500/20 text-violet-300 border-violet-500/30"
                 }`}
               >
                 {isPython ? (
                   <Terminal className="w-3.5 h-3.5" />
                 ) : isFinance ? (
                   <Landmark className="w-3.5 h-3.5" />
-                ) : (
+                ) : isSql ? (
                   <Database className="w-3.5 h-3.5" />
+                ) : (
+                  <BarChart3 className="w-3.5 h-3.5" />
                 )}
                 {course.title}
               </span>
@@ -140,7 +158,13 @@ export function DashboardView({
               </div>
               <div
                 className={`text-xl font-bold font-mono mt-1 ${
-                  isPython ? "text-emerald-400" : "text-amber-400"
+                  isPython
+                    ? "text-emerald-400"
+                    : isFinance
+                    ? "text-amber-400"
+                    : isSql
+                    ? "text-blue-400"
+                    : "text-violet-400"
                 }`}
               >
                 Lv.{courseLevel}
@@ -192,66 +216,72 @@ export function DashboardView({
         </div>
       </div>
 
-      {/* 1.5 Pre-learning Diagnostic & Roadmap Action Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Diagnostic Test Card */}
-        <Link
-          href={`/${course.id}/diagnostic`}
-          prefetch={false}
-          className="p-5 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent dark:from-emerald-950/30 dark:via-teal-950/10 dark:to-transparent border border-emerald-500/30 hover:border-emerald-500/60 dark:hover:border-emerald-500/50 transition-all hover:shadow-lg flex items-center justify-between gap-4 group"
-        >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform flex-shrink-0">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">
-                  사전 점검
-                </span>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                  {course.shortTitle} 사전 진단 테스트
-                </h3>
+      {/* 1.5 Pre-learning Diagnostic & Roadmap Action Cards (if available) */}
+      {(hasDiagnostic || hasRoadmap) && (
+        <div className={`grid grid-cols-1 ${hasDiagnostic && hasRoadmap ? "md:grid-cols-2" : ""} gap-4`}>
+          {/* Diagnostic Test Card */}
+          {hasDiagnostic && (
+            <Link
+              href={`/${course.id}/diagnostic`}
+              prefetch={false}
+              className="p-5 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent dark:from-emerald-950/30 dark:via-teal-950/10 dark:to-transparent border border-emerald-500/30 hover:border-emerald-500/60 dark:hover:border-emerald-500/50 transition-all hover:shadow-lg flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform flex-shrink-0">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">
+                      사전 점검
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      {course.shortTitle} 사전 진단 테스트
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                    트랙별 선수 이해도를 점검하고 나의 강약 지도를 확인해보세요.
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                트랙별 선수 이해도를 점검하고 나의 강약 지도를 확인해보세요.
-              </p>
-            </div>
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0">
-            <ArrowRight className="w-4 h-4" />
-          </div>
-        </Link>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          )}
 
-        {/* Course Roadmap & Journey Card */}
-        <Link
-          href={`/${course.id}/roadmap`}
-          prefetch={false}
-          className="p-5 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-indigo-500/5 to-transparent dark:from-cyan-950/30 dark:via-indigo-950/10 dark:to-transparent border border-cyan-500/30 hover:border-cyan-500/60 dark:hover:border-cyan-500/50 transition-all hover:shadow-lg flex items-center justify-between gap-4 group"
-        >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center shadow-md shadow-cyan-600/20 group-hover:scale-105 transition-transform flex-shrink-0">
-              <Compass className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-300">
-                  실무 여정
-                </span>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                  과정 전체 로드맵 &amp; 맛보기
-                </h3>
+          {/* Course Roadmap & Journey Card */}
+          {hasRoadmap && (
+            <Link
+              href={`/${course.id}/roadmap`}
+              prefetch={false}
+              className="p-5 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-indigo-500/5 to-transparent dark:from-cyan-950/30 dark:via-indigo-950/10 dark:to-transparent border border-cyan-500/30 hover:border-cyan-500/60 dark:hover:border-cyan-500/50 transition-all hover:shadow-lg flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center shadow-md shadow-cyan-600/20 group-hover:scale-105 transition-transform flex-shrink-0">
+                  <Compass className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-300">
+                      실무 여정
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      과정 전체 로드맵 &amp; 맛보기
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                    트랙별 실무 가치를 한눈에 보고 인터랙티브 계산기를 체험하세요.
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
-                트랙별 실무 가치를 한눈에 보고 인터랙티브 계산기를 체험하세요.
-              </p>
-            </div>
-          </div>
-          <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0">
-            <ArrowRight className="w-4 h-4" />
-          </div>
-        </Link>
-      </div>
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0">
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* 2. Track Roadmap Cards */}
       <div className="space-y-6">

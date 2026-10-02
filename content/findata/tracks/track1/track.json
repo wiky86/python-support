@@ -1,0 +1,17 @@
+{
+  "id": "track8",
+  "order": 1,
+  "title": "주가 데이터 분석",
+  "description": "가상 회사의 월별 주가 데이터로 수익률과 변동성을 계산해, 이 주식이 어땠는지를 숫자로 읽어봅니다. 금융 데이터 분석의 가장 기본인 주가 분석을 체험하는 트랙입니다.",
+  "topicOrder": [
+    "track1.finance-data-intro",
+    "track1.returns",
+    "track1.summary-stats"
+  ],
+  "topicFiles": [
+    "topics/t1-finance-data-intro.json",
+    "topics/t2-returns.json",
+    "topics/t3-summary-stats.json"
+  ],
+  "projectFile": "project.json"
+}

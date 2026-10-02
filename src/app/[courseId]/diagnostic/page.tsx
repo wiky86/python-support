@@ -11,9 +11,11 @@ interface DiagnosticPageProps {
 
 export function generateStaticParams() {
   const courses = getAllCourses();
-  return courses.map((course) => ({
-    courseId: course.id,
-  }));
+  return courses
+    .filter((course) => getDiagnostic(course.id) !== null)
+    .map((course) => ({
+      courseId: course.id,
+    }));
 }
 
 export function generateMetadata({ params }: DiagnosticPageProps): Metadata {

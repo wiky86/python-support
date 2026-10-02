@@ -23,6 +23,7 @@ import {
   Landmark,
   Database,
   Code2,
+  BarChart3,
 } from "lucide-react";
 
 export function Navbar() {
@@ -35,6 +36,7 @@ export function Navbar() {
   const isPython = pathname?.startsWith("/python");
   const isFinance = pathname?.startsWith("/finance");
   const isSql = pathname?.startsWith("/sql");
+  const isFindata = pathname?.startsWith("/findata");
   const isCodingTest = pathname?.startsWith("/coding-test");
 
   return (
@@ -70,7 +72,7 @@ export function Navbar() {
                   <span className="text-slate-800 dark:text-white"> DataLab</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-normal leading-none">
-                  파이썬 · 금융 · SQL
+                  파이썬 · 금융 · SQL · 금융데이터
                 </span>
               </div>
             </Link>
@@ -127,6 +129,19 @@ export function Navbar() {
               >
                 <Database className="w-3.5 h-3.5 text-blue-500" />
                 SQL
+              </Link>
+
+              <Link
+                href="/findata"
+                prefetch={false}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+                  isFindata
+                    ? "bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800/80"
+                    : "text-slate-600 hover:text-violet-600 dark:text-slate-300 dark:hover:text-violet-400"
+                }`}
+              >
+                <BarChart3 className="w-3.5 h-3.5 text-violet-500" />
+                금융데이터
               </Link>
 
               <Link

@@ -18,6 +18,7 @@ import {
   Landmark,
   Database,
   Globe,
+  BarChart3,
 } from "lucide-react";
 
 interface BadgesViewProps {
@@ -128,6 +129,7 @@ export function BadgesView({
           const courseBadgeCount = (courseBadgesMap[course.id] || []).length;
           const isPython = course.id === "python";
           const isFinance = course.id === "finance";
+          const isSql = course.id === "sql";
 
           return (
             <button
@@ -139,7 +141,9 @@ export function BadgesView({
                     ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
                     : isFinance
                     ? "border-amber-500 text-amber-600 dark:text-amber-400"
-                    : "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : isSql
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : "border-violet-500 text-violet-600 dark:text-violet-400"
                   : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
@@ -147,8 +151,10 @@ export function BadgesView({
                 <Terminal className="w-4 h-4 text-emerald-500" />
               ) : isFinance ? (
                 <Landmark className="w-4 h-4 text-amber-500" />
-              ) : (
+              ) : isSql ? (
                 <Database className="w-4 h-4 text-blue-500" />
+              ) : (
+                <BarChart3 className="w-4 h-4 text-violet-500" />
               )}
               <span>{course.title} ({courseBadgeCount})</span>
             </button>

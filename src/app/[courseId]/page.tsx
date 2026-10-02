@@ -7,6 +7,8 @@ import {
   getAllTopics,
   getCourseBadges,
   getProject,
+  getDiagnostic,
+  getRoadmap,
 } from "@/lib/content";
 import { DashboardView } from "@/components/DashboardView";
 import { Topic, Project } from "@/types/content";
@@ -44,6 +46,8 @@ export default function CoursePage({ params }: CoursePageProps) {
   const tracks = getAllTracks(params.courseId);
   const allTopics = getAllTopics(params.courseId);
   const badges = getCourseBadges(params.courseId);
+  const hasDiagnostic = getDiagnostic(params.courseId) !== null;
+  const hasRoadmap = getRoadmap(params.courseId) !== null;
 
   const topicsMap: Record<string, Topic> = {};
   allTopics.forEach((t) => {
@@ -67,6 +71,8 @@ export default function CoursePage({ params }: CoursePageProps) {
       topicsMap={topicsMap}
       badges={badges}
       projectsMap={projectsMap}
+      hasDiagnostic={hasDiagnostic}
+      hasRoadmap={hasRoadmap}
     />
   );
 }

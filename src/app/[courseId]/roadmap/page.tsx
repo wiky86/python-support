@@ -11,9 +11,11 @@ interface RoadmapPageProps {
 
 export function generateStaticParams() {
   const courses = getAllCourses();
-  return courses.map((course) => ({
-    courseId: course.id,
-  }));
+  return courses
+    .filter((course) => getRoadmap(course.id) !== null)
+    .map((course) => ({
+      courseId: course.id,
+    }));
 }
 
 export function generateMetadata({ params }: RoadmapPageProps): Metadata {

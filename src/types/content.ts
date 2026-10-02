@@ -81,10 +81,16 @@ export interface ProjectMission {
   explain?: string;
 }
 
+export interface ProjectReportConclusion {
+  title: string;
+  body: string;
+}
+
 export interface ProjectReport {
   title: string;
   template: string;
   computedValues: Record<string, string | number>;
+  conclusion?: ProjectReportConclusion;
   conceptsUsed: string[];
 }
 

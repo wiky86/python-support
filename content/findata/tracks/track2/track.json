@@ -1,0 +1,15 @@
+{
+  "id": "track2",
+  "order": 2,
+  "title": "환율 데이터 분석",
+  "description": "원/달러 환율 1년치 데이터를 분석합니다. 환율이 오르고 내리는 것이 무엇을 의미하는지, 변동률과 변동성을 구해 '환율이 얼마나 출렁였는지'를 숫자로 읽어봅니다. 주가와는 또 다른 금융 데이터를 다뤄보는 트랙입니다.",
+  "topicOrder": [
+    "track2.exchange-intro",
+    "track2.exchange-analysis"
+  ],
+  "topicFiles": [
+    "topics/t1-exchange-intro.json",
+    "topics/t2-exchange-analysis.json"
+  ],
+  "projectFile": "project.json"
+}

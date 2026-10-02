@@ -36,6 +36,18 @@
       "icon": "database",
       "contentPath": "content/sql",
       "trackCount": 8
+    },
+    {
+      "id": "findata",
+      "order": 4,
+      "title": "금융 데이터 분석",
+      "shortTitle": "금융데이터",
+      "description": "주가·환율·가계부 등 금융 데이터를 파이썬으로 직접 분석해보는 실습 중심 과목",
+      "theme": "findata",
+      "accent": "#8b5cf6",
+      "icon": "bar-chart",
+      "contentPath": "content/findata",
+      "trackCount": 3
     }
   ]
 }

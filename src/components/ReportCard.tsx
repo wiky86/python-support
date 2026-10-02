@@ -139,6 +139,19 @@ export function ReportCard({
           </div>
         </div>
 
+        {/* Optional Project Conclusion / Practical Takeaways */}
+        {report.conclusion && (
+          <div className="py-6 border-t border-slate-800/80 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+              <Sparkles className="w-4 h-4" />
+              <span>{report.conclusion.title || "프로젝트 결론 및 실무 연결"}</span>
+            </div>
+            <div className="p-5 rounded-2xl bg-indigo-950/40 border border-indigo-900/60 text-slate-200 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans">
+              {report.conclusion.body}
+            </div>
+          </div>
+        )}
+
         {/* Concepts Used Tag Pills */}
         {report.conceptsUsed && report.conceptsUsed.length > 0 && (
           <div className="pt-2">

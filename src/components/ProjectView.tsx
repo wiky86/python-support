@@ -194,6 +194,8 @@ export function ProjectView({
               ? "파이썬 데이터 분석"
               : courseId === "finance"
               ? "디지털 금융 이론"
+              : courseId === "findata"
+              ? "금융 데이터 분석"
               : "데이터베이스 활용을 위한 SQL"}
           </Link>
           <span>/</span>

@@ -1,0 +1,30 @@
+{
+  "_comment": "금융 데이터 분석 과목 배지. 모든 배지는 scope='course'. 획득 기록은 user_badges에 (course='findata', badge_id)로 저장. 실습 중심 소규모 과목이라 배지도 간결하게 구성. icon은 자리표시자.",
+  "conditionTypes": {
+    "topic_count": "이 과목에서 완료한 토픽 수가 gte 이상",
+    "topic_percent": "이 과목 전체 토픽 대비 완료 비율(%)이 gte 이상",
+    "quiz_pass_count": "이 과목에서 통과한 퀴즈 수가 gte 이상",
+    "perfect_quiz_count": "이 과목에서 만점 통과한 퀴즈 수가 gte 이상",
+    "project_count": "이 과목에서 완료한 미니 프로젝트 수가 gte 이상",
+    "track_complete": "이 과목의 trackId 트랙 모든 토픽 완료",
+    "all_tracks_complete": "이 과목의 모든 트랙 완료",
+    "flawless_track": "이 과목 한 트랙의 모든 퀴즈를 만점 통과(최초 통과 점수 기준)",
+    "streak": "현재 연속 접속 일수(streak_count)가 gte 이상 (계정 전체 스트릭)",
+    "level": "이 과목 레벨이 gte 이상"
+  },
+  "badges": [
+    { "id": "fd_first_topic",   "scope": "course", "name": "첫 발자국",       "desc": "첫 토픽을 완료했어요",              "icon": "footprints",  "condition": { "type": "topic_count", "gte": 1 } },
+    { "id": "fd_first_project", "scope": "course", "name": "첫 분석 완료",    "desc": "첫 데이터 분석 프로젝트를 완료했어요","icon": "rocket",      "condition": { "type": "project_count", "gte": 1 } },
+
+    { "id": "fd_track1_done",   "scope": "course", "name": "주가 분석가",     "desc": "주가 데이터 분석 트랙을 완주했어요",  "icon": "trending-up", "condition": { "type": "track_complete", "trackId": "track1" } },
+    { "id": "fd_track2_done",   "scope": "course", "name": "환율 분석가",     "desc": "환율 데이터 분석 트랙을 완주했어요",  "icon": "globe",       "condition": { "type": "track_complete", "trackId": "track2" } },
+    { "id": "fd_track3_done",   "scope": "course", "name": "가계부 분석가",   "desc": "가계부 지출 분석 트랙을 완주했어요",  "icon": "wallet",      "condition": { "type": "track_complete", "trackId": "track3" } },
+
+    { "id": "fd_all_tracks",    "scope": "course", "name": "금융 데이터 분석가","desc": "금융 데이터 분석 전 트랙을 완주했어요","icon": "bar-chart",   "condition": { "type": "all_tracks_complete" } },
+    { "id": "fd_all_projects",  "scope": "course", "name": "프로젝트 마스터", "desc": "분석 프로젝트 3개를 모두 완료했어요","icon": "award",       "condition": { "type": "project_count", "gte": 3 } },
+    { "id": "fd_perfect_1",     "scope": "course", "name": "만점왕",         "desc": "퀴즈를 만점으로 통과했어요",        "icon": "star",        "condition": { "type": "perfect_quiz_count", "gte": 1 } },
+
+    { "id": "fd_streak_7",      "scope": "course", "name": "일주일 개근",     "desc": "7일 연속 접속했어요",              "icon": "flame",       "condition": { "type": "streak", "gte": 7 } },
+    { "id": "fd_level_5",       "scope": "course", "name": "레벨 5 달성",     "desc": "금융 데이터 분석 레벨 5에 도달했어요","icon": "chevrons-up", "condition": { "type": "level", "gte": 5 } }
+  ]
+}

@@ -34,6 +34,7 @@ import {
   ListChecks,
   Terminal,
   Landmark,
+  Wallet,
 } from "lucide-react";
 
 interface BadgeIconProps {
@@ -115,6 +116,8 @@ export function BadgeIcon({ icon, className = "w-6 h-6" }: BadgeIconProps) {
       return <Terminal className={className} />;
     case "landmark":
       return <Landmark className={className} />;
+    case "wallet":
+      return <Wallet className={className} />;
     default:
       return <Award className={className} />;
   }

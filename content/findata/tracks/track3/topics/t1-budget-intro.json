@@ -1,0 +1,124 @@
+{
+  "id": "track3.budget-intro",
+  "trackId": "track3",
+  "order": 1,
+  "title": "가계부 데이터 다루기",
+  "content": "## 가장 일상적인 금융 데이터\n\n주가·환율은 시간에 따라 변하는 '시계열' 데이터라 리스트로 다뤘습니다. 그런데 가계부처럼 '**항목별 금액**' 데이터는 **딕셔너리**가 더 잘 맞습니다. 카테고리(키)와 금액(값)의 짝이기 때문입니다.\n\n## 우리가 분석할 데이터\n\n한 달 카테고리별 지출입니다.\n\n```python\nexpenses = {\n    '식비': 450000,\n    '교통': 120000,\n    '주거': 600000,\n    '여가': 180000,\n    '기타': 150000\n}\n```\n\n딕셔너리로 '카테고리: 금액' 형태로 저장했습니다. 트랙(파이썬 과목)에서 배운 딕셔너리가 여기서 쓰입니다.\n\n## 값 조회하기\n\n```python\nprint(expenses['식비'])   # 450000\n```\n\n키('식비')로 값(지출액)을 조회합니다. '교통비가 얼마였지?'를 바로 확인할 수 있습니다.\n\n## 총지출 구하기\n\n```python\ntotal = sum(expenses.values())\nprint(total)   # 1500000\n```\n\n`values()`로 모든 금액을 꺼내 sum으로 더합니다. 한 달 총지출은 150만 원입니다.\n\n## 항목 수와 평균\n\n```python\nprint(len(expenses))                      # 5 (카테고리 수)\nprint(sum(expenses.values()) / len(expenses))   # 300000 (항목당 평균)\n```\n\n딕셔너리에서 len은 항목(키) 개수, values는 값들입니다. 리스트에서 쓰던 sum·len·평균이 딕셔너리의 values에도 그대로 적용됩니다.\n\n## 정리\n\n가계부처럼 '항목별 금액' 데이터는 딕셔너리(카테고리: 금액)로 다룹니다. 키로 값을 조회하고, values()로 금액들을 꺼내 총지출·평균을 구합니다. 리스트에서 쓰던 분석 방법이 딕셔너리 값에도 적용됩니다.",
+  "fillBlanks": [
+    {
+      "id": "fb1",
+      "prompt": "식비 지출액을 조회하세요. 딕셔너리에서 키로 값을 조회하는 형태를 완성하세요. (여는 기호)",
+      "code": "expenses = {'식비': 450000, '교통': 120000, '주거': 600000, '여가': 180000, '기타': 150000}\nprint(expenses______'식비'])",
+      "answers": ["["],
+      "ignoreCase": false,
+      "output": "450000",
+      "explain": "딕셔너리는 expenses['키'] 형태로 값을 조회합니다. expenses['식비']는 450000입니다."
+    },
+    {
+      "id": "fb2",
+      "prompt": "총지출을 구하세요. 딕셔너리의 '값들'을 꺼내는 메서드를 넣으세요.",
+      "code": "total = sum(expenses.______())\nprint(total)",
+      "answers": ["values"],
+      "ignoreCase": false,
+      "output": "1500000",
+      "explain": "values()는 딕셔너리의 모든 값(금액)을 반환합니다. sum으로 더하면 총지출 150만 원입니다."
+    },
+    {
+      "id": "fb3",
+      "prompt": "총지출을 구하는 합계 함수를 넣으세요.",
+      "code": "total = ______(expenses.values())\nprint(total)",
+      "answers": ["sum"],
+      "ignoreCase": false,
+      "output": "1500000",
+      "explain": "sum(expenses.values())로 모든 카테고리 지출을 더합니다."
+    },
+    {
+      "id": "fb4",
+      "prompt": "카테고리(항목) 개수를 구하세요. (개수 함수)",
+      "code": "print(______(expenses))",
+      "answers": ["len"],
+      "ignoreCase": false,
+      "output": "5",
+      "explain": "len(딕셔너리)는 키(항목)의 개수를 셉니다. 카테고리가 5개입니다."
+    },
+    {
+      "id": "fb5",
+      "prompt": "항목당 평균 지출을 구하세요. 값들의 합을 항목 수로 나눕니다. 값들을 꺼내는 메서드를 넣으세요.",
+      "code": "avg = sum(expenses.______()) / len(expenses)\nprint(avg)",
+      "answers": ["values"],
+      "ignoreCase": false,
+      "output": "300000.0",
+      "explain": "sum(values)/len으로 항목당 평균 지출 30만 원을 구합니다. 총 150만 원 ÷ 5항목."
+    }
+  ],
+  "quiz": {
+    "passThreshold": 0.8,
+    "questions": [
+      {
+        "id": "q1",
+        "type": "mcq",
+        "q": "가계부(항목별 금액) 데이터에 딕셔너리가 적합한 이유는?",
+        "options": [
+          "딕셔너리가 가장 빨라서",
+          "카테고리(키)-금액(값)의 짝으로 표현하기 좋아서",
+          "리스트는 금액을 못 담아서",
+          "딕셔너리만 금융에 쓸 수 있어서"
+        ],
+        "answer": 1,
+        "explain": "가계부는 '카테고리: 금액' 구조라 키-값 쌍인 딕셔너리로 표현하기 자연스럽습니다."
+      },
+      {
+        "id": "q2",
+        "type": "mcq",
+        "q": "`expenses['식비']` 가 하는 일은?",
+        "options": [
+          "식비 항목을 삭제",
+          "식비의 지출 금액을 조회",
+          "전체 합계",
+          "항목 개수"
+        ],
+        "answer": 1,
+        "explain": "딕셔너리에서 expenses['식비']는 '식비' 키에 해당하는 값(지출액)을 조회합니다."
+      },
+      {
+        "id": "q3",
+        "type": "mcq",
+        "q": "딕셔너리의 모든 값(금액)을 꺼내는 메서드는?",
+        "options": ["keys()", "values()", "items()", "sum()"],
+        "answer": 1,
+        "explain": "values()가 모든 값을 반환합니다. keys()는 키, items()는 키-값 쌍입니다."
+      },
+      {
+        "id": "q4",
+        "type": "mcq",
+        "q": "총지출을 구하는 올바른 코드는?",
+        "options": [
+          "sum(expenses)",
+          "sum(expenses.values())",
+          "sum(expenses.keys())",
+          "len(expenses)"
+        ],
+        "answer": 1,
+        "explain": "금액은 '값'이므로 expenses.values()를 sum으로 더합니다. sum(expenses)는 키를 더하려 해 오류/의도와 다릅니다."
+      },
+      {
+        "id": "q5",
+        "type": "mcq",
+        "q": "`len(expenses)` 가 가계부 딕셔너리에서 반환하는 것은?",
+        "options": [
+          "총지출 금액",
+          "카테고리(항목) 개수",
+          "가장 큰 금액",
+          "평균"
+        ],
+        "answer": 1,
+        "explain": "len(딕셔너리)는 키의 개수, 즉 카테고리(항목) 수를 반환합니다."
+      }
+    ]
+  },
+  "faq": [
+    { "q": "리스트로도 가계부를 만들 수 있지 않나요?", "a": "가능하지만 '어느 금액이 어느 항목인지' 알기 어렵습니다. 딕셔너리는 카테고리와 금액을 짝지어 저장해 '식비가 얼마'인지 바로 알 수 있어 더 적합합니다." },
+    { "q": "values()에 sum을 바로 쓸 수 있나요?", "a": "네. sum(expenses.values())처럼 바로 쓸 수 있습니다. values()가 숫자들을 반환하고 sum이 더합니다." },
+    { "q": "실제 가계부 앱도 이렇게 분석하나요?", "a": "원리는 같습니다. 카테고리별로 지출을 모으고, 합계·비중·추세를 계산합니다. 실제 앱은 데이터가 많고 날짜별 관리가 더해질 뿐, 기본은 이 분석입니다." }
+  ]
+}

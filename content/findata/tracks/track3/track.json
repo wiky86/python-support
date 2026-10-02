@@ -1,0 +1,15 @@
+{
+  "id": "track3",
+  "order": 3,
+  "title": "가계부 지출 분석",
+  "description": "한 달 가계부 데이터를 분석합니다. 카테고리별 지출을 딕셔너리로 다루며, 총지출·비중·최대 지출 항목을 구해 '돈이 어디에 쓰였는지'를 파악합니다. 주가·환율(리스트)과 달리 딕셔너리 데이터를 다루는, 가장 일상적인 금융 데이터 분석입니다.",
+  "topicOrder": [
+    "track3.budget-intro",
+    "track3.budget-analysis"
+  ],
+  "topicFiles": [
+    "topics/t1-budget-intro.json",
+    "topics/t2-budget-analysis.json"
+  ],
+  "projectFile": "project.json"
+}

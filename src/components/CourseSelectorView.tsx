@@ -29,12 +29,16 @@ interface CourseSelectorViewProps {
   courses: Course[];
   globalBadges: BadgeDefinition[];
   courseTopicCounts: Record<string, number>;
+  courseHasDiagnostic?: Record<string, boolean>;
+  courseHasRoadmap?: Record<string, boolean>;
 }
 
 export function CourseSelectorView({
   courses,
   globalBadges,
   courseTopicCounts,
+  courseHasDiagnostic = {},
+  courseHasRoadmap = {},
 }: CourseSelectorViewProps) {
   const { stats, progress, courseProgressMap, badges: userBadges } = useAuth();
   const { level: globalLevel, percent: globalPercent, xp: globalXp, xpInCurrentLevel, xpRequiredForNext } =
@@ -59,10 +63,10 @@ export function CourseSelectorView({
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
               파이썬 데이터 분석 · 디지털 금융 <br className="hidden sm:block" />
-              SQL 데이터베이스까지 한번에.
+              SQL · 금융데이터 분석까지 한번에.
             </h1>
             <p className="text-sm text-slate-300 leading-relaxed">
-              파이썬 데이터 분석 실무, 디지털 금융시장 이론, SQL 질의 언어를 단계별 실습과 퀴즈로 학습하고 통합 성취도를 관리하세요.
+              파이썬 데이터 분석 실무, 디지털 금융시장 이론, SQL 질의 언어 및 실전 금융 데이터 분석을 단계별 실습과 퀴즈로 학습하고 통합 성취도를 관리하세요.
             </p>
           </div>
 
@@ -137,11 +141,12 @@ export function CourseSelectorView({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           {courses.map((course) => {
             const isPython = course.id === "python";
             const isFinance = course.id === "finance";
             const isSql = course.id === "sql";
+            const isFindata = course.id === "findata";
 
             // Calculate course-specific stats
             const courseProgMap = courseProgressMap[course.id] || {};
@@ -149,10 +154,13 @@ export function CourseSelectorView({
             const completedCount = courseRows.filter(
               (p) => p.status === "completed" && !p.topic_id.endsWith(".project")
             ).length;
-            const totalTopics = courseTopicCounts[course.id] || (isPython ? 43 : isFinance ? 54 : 0);
+            const totalTopics = courseTopicCounts[course.id] || 0;
             const coursePercent = totalTopics > 0 ? Math.min(100, Math.round((completedCount / totalTopics) * 100)) : 0;
             const courseXp = calculateXpFromProgress(courseRows);
             const courseLevel = getLevel(courseXp);
+
+            const hasDiag = courseHasDiagnostic[course.id] ?? (course.id !== "findata");
+            const hasRoad = courseHasRoadmap[course.id] ?? (course.id !== "findata");
 
             return (
               <div
@@ -162,7 +170,9 @@ export function CourseSelectorView({
                     ? "bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-transparent dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-transparent border-emerald-200/80 dark:border-emerald-800/60 hover:border-emerald-400 dark:hover:border-emerald-600"
                     : isFinance
                     ? "bg-gradient-to-br from-amber-500/5 via-yellow-500/5 to-transparent dark:from-amber-950/20 dark:via-yellow-950/10 dark:to-transparent border-amber-200/80 dark:border-amber-800/60 hover:border-amber-400 dark:hover:border-amber-600"
-                    : "bg-gradient-to-br from-blue-500/5 via-indigo-500/5 to-transparent dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-transparent border-blue-200/80 dark:border-blue-800/60 hover:border-blue-400 dark:hover:border-blue-600"
+                    : isSql
+                    ? "bg-gradient-to-br from-blue-500/5 via-indigo-500/5 to-transparent dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-transparent border-blue-200/80 dark:border-blue-800/60 hover:border-blue-400 dark:hover:border-blue-600"
+                    : "bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-transparent dark:from-violet-950/20 dark:via-purple-950/10 dark:to-transparent border-violet-200/80 dark:border-violet-800/60 hover:border-violet-400 dark:hover:border-violet-600"
                 }`}
               >
                 <div className="space-y-4">
@@ -175,15 +185,19 @@ export function CourseSelectorView({
                             ? "bg-gradient-to-tr from-emerald-600 to-teal-400 shadow-emerald-500/20"
                             : isFinance
                             ? "bg-gradient-to-tr from-amber-600 to-yellow-500 shadow-amber-500/20"
-                            : "bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-blue-500/20"
+                            : isSql
+                            ? "bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-blue-500/20"
+                            : "bg-gradient-to-tr from-violet-600 to-purple-500 shadow-violet-500/20"
                         }`}
                       >
                         {isPython ? (
                           <Terminal className="w-6 h-6" />
                         ) : isFinance ? (
                           <Landmark className="w-6 h-6" />
-                        ) : (
+                        ) : isSql ? (
                           <Database className="w-6 h-6" />
+                        ) : (
+                          <BarChart3 className="w-6 h-6" />
                         )}
                       </div>
                       <div>
@@ -193,7 +207,9 @@ export function CourseSelectorView({
                               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
                               : isFinance
                               ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
-                              : "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                              : isSql
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                              : "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300"
                           }`}
                         >
                           TRACK {course.trackCount}개
@@ -211,7 +227,9 @@ export function CourseSelectorView({
                             ? "text-emerald-600 dark:text-emerald-400"
                             : isFinance
                             ? "text-amber-600 dark:text-amber-400"
-                            : "text-blue-600 dark:text-blue-400"
+                            : isSql
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-violet-600 dark:text-violet-400"
                         }`}
                       >
                         Lv.{courseLevel}
@@ -239,7 +257,9 @@ export function CourseSelectorView({
                             ? "text-emerald-600 dark:text-emerald-400"
                             : isFinance
                             ? "text-amber-600 dark:text-amber-400"
-                            : "text-blue-600 dark:text-blue-400"
+                            : isSql
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-violet-600 dark:text-violet-400"
                         }`}
                       >
                         {coursePercent}%
@@ -252,7 +272,9 @@ export function CourseSelectorView({
                             ? "bg-gradient-to-r from-emerald-500 to-teal-400"
                             : isFinance
                             ? "bg-gradient-to-r from-amber-500 to-yellow-400"
-                            : "bg-gradient-to-r from-blue-500 to-indigo-400"
+                            : isSql
+                            ? "bg-gradient-to-r from-blue-500 to-indigo-400"
+                            : "bg-gradient-to-r from-violet-500 to-purple-400"
                         }`}
                         style={{ width: `${coursePercent}%` }}
                       />
@@ -270,32 +292,40 @@ export function CourseSelectorView({
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
                         : isFinance
                         ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-500/20"
-                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20"
+                        : isSql
+                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20"
+                        : "bg-violet-600 hover:bg-violet-700 text-white shadow-violet-500/20"
                     }`}
                   >
                     <span>{completedCount > 0 ? "이어서 학습하기" : "과목 학습 시작하기"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <Link
-                      href={`/${course.id}/diagnostic`}
-                      prefetch={false}
-                      className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
-                    >
-                      <Sparkles className="w-3 h-3 text-emerald-500" />
-                      <span>사전 진단</span>
-                    </Link>
+                  {(hasDiag || hasRoad) && (
+                    <div className={`grid gap-2 text-xs ${hasDiag && hasRoad ? "grid-cols-2" : "grid-cols-1"}`}>
+                      {hasDiag && (
+                        <Link
+                          href={`/${course.id}/diagnostic`}
+                          prefetch={false}
+                          className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
+                        >
+                          <Sparkles className="w-3 h-3 text-emerald-500" />
+                          <span>사전 진단</span>
+                        </Link>
+                      )}
 
-                    <Link
-                      href={`/${course.id}/roadmap`}
-                      prefetch={false}
-                      className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
-                    >
-                      <Compass className="w-3 h-3 text-cyan-500" />
-                      <span>여정 로드맵</span>
-                    </Link>
-                  </div>
+                      {hasRoad && (
+                        <Link
+                          href={`/${course.id}/roadmap`}
+                          prefetch={false}
+                          className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 font-semibold text-center flex items-center justify-center gap-1 transition-colors text-[11px]"
+                        >
+                          <Compass className="w-3 h-3 text-cyan-500" />
+                          <span>여정 로드맵</span>
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
